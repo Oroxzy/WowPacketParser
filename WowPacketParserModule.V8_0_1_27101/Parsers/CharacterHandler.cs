@@ -1,6 +1,7 @@
 ﻿using WowPacketParser.Enums;
 using WowPacketParser.Misc;
 using WowPacketParser.Parsing;
+using WowPacketParser.Proto;
 using WowPacketParser.Store;
 using WowPacketParser.Store.Objects;
 
@@ -98,9 +99,10 @@ namespace WowPacketParserModule.V8_0_1_27101.Parsers
         [Parser(Opcode.SMSG_QUERY_PLAYER_NAME_RESPONSE)]
         public static void HandleNameQueryResponse(Packet packet)
         {
+            PacketQueryPlayerNameResponse response = packet.Holder.QueryPlayerNameResponse = new();
             var hasData = packet.ReadByte("HasData");
 
-            packet.ReadPackedGuid128("Player Guid");
+            response.PlayerGuid = packet.ReadPackedGuid128("Player Guid");
 
             if (hasData == 0)
             {
@@ -121,12 +123,13 @@ namespace WowPacketParserModule.V8_0_1_27101.Parsers
                 packet.ReadUInt64("GuildClubMemberID");
                 packet.ReadUInt32("VirtualRealmAddress");
 
-                packet.ReadByteE<Race>("Race");
-                packet.ReadByteE<Gender>("Gender");
-                packet.ReadByteE<Class>("Class");
-                packet.ReadByte("Level");
+                response.Race = (uint)packet.ReadByteE<Race>("Race");
+                response.Gender = (uint)packet.ReadByteE<Gender>("Gender");
+                response.Class = (uint)packet.ReadByteE<Class>("Class");
+                response.Level = packet.ReadByte("Level");
 
-                packet.ReadWoWString("Name", bits15);
+                response.PlayerName = packet.ReadWoWString("Name", bits15);
+                response.HasData = true;
             }
         }
 
@@ -345,10 +348,10 @@ namespace WowPacketParserModule.V8_0_1_27101.Parsers
                 packet.ReadInt32("SeasonPlayed", i);
                 packet.ReadInt32("SeasonWon", i);
                 packet.ReadInt32("WeeklyBestRating", i);
-                packet.ReadInt32("Unk710", i);
-                packet.ReadInt32("Unk801_1", i);
+                packet.ReadInt32("SeasonBestRating", i);
+                packet.ReadInt32("PvpTierID", i);
                 packet.ResetBitReader();
-                packet.ReadBit("Unk801_2", i);
+                packet.ReadBit("Disqualified", i);
             }
 
             if (hasGuildData)
@@ -407,9 +410,9 @@ namespace WowPacketParserModule.V8_0_1_27101.Parsers
             packet.ReadInt32("SeasonPlayed", idx);
             packet.ReadInt32("SeasonWon", idx);
             packet.ReadInt32("WeeklyBestRating", idx);
-            packet.ReadInt32("Unk710");
-            packet.ReadInt32("Unk801");
-            packet.ReadBit("Unk801_Bit");
+            packet.ReadInt32("SeasonBestRating", idx);
+            packet.ReadInt32("PvpTierID", idx);
+            packet.ReadBit("Disqualified", idx);
         }
 
         [Parser(Opcode.SMSG_INSPECT_PVP)]
@@ -444,7 +447,7 @@ namespace WowPacketParserModule.V8_0_1_27101.Parsers
             packet.ReadPackedGuid128("Item");
             packet.ReadUInt64("AzeriteXPGained");
         }
-        
+
         [Parser(Opcode.SMSG_PLAYER_AZERITE_ITEM_EQUIPPED_STATUS_CHANGED)]
         public static void HandlePlayerAzeriteItemEquippedStatusChanged(Packet packet)
         {

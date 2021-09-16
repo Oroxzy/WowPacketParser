@@ -355,6 +355,7 @@ namespace WowPacketParser.SQL.Builders
 
                     row.Data.PositionX = pointOfInterest.Item1.PositionX;
                     row.Data.PositionY = pointOfInterest.Item1.PositionY;
+                    row.Data.PositionZ = pointOfInterest.Item1.PositionZ;
                     row.Data.Icon = pointOfInterest.Item1.Icon;
                     row.Data.Flags = pointOfInterest.Item1.Flags;
                     row.Data.Importance = pointOfInterest.Item1.Importance;
@@ -564,8 +565,6 @@ namespace WowPacketParser.SQL.Builders
                     var creatureDiff = DBC.DBC.CreatureDifficulty.Where(diff => diff.Value.CreatureID == unit.Key.GetEntry());
                     if (creatureDiff.Any())
                     {
-                        template.MinLevel = creatureDiff.Select(lv => lv.Value.MinLevel).First();
-                        template.MaxLevel = creatureDiff.Select(lv => lv.Value.MaxLevel).First();
                         template.Faction  = creatureDiff.Select(lv => lv.Value.FactionTemplateID).First();
                     }
                 }

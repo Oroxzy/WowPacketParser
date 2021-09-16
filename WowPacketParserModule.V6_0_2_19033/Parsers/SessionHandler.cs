@@ -1,5 +1,4 @@
-﻿using System;
-using WowPacketParser.Enums;
+﻿using WowPacketParser.Enums;
 using WowPacketParser.Misc;
 using WowPacketParser.Parsing;
 using CoreParsers = WowPacketParser.Parsing.Parsers;
@@ -209,6 +208,7 @@ namespace WowPacketParserModule.V6_0_2_19033.Parsers
             var guid = packet.ReadPackedGuid128("Guid");
             ReadClientSettings(packet, "ClientSettings");
             CoreParsers.SessionHandler.LoginGuid = guid;
+            packet.Holder.PlayerLogin = new() { PlayerGuid = guid };
         }
 
         [Parser(Opcode.CMSG_AUTH_CONTINUED_SESSION)]

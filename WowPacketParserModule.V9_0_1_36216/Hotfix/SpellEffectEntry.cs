@@ -29,6 +29,8 @@ namespace WowPacketParserModule.V9_0_1_36216.Hotfix
         public float ResourceCoefficient { get; set; }
         public float GroupSizeBasePointsCoefficient { get; set; }
         public float EffectBasePoints { get; set; }
+        [HotfixVersion(ClientVersionBuild.V9_1_0_39185, false)]
+        public int ScalingClass { get; set; }
         [HotfixArray(2)]
         public int[] EffectMiscValue { get; set; }
         [HotfixArray(2)]

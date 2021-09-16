@@ -21,7 +21,8 @@ namespace WowPacketParser.Store
 
         // Templates
         public static readonly DataBag<AreaTriggerTemplate> AreaTriggerTemplates = new DataBag<AreaTriggerTemplate>(new List<SQLOutput> { SQLOutput.areatrigger_template });
-        public static readonly DataBag<AreaTriggerTemplateVertices> AreaTriggerTemplatesVertices = new DataBag<AreaTriggerTemplateVertices>(new List<SQLOutput> { SQLOutput.areatrigger_template_polygon_vertices });
+        public static readonly DataBag<SpellAreatriggerSpline> SpellAreaTriggerSplines = new DataBag<SpellAreatriggerSpline>(new List<SQLOutput> { SQLOutput.spell_areatrigger_splines });
+        public static readonly DataBag<SpellAreatriggerVertices> SpellAreaTriggerVertices = new DataBag<SpellAreatriggerVertices>(new List<SQLOutput> { SQLOutput.spell_areatrigger_vertices });
         public static readonly DataBag<ConversationActor> ConversationActors = new DataBag<ConversationActor>(new List<SQLOutput> { SQLOutput.conversation_actors });
         public static readonly DataBag<ConversationActorTemplate> ConversationActorTemplates = new DataBag<ConversationActorTemplate>(new List<SQLOutput> { SQLOutput.conversation_actor_template });
         public static readonly DataBag<ConversationLineTemplate> ConversationLineTemplates = new DataBag<ConversationLineTemplate>(new List<SQLOutput> { SQLOutput.conversation_line_template });
@@ -113,7 +114,7 @@ namespace WowPacketParser.Store
 
         public static readonly DataBag<HotfixData> HotfixDatas = new DataBag<HotfixData>(new List<SQLOutput> { SQLOutput.hotfix_data });
         public static readonly DataBag<HotfixBlob> HotfixBlobs = new DataBag<HotfixBlob>(new List<SQLOutput> { SQLOutput.hotfix_blob });
-        public static readonly DataBag<HotfixOptionalData> HotfixOptionalDatas = new DataBag<HotfixOptionalData>(new List<SQLOutput> {});
+        public static readonly DataBag<HotfixOptionalData> HotfixOptionalDatas = new DataBag<HotfixOptionalData>(new List<SQLOutput> { });
         // Scenes
         public static readonly DataBag<SceneTemplate> Scenes = new DataBag<SceneTemplate>(new List<SQLOutput> { SQLOutput.scene_template });
 
@@ -141,7 +142,6 @@ namespace WowPacketParser.Store
             Objects.Clear();
 
             AreaTriggerTemplates.Clear();
-            AreaTriggerTemplatesVertices.Clear();
             ConversationActors.Clear();
             ConversationActorTemplates.Clear();
             ConversationLineTemplates.Clear();
@@ -223,9 +223,11 @@ namespace WowPacketParser.Store
             ScenarioPOIs.Clear();
             ScenarioPOIPoints.Clear();
 
+            SpellAreaTriggerVertices.Clear();
+
             BroadcastTexts.Clear();
             BroadcastTextLocales.Clear();
-            
+
             PlayerChoices.Clear();
             PlayerChoiceLocales.Clear();
             PlayerChoiceResponses.Clear();
