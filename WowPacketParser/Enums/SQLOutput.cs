@@ -3,6 +3,10 @@
     public enum SQLOutput
     {
         // ReSharper disable InconsistentNaming
+        areatrigger_create_properties,
+        areatrigger_create_properties_orbit,
+        areatrigger_create_properties_polygon_vertex,
+        areatrigger_create_properties_spline_point,
         areatrigger_template,
         broadcast_text,
         broadcast_text_locale,
@@ -14,6 +18,8 @@
         creature_addon,
         creature_equip_template,
         creature_model_info,
+        creature_queststarter,
+        creature_questender,
         creature_template,
         creature_template_addon,
         creature_template_locale,
@@ -21,6 +27,8 @@
         creature_text,
         gameobject,
         gameobject_addon,
+        gameobject_queststarter,
+        gameobject_questender,
         gameobject_template,
         gameobject_template_addon,
         gossip_menu,
@@ -46,9 +54,6 @@
         scene_template,
         scenario_poi,
         spell_target_position,
-        spell_areatrigger,
-        spell_areatrigger_splines,
-        spell_areatrigger_vertices,
         SniffData,
         SniffDataOpcodes,
         trainer,
@@ -56,7 +61,8 @@
         weather_updates,
 
         hotfix_data,
-        hotfix_blob
+        hotfix_blob,
+        hotfix_optional_data
         // ReSharper restore InconsistentNaming
     }
 }
