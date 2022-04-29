@@ -33,7 +33,7 @@ namespace WowPacketParserModule.V6_0_2_19033.Parsers
             gossipOption.OptionIcon = (GossipOptionIcon?)packet.ReadByte("OptionNPC", idx);
             gossipMenuOptionBox.BoxCoded = packet.ReadByte("OptionFlags", idx) != 0;
             gossipMenuOptionBox.BoxMoney = (uint)packet.ReadInt32("OptionCost", idx);
-            if (ClientVersion.AddedInVersion(ClientVersionBuild.V9_2_0_42423))
+            if (ClientVersion.AddedInVersion(9, 2, 0, 1, 14, 1, 2, 5, 3))
                 gossipOption.Language = packet.ReadUInt32E<Language>("Language", idx);
 
             packet.ResetBitReader();
@@ -108,7 +108,7 @@ namespace WowPacketParserModule.V6_0_2_19033.Parsers
 
             packet.ResetBitReader();
 
-            packet.ReadBit("Repeatable");
+            packet.ReadBit("Repeatable", idx);
 
             uint questTitleLen = packet.ReadBits(9);
 
@@ -312,14 +312,14 @@ namespace WowPacketParserModule.V6_0_2_19033.Parsers
 
             gossip.TextID = (uint)packet.ReadInt32("TextID");
 
-            int int44 = packet.ReadInt32("GossipOptions");
-            int int60 = packet.ReadInt32("GossipText");
+            int int44 = packet.ReadInt32("GossipOptionsCount");
+            int int60 = packet.ReadInt32("GossipQuestsCount");
 
             for (int i = 0; i < int44; ++i)
                 ReadGossipOptionsData((uint)menuId, packet, i, "GossipOptions");
 
             for (int i = 0; i < int60; ++i)
-                ReadGossipQuestTextData(packet, i, "GossipQuestText");
+                ReadGossipQuestTextData(packet, i, "GossipQuests");
 
             Storage.StoreCreatureGossip(guid, (uint)menuId, packet);
             Storage.Gossips.Add(gossip, packet.TimeSpan);

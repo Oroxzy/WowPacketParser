@@ -494,6 +494,23 @@ namespace WowPacketParser.Parsing.Parsers
             TempGossipOptionPOI.TimeSpan = packet.TimeSpan;
         }
 
+        public static void ReadGossipQuestTextData(Packet packet, params object[] idx)
+        {
+            packet.ReadUInt32<QuestId>("QuestID", idx);
+            packet.ReadUInt32("QuestType", idx);
+            packet.ReadInt32("QuestLevel", idx);
+
+            if (ClientVersion.AddedInVersion(ClientVersionBuild.V3_3_3_11685))
+                packet.ReadUInt32E<QuestFlags>("Flags", idx);
+            if (ClientVersion.AddedInVersion(ClientVersionBuild.V5_1_0_16309))
+                packet.ReadUInt32E<QuestFlagsEx>("FlagsEx", idx);
+
+            if (ClientVersion.AddedInVersion(ClientVersionBuild.V3_3_3_11685))
+                packet.ReadBool("Repeatable", idx);
+
+            packet.ReadCString("Title", idx);
+        }
+
         [HasSniffData]
         [Parser(Opcode.SMSG_GOSSIP_MESSAGE)]
         public static void HandleNpcGossip(Packet packet)
@@ -550,24 +567,9 @@ namespace WowPacketParser.Parsing.Parsers
                 }
             }
 
-            uint questgossips = packet.ReadUInt32("Amount of Quest gossips");
-            for (int i = 0; i < questgossips; i++)
-            {
-                packet.ReadUInt32<QuestId>("Quest ID", i);
-
-                packet.ReadUInt32("Icon", i);
-                packet.ReadInt32("Level", i);
-
-                if (ClientVersion.AddedInVersion(ClientVersionBuild.V3_3_3_11685))
-                    packet.ReadUInt32E<QuestFlags>("Flags", i);
-                if (ClientVersion.AddedInVersion(ClientVersionBuild.V5_1_0_16309))
-                    packet.ReadUInt32E<QuestFlagsEx>("Flags 2", i);
-
-                if (ClientVersion.AddedInVersion(ClientVersionBuild.V3_3_3_11685))
-                    packet.ReadBool("Change Icon", i);
-
-                packet.ReadCString("Title", i);
-            }
+            uint questsCount = packet.ReadUInt32("GossipQuestsCount");
+            for (int i = 0; i < questsCount; i++)
+                ReadGossipQuestTextData(packet, i, "GossipQuests");
 
             if (menuId != 0)
                 Storage.Gossips.Add(gossip, packet.TimeSpan);
