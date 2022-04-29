@@ -107,5 +107,48 @@ namespace WowPacketParserModule.V2_5_1_38707.Parsers
             packet.ReadUInt32("TeamId");
             packet.ReadPackedGuid128("PlayerGUID");
         }
+
+        [Parser(Opcode.SMSG_ARENA_TEAM_EVENT)]
+        public static void HandleArenaTeamEvent(Packet packet)
+        {
+            packet.ReadByteE<ArenaEvent>("Event");
+            uint len1 = packet.ReadBits(9);
+            uint len2 = packet.ReadBits(9);
+            uint len3 = packet.ReadBits(9);
+            packet.ReadWoWString("Param1", len1);
+            packet.ReadWoWString("Param2", len2);
+            packet.ReadWoWString("Param3", len3);
+        }
+
+        [Parser(Opcode.SMSG_ARENA_TEAM_COMMAND_RESULT)]
+        public static void HandleArenaTeamCommandResult(Packet packet)
+        {
+            packet.ReadByteE<ArenaTeamCommandTypes>("Action");
+            packet.ReadByteE<ArenaTeamCommandErrors254>("Error");
+            uint len1 = packet.ReadBits(7);
+            uint len2 = packet.ReadBits(6);
+            packet.ReadWoWString("TeamName", len1);
+            packet.ReadWoWString("PlayerName", len2);
+        }
+
+        [Parser(Opcode.SMSG_ARENA_TEAM_INVITE)]
+        public static void HandleArenaTeamInvite(Packet packet)
+        {
+            packet.ReadPackedGuid128("PlayerGuid");
+            packet.ReadUInt32("PlayerVirtualAddress");
+            packet.ReadPackedGuid128("TeamGuid");
+            uint len1 = packet.ReadBits(6);
+            uint len2 = packet.ReadBits(7);
+            packet.ReadWoWString("PlayerName", len1);
+            packet.ReadWoWString("TeamName", len2);
+        }
+
+        [Parser(Opcode.CMSG_ARENA_TEAM_ACCEPT)]
+        [Parser(Opcode.CMSG_ARENA_TEAM_DECLINE)]
+        public static void HandleArenaTeamAccept(Packet packet)
+        {
+            packet.ReadPackedGuid128("PlayerGuid");
+            packet.ReadPackedGuid128("TeamGuid");
+        }
     }
 }
