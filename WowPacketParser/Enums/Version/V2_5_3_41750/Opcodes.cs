@@ -334,6 +334,7 @@ namespace WowPacketParser.Enums.Version.V2_5_3_41750
             {Opcode.CMSG_JOIN_RATED_BATTLEGROUND, 0x317B},
             {Opcode.CMSG_KEEP_ALIVE, 0x3681},
             {Opcode.CMSG_KEYBOUND_OVERRIDE, 0x3220},
+            {Opcode.CMSG_LATENCY_REPORT, 0x3772},
             {Opcode.CMSG_LEARN_PVP_TALENTS, 0x3554},
             {Opcode.CMSG_LEARN_TALENT, 0x3551},
             {Opcode.CMSG_LEAVE_GROUP, 0x364C},
