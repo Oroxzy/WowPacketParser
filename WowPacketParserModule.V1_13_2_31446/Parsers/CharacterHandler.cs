@@ -112,8 +112,9 @@ namespace WowPacketParserModule.V1_13_2_31446.Parsers
             info.Level = packet.ReadInt32("Level");
             info.Health = packet.ReadInt32("HealthDelta");
 
-            info.Power = new int?[6];
-            for (var i = 0; i < 6; i++)
+            var powerCount = ClientVersion.GetPowerCountForClientVersion();
+            info.Power = new int?[powerCount];
+            for (var i = 0; i < powerCount; i++)
                 info.Power[i] = packet.ReadInt32("PowerDelta", (PowerType)i);
 
             info.Stat = new int?[5];

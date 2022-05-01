@@ -899,10 +899,10 @@ namespace WowPacketParser.Parsing.Parsers
         [Parser(Opcode.SMSG_ARENA_TEAM_COMMAND_RESULT, ClientVersionBuild.Zero, ClientVersionBuild.V4_0_6a_13623)]
         public static void HandleArenaTeamCommandResult(Packet packet)
         {
-            packet.ReadUInt32("Action"); // FIXME: Use enum
+            packet.ReadUInt32E<ArenaTeamCommandTypes>("Action");
             packet.ReadCString("Team Name");
             packet.ReadCString("Player Name");
-            packet.ReadUInt32("ErrorId"); // FIXME: Use enum
+            packet.ReadUInt32E<ArenaTeamCommandErrors243>("ErrorId");
         }
 
         [Parser(Opcode.SMSG_ARENA_TEAM_COMMAND_RESULT, ClientVersionBuild.V4_0_6a_13623, ClientVersionBuild.V4_3_4_15595)]

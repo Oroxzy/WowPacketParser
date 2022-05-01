@@ -23,4 +23,12 @@
         CommandsLocked            = 30,
         TooManyCreateAttempts     = 33
     }
+
+    public enum ArenaTeamCommandTypes
+    {
+        Create  = 0,
+        Invite  = 1,
+        Quit    = 3,
+        Founder = 14,
+    }
 }

@@ -584,20 +584,36 @@ namespace WowPacketParser.Parsing.Parsers
         public static void HandleQuestNpcQueryResponse(Packet packet)
         {
             var count = packet.ReadUInt32("Count");
+            List<KeyValuePair<int, bool>>[] questEnders = new List<KeyValuePair<int, bool>>[count];
 
             for (var i = 0; i < count; ++i)
             {
+                questEnders[i] = new List<KeyValuePair<int, bool>>();
                 var count2 = packet.ReadUInt32("Number of NPC", i);
                 for (var j = 0; j < count2; ++j)
                 {
                     var entry = packet.ReadEntry();
+                    questEnders[i].Add(entry);
                     packet.AddValue(!entry.Value ? "Creature" : "GameObject",
                         StoreGetters.GetName(entry.Value ? StoreNameType.GameObject : StoreNameType.Unit, entry.Key), i, j);
                 }
             }
 
             for (var i = 0; i < count; ++i)
-                packet.ReadInt32<QuestId>("Quest ID", i);
+            {
+                int questId = packet.ReadInt32<QuestId>("Quest ID", i);
+                foreach (var entry in questEnders[i])
+                {
+                    string objectType = !entry.Value ? "Creature" : "GameObject";
+                    QuestEnder questEnder = new QuestEnder
+                    {
+                        ObjectId = (uint)entry.Key,
+                        ObjectType = objectType,
+                        QuestId = (uint)questId
+                    };
+                    Storage.QuestEnders.Add(questEnder, packet.TimeSpan);
+                }
+            }
         }
 
         [Parser(Opcode.SMSG_QUEST_COMPLETION_NPC_RESPONSE, ClientVersionBuild.V4_3_4_15595)]
@@ -803,20 +819,9 @@ namespace WowPacketParser.Parsing.Parsers
             packet.ReadUInt32("Delay");
             packet.ReadUInt32("Emote");
 
-            var count = packet.ReadByte("Count");
+            var count = packet.ReadByte("QuestsCount");
             for (var i = 0; i < count; i++)
-            {
-                packet.ReadUInt32<QuestId>("Quest ID", i);
-                packet.ReadUInt32("Quest Icon", i);
-                packet.ReadInt32("Quest Level", i);
-                packet.ReadUInt32E<QuestFlags>("Quest Flags", i);
-                if (ClientVersion.AddedInVersion(ClientVersionBuild.V5_1_0_16309))
-                    packet.ReadUInt32E<QuestFlagsEx>("Quest Flags 2", i);
-
-                packet.ReadBool("Change icon", i);
-                packet.ReadCString("Title", i);
-            }
-
+                NpcHandler.ReadGossipQuestTextData(packet, i, "Quests");
         }
 
         [Parser(Opcode.CMSG_QUEST_GIVER_QUERY_QUEST)]
