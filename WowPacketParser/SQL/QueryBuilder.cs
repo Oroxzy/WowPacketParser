@@ -544,8 +544,27 @@ namespace WowPacketParser.SQL
                     else if (value is Array)
                     {
                         Array arr = value as Array;
-                        foreach (object v in arr)
+
+                        int arraySize = 0;
+                        foreach (var attribute in field.Item3)
                         {
+                            if (attribute.Count > arraySize)
+                                arraySize = attribute.Count;
+                        }
+                        
+                        for (int i = 0; i < arraySize; i++)
+                        {
+                            object v;
+                            if (i >= arr.Length)
+                            {
+                                if (arr.GetType().GetElementType().IsPrimitive)
+                                    v = 0;
+                                else
+                                    v = null;
+                            }
+                            else
+                                v = arr.GetValue(i);
+
                             if (v == null)
                             {
                                 if (field.Item3.Any(a => a.Nullable))

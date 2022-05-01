@@ -363,7 +363,7 @@ namespace WowPacketParserModule.V9_0_1_36216.Parsers
         [Parser(Opcode.SMSG_QUEST_GIVER_OFFER_REWARD_MESSAGE)]
         public static void QuestGiverOfferReward(Packet packet)
         {
-            packet.ReadPackedGuid128("QuestGiverGUID");
+            WowGuid guid = packet.ReadPackedGuid128("QuestGiverGUID");
 
             packet.ReadInt32("QuestGiverCreatureID");
             int id = packet.ReadInt32("QuestID");
@@ -419,6 +419,13 @@ namespace WowPacketParserModule.V9_0_1_36216.Parsers
             packet.ReadWoWString("PortraitTurnInText", portraitTurnInTextLen);
             packet.ReadWoWString("PortraitTurnInName", portraitTurnInNameLen);
 
+            QuestEnder questEnder = new QuestEnder
+            {
+                ObjectId = guid.GetEntry(),
+                ObjectType = Storage.GetObjectTypeNameForDB(guid),
+                QuestId = (uint)id
+            };
+            Storage.QuestEnders.Add(questEnder, packet.TimeSpan);
             Storage.QuestOfferRewards.Add(questOfferReward, packet.TimeSpan);
         }
 
@@ -452,7 +459,7 @@ namespace WowPacketParserModule.V9_0_1_36216.Parsers
         [Parser(Opcode.SMSG_QUEST_GIVER_QUEST_DETAILS)]
         public static void HandleQuestGiverQuestDetails(Packet packet)
         {
-            packet.ReadPackedGuid128("QuestGiverGUID");
+            WowGuid guid = packet.ReadPackedGuid128("QuestGiverGUID");
             packet.ReadPackedGuid128("InformUnit");
 
             int id = packet.ReadInt32("QuestID");
@@ -523,6 +530,13 @@ namespace WowPacketParserModule.V9_0_1_36216.Parsers
             packet.ReadWoWString("PortraitTurnInText", portraitTurnInTextLen);
             packet.ReadWoWString("PortraitTurnInName", portraitTurnInNameLen);
 
+            QuestStarter questStarter = new QuestStarter
+            {
+                ObjectId = Storage.GetObjectEntry(guid),
+                ObjectType = Storage.GetObjectTypeNameForDB(guid),
+                QuestId = (uint)id
+            };
+            Storage.QuestStarters.Add(questStarter, packet.TimeSpan);
             Storage.QuestDetails.Add(questDetails, packet.TimeSpan);
         }
 
