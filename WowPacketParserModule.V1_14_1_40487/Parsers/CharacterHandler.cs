@@ -10,7 +10,7 @@ namespace WowPacketParserModule.V1_14_1_40487.Parsers
         public static void ReadAccountCharacterList(Packet packet, params object[] idx)
         {
             packet.ReadPackedGuid128("WowAccountGUID", idx);
-            packet.ReadPackedGuid128("CharacterGUID", idx);
+            WowGuid guid = packet.ReadPackedGuid128("CharacterGUID", idx);
             packet.ReadUInt32("VirtualRealmAddress", idx);
             packet.ReadByteE<Race>("Race", idx);
             packet.ReadByteE<Class>("Class", idx);
@@ -26,8 +26,10 @@ namespace WowPacketParserModule.V1_14_1_40487.Parsers
             uint characterNameLength = packet.ReadBits(6);
             uint realmNameLength = packet.ReadBits(9);
 
-            packet.ReadWoWString("CharacterName", characterNameLength, idx);
+            string name = packet.ReadWoWString("CharacterName", characterNameLength, idx);
             packet.ReadWoWString("RealmName", realmNameLength, idx);
+
+            StoreGetters.AddName(guid, name);
         }
 
         [Parser(Opcode.SMSG_GET_ACCOUNT_CHARACTER_LIST_RESULT)]

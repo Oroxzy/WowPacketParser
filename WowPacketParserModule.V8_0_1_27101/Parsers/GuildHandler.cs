@@ -60,7 +60,7 @@ namespace WowPacketParserModule.V8_0_1_27101.Parsers
 
             for (var i = 0; i < int20; ++i)
             {
-                packet.ReadPackedGuid128("Guid", i);
+                WowGuid guid = packet.ReadPackedGuid128("Guid", i);
 
                 packet.ReadUInt32("RankID", i);
                 packet.ReadUInt32<AreaId>("AreaID", i);
@@ -92,9 +92,11 @@ namespace WowPacketParserModule.V8_0_1_27101.Parsers
                 packet.ReadBit("Authenticated", i);
                 packet.ReadBit("SorEligible", i);
 
-                packet.ReadWoWString("Name", nameLen, i);
+                string name = packet.ReadWoWString("Name", nameLen, i);
                 packet.ReadWoWString("Note", noteLen, i);
                 packet.ReadWoWString("OfficerNote", officersNoteLen, i);
+
+                StoreGetters.AddName(guid, name);
             }
 
             packet.ReadWoWString("WelcomeText", welcomeTextLen);

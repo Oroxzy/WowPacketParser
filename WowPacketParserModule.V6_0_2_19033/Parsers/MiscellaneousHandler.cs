@@ -470,6 +470,9 @@ namespace WowPacketParserModule.V6_0_2_19033.Parsers
             uint sound = packet.ReadUInt32<SoundId>("SoundKitID");
             WowGuid guid = packet.ReadPackedGuid128("SourceObjectGUID");
 
+            if (ClientVersion.AddedInVersion(ClientType.Shadowlands))
+                packet.ReadInt32("BroadcastTextID");
+
             Storage.Sounds.Add(new ObjectSound(sound, packet.Time, guid, packet.SniffId));
             packet.AddSniffData(StoreNameType.Sound, (int)sound, "PLAY_SOUND");
         }

@@ -88,5 +88,11 @@ namespace WowPacketParserModule.V9_0_1_36216.Parsers
             packet.ReadInt32("MountDisplayID");
             packet.ReadByte("Reason");
         }
+
+        [Parser(Opcode.CMSG_MOVE_INIT_ACTIVE_MOVER_COMPLETE)]
+        public static void HandleMoveInitActiveMoverComplete(Packet packet)
+        {
+            packet.ReadInt32("Ticks");
+        }
     }
 }

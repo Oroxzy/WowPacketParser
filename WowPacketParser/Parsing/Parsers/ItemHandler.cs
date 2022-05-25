@@ -642,7 +642,7 @@ namespace WowPacketParser.Parsing.Parsers
 
             item.SheathType = packet.ReadInt32E<SheathType>("Sheath Type");
 
-            item.RandomPropery = packet.ReadInt32("Random Property");
+            item.RandomProperty = packet.ReadInt32("Random Property");
 
             if (ClientVersion.AddedInVersion(ClientVersionBuild.V2_0_1_6180))
                 item.RandomSuffix = packet.ReadUInt32("Random Suffix");
@@ -1022,7 +1022,7 @@ namespace WowPacketParser.Parsing.Parsers
                 item.LockId = packet.ReadUInt32("Lock ID");
                 item.Material = packet.ReadInt32E<Material>("Material");
                 item.SheathType = packet.ReadInt32E<SheathType>("Sheath Type");
-                item.RandomPropery = packet.ReadInt32("Random Property");
+                item.RandomProperty = packet.ReadInt32("Random Property");
                 item.RandomSuffix = packet.ReadUInt32("Random Suffix");
                 item.ItemSet = packet.ReadUInt32("Item Set");
                 item.AreaID = packet.ReadUInt32<AreaId>("Area");
@@ -1191,7 +1191,7 @@ namespace WowPacketParser.Parsing.Parsers
                     item.LockId = packet.ReadUInt32("Lock ID");
                     item.Material = packet.ReadInt32E<Material>("Material");
                     item.SheathType = packet.ReadInt32E<SheathType>("Sheath Type");
-                    item.RandomPropery = packet.ReadInt32("Random Property");
+                    item.RandomProperty = packet.ReadInt32("Random Property");
                     item.RandomSuffix = packet.ReadUInt32("Random Suffix");
                     item.ItemSet = packet.ReadUInt32("Item Set");
                     item.AreaID = packet.ReadUInt32<AreaId>("Area");

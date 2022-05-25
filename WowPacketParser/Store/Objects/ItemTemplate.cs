@@ -207,7 +207,7 @@ namespace WowPacketParser.Store.Objects
         public SheathType? SheathType;
 
         [DBFieldName("RandomProperty")]
-        public int? RandomPropery;
+        public int? RandomProperty;
 
         [DBFieldName("RandomSuffix")]
         public uint? RandomSuffix;
