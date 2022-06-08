@@ -41,8 +41,8 @@ namespace WowPacketParser.Store.Objects
 
         public Unit(bool isCreature = true) : base()
         {
-            UnitData = new UnitData(this);
-            UnitDataOriginal = new OriginalUnitData(this);
+            UnitData = new UnitData(this, false);
+            UnitDataOriginal = new UnitData(this, true);
             CombatMovements = new List<ServerSideMovement>();
             CombatMovementSplines = new List<ServerSideMovementSpline>();
 

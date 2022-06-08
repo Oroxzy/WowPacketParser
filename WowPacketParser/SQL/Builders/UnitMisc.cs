@@ -528,10 +528,6 @@ namespace WowPacketParser.SQL.Builders
             if (!Settings.SqlTables.creature_stats)
                 return string.Empty;
 
-            // Update fields system changed in BfA.
-            if (ClientVersion.IsUsingNewUpdateFieldSystem())
-                return string.Empty;
-
             HashSet<Tuple<uint, uint>> mobsWithStats = new HashSet<Tuple<uint, uint>>();
             var rows = new RowList<CreatureStats>();
 
