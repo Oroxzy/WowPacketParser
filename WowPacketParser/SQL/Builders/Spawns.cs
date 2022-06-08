@@ -231,7 +231,7 @@ namespace WowPacketParser.SQL.Builders
                 row.Data.OffHandSlotItem = (uint)unitData.VirtualItems[1].ItemID;
                 row.Data.RangedSlotItem = (uint)unitData.VirtualItems[2].ItemID;
                 row.Data.ChannelSpellId = (uint)unitData.ChannelData.SpellID;
-                row.Data.ChannelVisualId = (uint)unitData.ChannelData.SpellVisual.SpellXSpellVisualID;
+                row.Data.ChannelVisualId = (uint)unitData.ChannelData.SpellXSpellVisualID;
 
                 row.Data.SniffId = "@SNIFFID+" + creature.SourceSniffId;
                 row.Data.SniffBuild = creature.SourceSniffBuild;

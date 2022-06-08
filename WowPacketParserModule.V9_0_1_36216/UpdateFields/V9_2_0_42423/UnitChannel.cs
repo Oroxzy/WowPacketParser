@@ -9,6 +9,7 @@ namespace WowPacketParserModule.V9_0_1_36216.UpdateFields.V9_2_0_42423
     {
         public int SpellID { get; set; }
         public ISpellCastVisual SpellVisual { get; set; }
+        public int SpellXSpellVisualID => SpellVisual.SpellXSpellVisualID;
     }
 }
 

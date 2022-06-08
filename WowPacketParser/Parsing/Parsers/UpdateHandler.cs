@@ -987,7 +987,7 @@ namespace WowPacketParser.Parsing.Parsers
                         if (Storage.Objects.ContainsKey(guid))
                         {
                             var obj = Storage.Objects[guid].Item1 as Unit;
-                            if (obj.UnitData.ChannelData.SpellVisual.SpellXSpellVisualID != update.Value.UInt32Value)
+                            if (obj.UnitData.ChannelData.SpellXSpellVisualID != update.Value.UInt32Value)
                             {
                                 hasData = true;
                                 creatureUpdate.ChannelVisualId = update.Value.UInt32Value;
@@ -1013,7 +1013,7 @@ namespace WowPacketParser.Parsing.Parsers
                         if (Storage.Objects.ContainsKey(guid))
                         {
                             var obj = Storage.Objects[guid].Item1 as Unit;
-                            if (obj.UnitData.ChannelData.SpellVisual.SpellXSpellVisualID != update.Value.UInt32Value)
+                            if (obj.UnitData.ChannelData.SpellXSpellVisualID != update.Value.UInt32Value)
                             {
                                 hasData = true;
                                 creatureUpdate.ChannelVisualId = update.Value.UInt32Value;

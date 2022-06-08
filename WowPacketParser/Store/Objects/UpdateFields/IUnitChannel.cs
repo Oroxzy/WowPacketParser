@@ -3,6 +3,7 @@
     public interface IUnitChannel
     {
         int SpellID { get; }
-        ISpellCastVisual SpellVisual { get; }
+        int SpellXSpellVisualID { get; }
+        //ISpellCastVisual SpellVisual { get; }
     }
 }

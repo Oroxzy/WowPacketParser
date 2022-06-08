@@ -1544,7 +1544,6 @@ namespace WowPacketParser.Parsing.Parsers
         [Parser(Opcode.CMSG_MOVE_FALL_RESET, ClientVersionBuild.Zero, ClientVersionBuild.V4_3_4_15595)]
         [Parser(Opcode.CMSG_MOVE_SET_FLY)]
         [Parser(Opcode.CMSG_MOVE_CHANGE_TRANSPORT, ClientVersionBuild.Zero, ClientVersionBuild.V4_3_4_15595)]
-        [Parser(Opcode.CMSG_MOVE_NOT_ACTIVE_MOVER, ClientVersionBuild.Zero, ClientVersionBuild.V4_3_4_15595)]
         [Parser(Opcode.CMSG_DISMISS_CONTROLLED_VEHICLE, ClientVersionBuild.Zero, ClientVersionBuild.V4_3_4_15595)]
         public static void HandleMovementMessages(Packet packet)
         {
@@ -1566,6 +1565,20 @@ namespace WowPacketParser.Parsing.Parsers
             packet.ReadSingle("Cos Angle");
             packet.ReadSingle("Horizontal Speed");
             packet.ReadSingle("Vertical Speed");
+        }
+
+        [Parser(Opcode.CMSG_MOVE_NOT_ACTIVE_MOVER, ClientVersionBuild.Zero, ClientVersionBuild.V4_3_4_15595)]
+        public static void HandleNotActiveMover(Packet packet)
+        {
+            WowGuid moverGuid;
+            if (ClientVersion.AddedInVersion(ClientVersionBuild.V3_2_0_10192))
+                moverGuid = packet.ReadPackedGuid("Guid");
+            else if (ClientVersion.AddedInVersion(ClientVersionBuild.V1_10_2_5302))
+                moverGuid = packet.ReadGuid("Guid");
+            else
+                moverGuid = Storage.CurrentActivePlayer != null ? Storage.CurrentActivePlayer : WowGuid64.Empty;
+
+            ReadMovementInfo(packet, moverGuid);
         }
 
         [Parser(Opcode.CMSG_MOVE_SPLINE_DONE, ClientVersionBuild.Zero, ClientVersionBuild.V4_3_4_15595)]

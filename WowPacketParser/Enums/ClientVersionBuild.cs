@@ -6,6 +6,7 @@ namespace WowPacketParser.Enums
         Zero = 0,
 
         V1_9_4_5086 = 5086,
+        V1_10_2_5302 = 5302,
         V1_12_1_5875 = 5875,
 
         V2_0_1_6180 = 6180,

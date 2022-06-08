@@ -275,6 +275,8 @@ namespace WowPacketParser.Store.Objects.UpdateFields.LegacyImplementation
         {
             public int SpellID { get; set; }
             public ISpellCastVisual SpellVisual { get; set; }
+
+            public int SpellXSpellVisualID => SpellVisual.SpellXSpellVisualID;
         }
 
         public class SpellCastVisual : ISpellCastVisual
@@ -649,6 +651,7 @@ namespace WowPacketParser.Store.Objects.UpdateFields.LegacyImplementation
         {
             public int SpellID { get; set; }
             public ISpellCastVisual SpellVisual { get; set; }
+            public int SpellXSpellVisualID => SpellVisual.SpellXSpellVisualID;
         }
 
         public class SpellCastVisual : ISpellCastVisual

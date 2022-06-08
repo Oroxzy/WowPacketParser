@@ -397,10 +397,10 @@ namespace WowPacketParserModule.V8_0_1_27101.Parsers
                         hasData = true;
                         creatureUpdate.ChannelSpellId = (uint)unit.UnitData.ChannelData.SpellID;
                     }
-                    if (oldUnitData.ChannelData.SpellVisual.SpellXSpellVisualID != unit.UnitData.ChannelData.SpellVisual.SpellXSpellVisualID)
+                    if (oldUnitData.ChannelData.SpellXSpellVisualID != unit.UnitData.ChannelData.SpellXSpellVisualID)
                     {
                         hasData = true;
-                        creatureUpdate.ChannelVisualId = (uint)unit.UnitData.ChannelData.SpellVisual.SpellXSpellVisualID;
+                        creatureUpdate.ChannelVisualId = (uint)unit.UnitData.ChannelData.SpellXSpellVisualID;
                     }
                     uint slot = 0;
                     foreach (var item in unit.UnitData.VirtualItems)
@@ -562,6 +562,7 @@ namespace WowPacketParserModule.V8_0_1_27101.Parsers
             BitArray updateMaskArray = null;
             var moves = ReadMovementUpdateBlock(packet, guid, obj, index);
             Storage.StoreObjectCreateTime(guid, map, moves, packet.Time, type);
+
             if (ClientVersion.AddedInVersion(ClientVersionBuild.V8_1_0_28724))
             {
                 var updatefieldSize = packet.ReadUInt32();
@@ -672,24 +673,35 @@ namespace WowPacketParserModule.V8_0_1_27101.Parsers
                     if (isExistingObject)
                         StoreObjectUpdate(packet, guid, obj, oldObjectData, oldGameObjectData, oldUnitData, oldPlayerData, true);
                 }
+
+                obj.Movement = moves;
+
+                // If this is the second time we see the same object (same guid,
+                // same position) update its phasemask
+                if (isExistingObject)
+                    CoreParsers.UpdateHandler.ProcessExistingObject(ref obj, guid, packet, updateMaskArray, obj.UpdateFields, obj.DynamicUpdateFields, moves); // can't do "ref Storage.Objects[guid].Item1 directly
+                else
+                    Storage.StoreNewObject(guid, obj, type, packet);
             }
             else
             {
                 var updates = CoreParsers.UpdateHandler.ReadValuesUpdateBlockOnCreate(packet, objType, index, out updateMaskArray);
                 var dynamicUpdates = CoreParsers.UpdateHandler.ReadDynamicValuesUpdateBlockOnCreate(packet, objType, index);
 
-                obj.UpdateFields = updates;
-                obj.DynamicUpdateFields = dynamicUpdates;
+                // If this is the second time we see the same object (same guid,
+                // same position) update its phasemask
+                if (isExistingObject)
+                {
+                    CoreParsers.UpdateHandler.ProcessExistingObject(ref obj, guid, packet, updateMaskArray, updates, dynamicUpdates, moves);
+                }
+                else
+                {
+                    obj.Movement = moves;
+                    obj.UpdateFields = updates;
+                    obj.DynamicUpdateFields = dynamicUpdates;
+                    Storage.StoreNewObject(guid, obj, type, packet);
+                }
             }
-
-            obj.Movement = moves;
-
-            // If this is the second time we see the same object (same guid,
-            // same position) update its phasemask
-            if (isExistingObject)
-                CoreParsers.UpdateHandler.ProcessExistingObject(ref obj, guid, packet, updateMaskArray, obj.UpdateFields, obj.DynamicUpdateFields, moves); // can't do "ref Storage.Objects[guid].Item1 directly
-            else
-                Storage.StoreNewObject(guid, obj, type, packet);
 
             if (guid.HasEntry() && (objType == ObjectType.Unit || objType == ObjectType.GameObject))
                 packet.AddSniffData(Utilities.ObjectTypeToStore(objType), (int)guid.GetEntry(), "SPAWN");
