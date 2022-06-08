@@ -2575,7 +2575,6 @@ namespace WowPacketParser.SQL.Builders
             Dictionary<WowGuid, uint> accountIdDictionary = new Dictionary<WowGuid, uint>();
             foreach (var objPair in Storage.Objects)
             {
-                Console.WriteLine(objPair.Key);
                 if (objPair.Key.GetObjectType() != ObjectType.Player)
                     continue;
 

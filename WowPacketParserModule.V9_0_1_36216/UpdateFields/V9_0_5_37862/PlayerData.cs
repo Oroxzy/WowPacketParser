@@ -51,7 +51,7 @@ namespace WowPacketParserModule.V9_0_1_36216.UpdateFields.V9_0_5_37862
             ChrCustomizationChoice[] data = new ChrCustomizationChoice[Customizations.Count];
             for (var i = 0; i < Customizations.Count; ++i)
             {
-                if (Customizations.UpdateMask[i])
+                if (Customizations.UpdateMask.Count > i && Customizations.UpdateMask[i])
                 {
                     ChrCustomizationChoice custom = Customizations[i] as ChrCustomizationChoice;
                     if (custom != null)
