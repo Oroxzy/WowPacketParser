@@ -864,6 +864,45 @@ namespace WowPacketParser.Misc
                 case ClientVersionBuild.V1_13_7_39605:
                 case ClientVersionBuild.V1_13_7_39692:
                     return ClientVersionBuild.V1_13_2_31446;
+                case ClientVersionBuild.V1_14_0_39802:
+                case ClientVersionBuild.V1_14_0_39958:
+                case ClientVersionBuild.V1_14_0_40140:
+                case ClientVersionBuild.V1_14_0_40179:
+                case ClientVersionBuild.V1_14_0_40237:
+                case ClientVersionBuild.V1_14_0_40347:
+                case ClientVersionBuild.V1_14_0_40441:
+                case ClientVersionBuild.V1_14_0_40618:
+                case ClientVersionBuild.V1_14_1_40487:
+                case ClientVersionBuild.V1_14_1_40594:
+                case ClientVersionBuild.V1_14_1_40666:
+                case ClientVersionBuild.V1_14_1_40688:
+                case ClientVersionBuild.V1_14_1_40800:
+                case ClientVersionBuild.V1_14_1_40818:
+                case ClientVersionBuild.V1_14_1_40926:
+                case ClientVersionBuild.V1_14_1_40962:
+                case ClientVersionBuild.V1_14_1_41009:
+                case ClientVersionBuild.V1_14_1_41030:
+                case ClientVersionBuild.V1_14_1_41077:
+                case ClientVersionBuild.V1_14_1_41137:
+                case ClientVersionBuild.V1_14_1_41243:
+                case ClientVersionBuild.V1_14_1_41511:
+                case ClientVersionBuild.V1_14_1_41794:
+                case ClientVersionBuild.V1_14_1_42032:
+                case ClientVersionBuild.V1_14_2_41858:
+                case ClientVersionBuild.V1_14_2_41959:
+                case ClientVersionBuild.V1_14_2_42065:
+                case ClientVersionBuild.V1_14_2_42082:
+                case ClientVersionBuild.V1_14_2_42214:
+                case ClientVersionBuild.V1_14_2_42597:
+                case ClientVersionBuild.V1_14_3_42770:
+                case ClientVersionBuild.V1_14_3_42926:
+                case ClientVersionBuild.V1_14_3_43037:
+                case ClientVersionBuild.V1_14_3_43086:
+                case ClientVersionBuild.V1_14_3_43154:
+                case ClientVersionBuild.V1_14_3_43401:
+                case ClientVersionBuild.V1_14_3_43639:
+                case ClientVersionBuild.V1_14_3_44016:
+                case ClientVersionBuild.V1_14_3_44170:
                 case ClientVersionBuild.V2_5_1_38598:
                 case ClientVersionBuild.V2_5_1_38644:
                 case ClientVersionBuild.V2_5_1_38707:
@@ -907,43 +946,6 @@ namespace WowPacketParser.Misc
                 case ClientVersionBuild.V2_5_4_42917:
                 case ClientVersionBuild.V2_5_4_42940:
                     return ClientVersionBuild.V2_5_1_38707;
-                case ClientVersionBuild.V1_14_0_39802:
-                case ClientVersionBuild.V1_14_0_39958:
-                case ClientVersionBuild.V1_14_0_40140:
-                case ClientVersionBuild.V1_14_0_40179:
-                case ClientVersionBuild.V1_14_0_40237:
-                case ClientVersionBuild.V1_14_0_40347:
-                case ClientVersionBuild.V1_14_0_40441:
-                case ClientVersionBuild.V1_14_0_40618:
-                case ClientVersionBuild.V1_14_1_40487:
-                case ClientVersionBuild.V1_14_1_40594:
-                case ClientVersionBuild.V1_14_1_40666:
-                case ClientVersionBuild.V1_14_1_40688:
-                case ClientVersionBuild.V1_14_1_40800:
-                case ClientVersionBuild.V1_14_1_40818:
-                case ClientVersionBuild.V1_14_1_40926:
-                case ClientVersionBuild.V1_14_1_40962:
-                case ClientVersionBuild.V1_14_1_41009:
-                case ClientVersionBuild.V1_14_1_41030:
-                case ClientVersionBuild.V1_14_1_41077:
-                case ClientVersionBuild.V1_14_1_41137:
-                case ClientVersionBuild.V1_14_1_41243:
-                case ClientVersionBuild.V1_14_1_41511:
-                case ClientVersionBuild.V1_14_1_41794:
-                case ClientVersionBuild.V1_14_1_42032:
-                case ClientVersionBuild.V1_14_2_41858:
-                case ClientVersionBuild.V1_14_2_41959:
-                case ClientVersionBuild.V1_14_2_42065:
-                case ClientVersionBuild.V1_14_2_42082:
-                case ClientVersionBuild.V1_14_2_42214:
-                case ClientVersionBuild.V1_14_2_42597:
-                case ClientVersionBuild.V1_14_3_42770:
-                case ClientVersionBuild.V1_14_3_42926:
-                case ClientVersionBuild.V1_14_3_43037:
-                case ClientVersionBuild.V1_14_3_43086:
-                case ClientVersionBuild.V1_14_3_43154:
-                case ClientVersionBuild.V1_14_3_43401:
-                    return ClientVersionBuild.V1_14_1_40487;
                 case ClientVersionBuild.BattleNetV37165:
                     return ClientVersionBuild.BattleNetV37165;
                 case ClientVersionBuild.Zero:
@@ -967,8 +969,6 @@ namespace WowPacketParser.Misc
             {
                 case ClientVersionBuild.V1_13_2_31446:
                     return ClientVersionBuild.V8_0_1_27101;
-                case ClientVersionBuild.V1_14_1_40487:
-                    return ClientVersionBuild.V9_0_1_36216;
                 case ClientVersionBuild.V2_5_1_38707:
                     return ClientVersionBuild.V9_0_1_36216;
                 case ClientVersionBuild.V7_0_3_22248:
@@ -1192,6 +1192,14 @@ namespace WowPacketParser.Misc
             return AddedInVersion(retailExpansion, retailMajor, retailMinor);
         }
 
+        public static bool RemovedInClassicVersion(byte classicExpansion, byte classicMajor, byte classicMinor, byte tbcExpansion, byte tbcMajor, byte tbcMinor)
+        {
+            if (!IsClassicClientVersionBuild(Build))
+                return false;
+
+            return !AddedInClassicVersion(classicExpansion, classicMajor, classicMinor, tbcExpansion, tbcMajor, tbcMinor);
+        }
+
         public static bool RemovedInVersion(byte retailExpansion, byte retailMajor, byte retailMinor, byte classicExpansion, byte classicMajor, byte classicMinor, byte tbcExpansion, byte tbcMajor, byte tbcMinor)
         {
             return !AddedInVersion(retailExpansion, retailMajor, retailMinor, classicExpansion, classicMajor, classicMinor, tbcExpansion, tbcMajor, tbcMinor);
@@ -1315,6 +1323,9 @@ namespace WowPacketParser.Misc
                 case ClientVersionBuild.V1_14_3_43086:
                 case ClientVersionBuild.V1_14_3_43154:
                 case ClientVersionBuild.V1_14_3_43401:
+                case ClientVersionBuild.V1_14_3_43639:
+                case ClientVersionBuild.V1_14_3_44016:
+                case ClientVersionBuild.V1_14_3_44170:
                 {
                     return true;
                 }
@@ -1379,6 +1390,9 @@ namespace WowPacketParser.Misc
                 case ClientVersionBuild.V1_14_3_43086:
                 case ClientVersionBuild.V1_14_3_43154:
                 case ClientVersionBuild.V1_14_3_43401:
+                case ClientVersionBuild.V1_14_3_43639:
+                case ClientVersionBuild.V1_14_3_44016:
+                case ClientVersionBuild.V1_14_3_44170:
                 {
                     return true;
                 }

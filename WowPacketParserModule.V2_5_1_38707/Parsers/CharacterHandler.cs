@@ -18,7 +18,7 @@ namespace WowPacketParserModule.V2_5_1_38835.Parsers
             packet.ReadByte("Level", idx);
             packet.ReadTime64("LastLogin", idx);
 
-            if (ClientVersion.AddedInVersion(ClientVersionBuild.V2_5_3_41531))
+            if (ClientVersion.AddedInClassicVersion(1, 14, 1, 2, 5, 3))
                 packet.ReadUInt32("Unk", idx);
 
             packet.ResetBitReader();
@@ -187,7 +187,7 @@ namespace WowPacketParserModule.V2_5_1_38835.Parsers
             packet.ReadUInt16("TodayDishonorableKills");
             packet.ReadUInt16("YesterdayHonorableKills");
             packet.ReadUInt16("YesterdayDishonorableKills");
-            if (ClientVersion.AddedInVersion(2, 5, 4))
+            if (ClientVersion.AddedInClassicVersion(1, 14, 0, 2, 5, 4))
             {
                 packet.ReadUInt16("LastWeekHonorableKills");
                 packet.ReadUInt16("LastWeekDishonorableKills");

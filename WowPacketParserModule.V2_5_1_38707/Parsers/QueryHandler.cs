@@ -207,16 +207,15 @@ namespace WowPacketParserModule.V2_5_1_38835.Parsers
         }
 
         [HasSniffData]
-        [Parser(Opcode.SMSG_QUERY_GAME_OBJECT_RESPONSE, ClientVersionBuild.V2_5_1_38598, ClientVersionBuild.V2_5_3_41531)]
-        public static void HandleGameObjectQueryResponse(Packet packet)
-        {
-            WowPacketParserModule.V8_0_1_27101.Parsers.GameObjectHandler.HandleGameObjectQueryResponse(packet);
-        }
-
-        [HasSniffData]
-        [Parser(Opcode.SMSG_QUERY_GAME_OBJECT_RESPONSE, ClientVersionBuild.V2_5_3_41531)]
+        [Parser(Opcode.SMSG_QUERY_GAME_OBJECT_RESPONSE)]
         public static void HandleGameObjectQueryResponse253(Packet packet)
         {
+            if (ClientVersion.RemovedInClassicVersion(1, 14, 1, 2, 5, 3))
+            {
+                WowPacketParserModule.V8_0_1_27101.Parsers.GameObjectHandler.HandleGameObjectQueryResponse(packet);
+                return;
+            }
+
             var entry = packet.ReadEntry("Entry");
             if (entry.Value) // entry is masked
                 return;
