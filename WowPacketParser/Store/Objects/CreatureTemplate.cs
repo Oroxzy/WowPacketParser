@@ -331,21 +331,15 @@ namespace WowPacketParser.Store.Objects
         [DBFieldName("FadeRegionRadius", TargetedDbExpansion.BattleForAzeroth, TargetedDbExpansion.Shadowlands, DbType = (TargetedDbType.TRINITY))]
         public float? FadeRegionRadius;
 
-        [DBFieldName("difficulty_id", TargetedDbExpansion.BurningCrusadeClassic, TargetedDbExpansion.Classic, DbType = (TargetedDbType.WPP))]
         [DBFieldName("difficulty_id", TargetedDbExpansion.Shadowlands, DbType = (TargetedDbType.WPP))]
-        [DBFieldName("CreatureDifficultyID", TargetedDbExpansion.BurningCrusadeClassic, TargetedDbExpansion.Classic, DbType = (TargetedDbType.TRINITY))]
         [DBFieldName("CreatureDifficultyID", TargetedDbExpansion.Shadowlands, DbType = (TargetedDbType.TRINITY))]
         public int? DifficultyID;
 
-        [DBFieldName("widget_set_id", TargetedDbExpansion.BurningCrusadeClassic, TargetedDbExpansion.Classic, DbType = (TargetedDbType.WPP))]
         [DBFieldName("widget_set_id", TargetedDbExpansion.BattleForAzeroth, DbType = (TargetedDbType.WPP))]
-        [DBFieldName("WidgetSetID", TargetedDbExpansion.BurningCrusadeClassic, TargetedDbExpansion.Classic, DbType = (TargetedDbType.TRINITY))]
         [DBFieldName("WidgetSetID", TargetedDbExpansion.BattleForAzeroth, DbType = (TargetedDbType.TRINITY))]
         public int? WidgetSetID;
 
-        [DBFieldName("widget_set_unit_condition_id", TargetedDbExpansion.BurningCrusadeClassic, TargetedDbExpansion.Classic, DbType = (TargetedDbType.WPP))]
         [DBFieldName("widget_set_unit_condition_id", TargetedDbExpansion.BattleForAzeroth, DbType = (TargetedDbType.WPP))]
-        [DBFieldName("WidgetSetUnitConditionID", TargetedDbExpansion.BurningCrusadeClassic, TargetedDbExpansion.Classic, DbType = (TargetedDbType.TRINITY))]
         [DBFieldName("WidgetSetUnitConditionID", TargetedDbExpansion.BattleForAzeroth, DbType = (TargetedDbType.TRINITY))]
         public int? WidgetSetUnitConditionID;
 
