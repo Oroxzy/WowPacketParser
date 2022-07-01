@@ -101,7 +101,6 @@ namespace WowPacketParserModule.V2_5_1_38707.Parsers
                                     var data = handler.ReadUpdateUnitData(fieldsData, unit?.UnitData, i);
                                     if (unit != null)
                                         unit.UnitData = data;
-
                                 }
                                 if ((updateTypeFlag & 0x0040) != 0)
                                 {

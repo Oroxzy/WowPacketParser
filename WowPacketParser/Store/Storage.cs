@@ -1331,46 +1331,43 @@ namespace WowPacketParser.Store
                 if (npc.UnitData.MaxDamage == 0)
                     return;
 
+                // Skip if creature is not currently affected by Beast Lore or controlled by player.
+                // Needed in new system because we don't know if stats came from same packet or previous.
+                // Fixes stats which were affected by auras being exported as clean from an update that does not
+                // contain stats after we can no longer see stat changes and the stat affecting aura has expired too.
+                if (npc.UnitData.SummonedBy != CurrentActivePlayer &&
+                    npc.UnitData.CharmedBy != CurrentActivePlayer &&
+                    !npc.ObjectData.DynamicFlags.HasAnyFlag(UnitDynamicFlagsWOD.EmpathyInfo))
+                    return;
+
                 CheckStatAffectingAuras(npc, out hasModStatsAura, out hasModMainHandDamageAura, out hasModOffHandDamageAura, out hasModRangedDamageAura, out hasModMeleeAttackPowerAura, out hasModRangedAttackPowerAura, out hasModResistAura, out hasAnyBadAuras);
 
                 creatureStats = new CreatureStats();
 
                 if (!hasModMainHandDamageAura || isPet)
                 {
-                    if (npc.UnitData.MinDamage != 0)
+                    if (npc.UnitData.MinDamage != 0 || npc.UnitData.MaxDamage != 0)
                     {
                         hasData = true;
                         creatureStats.DmgMin = npc.UnitData.MinDamage;
-                    }
-                    if (npc.UnitData.MaxDamage != 0)
-                    {
-                        hasData = true;
                         creatureStats.DmgMax = npc.UnitData.MaxDamage;
                     }
                 }
                 if (!hasModOffHandDamageAura || isPet)
                 {
-                    if (npc.UnitData.MinOffHandDamage != 0)
+                    if (npc.UnitData.MinOffHandDamage != 0 || npc.UnitData.MaxOffHandDamage != 0)
                     {
                         hasData = true;
                         creatureStats.OffhandDmgMin = npc.UnitData.MinOffHandDamage;
-                    }
-                    if (npc.UnitData.MaxOffHandDamage != 0)
-                    {
-                        hasData = true;
                         creatureStats.OffhandDmgMax = npc.UnitData.MaxOffHandDamage;
                     }
                 }
                 if (!hasModRangedDamageAura || isPet)
                 {
-                    if (npc.UnitData.MinRangedDamage != 0)
+                    if (npc.UnitData.MinRangedDamage != 0 || npc.UnitData.MaxRangedDamage != 0)
                     {
                         hasData = true;
                         creatureStats.RangedDmgMin = npc.UnitData.MinRangedDamage;
-                    }
-                    if (npc.UnitData.MaxRangedDamage != 0)
-                    {
-                        hasData = true;
                         creatureStats.RangedDmgMax = npc.UnitData.MaxRangedDamage;
                     }
                 }
@@ -1411,197 +1408,127 @@ namespace WowPacketParser.Store
                 if (!hasModStatsAura || isPet)
                 {
                     var stats = npc.UnitData.Stats;
-                    if (stats.Length > 0 && stats[0] != 0)
+                    bool hasStats = false;
+                    foreach (var stat in stats)
+                    {
+                        if (stat != 0)
+                        {
+                            hasStats = true;
+                            break;
+                        }
+                    }
+                    if (hasStats)
                     {
                         hasData = true;
-                        creatureStats.Strength = stats[0];
-                    }
-                    if (stats.Length > 1 && stats[1] != 0)
-                    {
-                        hasData = true;
-                        creatureStats.Agility = stats[1];
-                    }
-                    if (stats.Length > 2 && stats[2] != 0)
-                    {
-                        hasData = true;
-                        creatureStats.Stamina = stats[2];
-                    }
-                    if (stats.Length > 3 && stats[3] != 0)
-                    {
-                        hasData = true;
-                        creatureStats.Intellect = stats[3];
-                    }
-                    if (stats.Length > 4 && stats[4] != 0)
-                    {
-                        hasData = true;
-                        creatureStats.Spirit = stats[4];
-                    }
+                        if (stats.Length > 0) 
+                            creatureStats.Strength = stats[0];
+                        if (stats.Length > 1 )
+                            creatureStats.Agility = stats[1];
+                        if (stats.Length > 2)
+                            creatureStats.Stamina = stats[2];
+                        if (stats.Length > 3)
+                            creatureStats.Intellect = stats[3];
+                        if (stats.Length > 4)
+                            creatureStats.Spirit = stats[4];
 
-                    var statsPos = npc.UnitData.StatPosBuff;
-                    if (statsPos.Length > 0 && statsPos[0] != 0)
-                    {
-                        hasData = true;
-                        creatureStats.PositiveStrength = statsPos[0];
-                    }
-                    if (statsPos.Length > 1 && statsPos[1] != 0)
-                    {
-                        hasData = true;
-                        creatureStats.PositiveAgility = statsPos[1];
-                    }
-                    if (statsPos.Length > 2 && statsPos[2] != 0)
-                    {
-                        hasData = true;
-                        creatureStats.PositiveStamina = statsPos[2];
-                    }
-                    if (statsPos.Length > 3 && statsPos[3] != 0)
-                    {
-                        hasData = true;
-                        creatureStats.PositiveIntellect = statsPos[3];
-                    }
-                    if (statsPos.Length > 4 && statsPos[4] != 0)
-                    {
-                        hasData = true;
-                        creatureStats.PositiveSpirit = statsPos[4];
-                    }
-
-                    var statsNeg = npc.UnitData.StatNegBuff;
-                    if (statsNeg.Length > 0 && statsNeg[0] != 0)
-                    {
-                        hasData = true;
-                        creatureStats.NegativeStrength = statsNeg[0];
-                    }
-                    if (statsNeg.Length > 1 && statsNeg[1] != 0)
-                    {
-                        hasData = true;
-                        creatureStats.NegativeAgility = statsNeg[1];
-                    }
-                    if (statsNeg.Length > 2 && statsNeg[2] != 0)
-                    {
-                        hasData = true;
-                        creatureStats.NegativeStamina = statsNeg[2];
-                    }
-                    if (statsNeg.Length > 3 && statsNeg[3] != 0)
-                    {
-                        hasData = true;
-                        creatureStats.NegativeIntellect = statsNeg[3];
-                    }
-                    if (statsNeg.Length > 4 && statsNeg[4] != 0)
-                    {
-                        hasData = true;
-                        creatureStats.NegativeSpirit = statsNeg[4];
+                        var statsPos = npc.UnitData.StatPosBuff;
+                        var statsNeg = npc.UnitData.StatNegBuff;
+                        if (statsPos.Length > 0)
+                            creatureStats.PositiveStrength = statsPos[0];
+                        if (statsPos.Length > 1)
+                            creatureStats.PositiveAgility = statsPos[1];
+                        if (statsPos.Length > 2)
+                            creatureStats.PositiveStamina = statsPos[2];
+                        if (statsPos.Length > 3)
+                            creatureStats.PositiveIntellect = statsPos[3];
+                        if (statsPos.Length > 4)
+                            creatureStats.PositiveSpirit = statsPos[4];
+                        if (statsNeg.Length > 0)
+                            creatureStats.NegativeStrength = statsNeg[0];
+                        if (statsNeg.Length > 1)
+                            creatureStats.NegativeAgility = statsNeg[1];
+                        if (statsNeg.Length > 2)
+                            creatureStats.NegativeStamina = statsNeg[2];
+                        if (statsNeg.Length > 3)
+                            creatureStats.NegativeIntellect = statsNeg[3];
+                        if (statsNeg.Length > 4)
+                            creatureStats.NegativeSpirit = statsNeg[4];
                     }
                 }
                 if (!hasModResistAura || isPet)
                 {
                     var resists = npc.UnitData.Resistances;
-                    if (resists.Length > 0 && resists[0] != 0)
+                    bool hasResists = false;
+                    foreach (var resist in resists)
                     {
-                        hasData = true;
-                        creatureStats.Armor = resists[0];
+                        if (resist != 0)
+                        {
+                            hasResists = true;
+                            break;
+                        }
                     }
-                    if (resists.Length > 1 && resists[1] != 0)
+                    if (hasResists)
                     {
                         hasData = true;
-                        creatureStats.HolyResistance = resists[1];
-                    }
-                    if (resists.Length > 2 && resists[2] != 0)
-                    {
-                        hasData = true;
-                        creatureStats.FireResistance = resists[2];
-                    }
-                    if (resists.Length > 3 && resists[3] != 0)
-                    {
-                        hasData = true;
-                        creatureStats.NatureResistance = resists[3];
-                    }
-                    if (resists.Length > 4 && resists[4] != 0)
-                    {
-                        hasData = true;
-                        creatureStats.FrostResistance = resists[4];
-                    }
-                    if (resists.Length > 5 && resists[5] != 0)
-                    {
-                        hasData = true;
-                        creatureStats.ShadowResistance = resists[5];
-                    }
-                    if (resists.Length > 6 && resists[6] != 0)
-                    {
-                        hasData = true;
-                        creatureStats.ArcaneResistance = resists[6];
+                        if (resists.Length > 0)
+                            creatureStats.Armor = resists[0];
+                        if (resists.Length > 1)
+                            creatureStats.HolyResistance = resists[1];
+                        if (resists.Length > 2)
+                            creatureStats.FireResistance = resists[2];
+                        if (resists.Length > 3)
+                            creatureStats.NatureResistance = resists[3];
+                        if (resists.Length > 4)
+                            creatureStats.FrostResistance = resists[4];
+                        if (resists.Length > 5)
+                            creatureStats.ShadowResistance = resists[5];
+                        if (resists.Length > 6)
+                            creatureStats.ArcaneResistance = resists[6];
                     }
 
                     var resistsPos = npc.UnitData.ResistanceBuffModsPositive;
-                    if (resistsPos.Length > 0 && resistsPos[0] != 0)
-                    {
-                        hasData = true;
-                        creatureStats.PositiveArmor = resistsPos[0];
-                    }
-                    if (resistsPos.Length > 1 && resistsPos[1] != 0)
-                    {
-                        hasData = true;
-                        creatureStats.PositiveHolyResistance = resistsPos[1];
-                    }
-                    if (resistsPos.Length > 2 && resistsPos[2] != 0)
-                    {
-                        hasData = true;
-                        creatureStats.PositiveFireResistance = resistsPos[2];
-                    }
-                    if (resistsPos.Length > 3 && resistsPos[3] != 0)
-                    {
-                        hasData = true;
-                        creatureStats.PositiveNatureResistance = resistsPos[3];
-                    }
-                    if (resistsPos.Length > 4 && resistsPos[4] != 0)
-                    {
-                        hasData = true;
-                        creatureStats.PositiveFrostResistance = resistsPos[4];
-                    }
-                    if (resistsPos.Length > 5 && resistsPos[5] != 0)
-                    {
-                        hasData = true;
-                        creatureStats.PositiveShadowResistance = resistsPos[5];
-                    }
-                    if (resistsPos.Length > 6 && resistsPos[6] != 0)
-                    {
-                        hasData = true;
-                        creatureStats.PositiveArcaneResistance = resistsPos[6];
-                    }
-
                     var resistsNeg = npc.UnitData.ResistanceBuffModsNegative;
-                    if (resistsNeg.Length > 0 && resistsNeg[0] != 0)
+                    System.Diagnostics.Trace.Assert(resistsPos.Length == resistsNeg.Length);
+                    bool hasResistMods = false;
+                    for (int i = 0; i < resistsPos.Length; i++)
                     {
-                        hasData = true;
-                        creatureStats.NegativeArmor = resistsNeg[0];
+                        if (resistsPos[i] != 0 || resistsNeg[i] != 0)
+                        {
+                            hasResistMods = true;
+                            break;
+                        }
                     }
-                    if (resistsNeg.Length > 1 && resistsNeg[1] != 0)
+                    if (hasResistMods)
                     {
                         hasData = true;
-                        creatureStats.NegativeHolyResistance = resistsNeg[1];
-                    }
-                    if (resistsNeg.Length > 2 && resistsNeg[2] != 0)
-                    {
-                        hasData = true;
-                        creatureStats.NegativeFireResistance = resistsNeg[2];
-                    }
-                    if (resistsNeg.Length > 3 && resistsNeg[3] != 0)
-                    {
-                        hasData = true;
-                        creatureStats.NegativeNatureResistance = resistsNeg[3];
-                    }
-                    if (resistsNeg.Length > 4 && resistsNeg[4] != 0)
-                    {
-                        hasData = true;
-                        creatureStats.NegativeFrostResistance = resistsNeg[4];
-                    }
-                    if (resistsNeg.Length > 5 && resistsNeg[5] != 0)
-                    {
-                        hasData = true;
-                        creatureStats.NegativeShadowResistance = resistsNeg[5];
-                    }
-                    if (resistsNeg.Length > 6 && resistsNeg[6] != 0)
-                    {
-                        hasData = true;
-                        creatureStats.NegativeArcaneResistance = resistsNeg[6];
+                        if (resistsPos.Length > 0)
+                            creatureStats.PositiveArmor = resistsPos[0];
+                        if (resistsPos.Length > 1)
+                            creatureStats.PositiveHolyResistance = resistsPos[1];
+                        if (resistsPos.Length > 2)
+                            creatureStats.PositiveFireResistance = resistsPos[2];
+                        if (resistsPos.Length > 3)
+                            creatureStats.PositiveNatureResistance = resistsPos[3];
+                        if (resistsPos.Length > 4)
+                            creatureStats.PositiveFrostResistance = resistsPos[4];
+                        if (resistsPos.Length > 5)
+                            creatureStats.PositiveShadowResistance = resistsPos[5];
+                        if (resistsPos.Length > 6)
+                            creatureStats.PositiveArcaneResistance = resistsPos[6];
+                        if (resistsNeg.Length > 0)
+                            creatureStats.NegativeArmor = resistsNeg[0];
+                        if (resistsNeg.Length > 1)
+                            creatureStats.NegativeHolyResistance = resistsNeg[1];
+                        if (resistsNeg.Length > 2)
+                            creatureStats.NegativeFireResistance = resistsNeg[2];
+                        if (resistsNeg.Length > 3)
+                            creatureStats.NegativeNatureResistance = resistsNeg[3];
+                        if (resistsNeg.Length > 4)
+                            creatureStats.NegativeFrostResistance = resistsNeg[4];
+                        if (resistsNeg.Length > 5)
+                            creatureStats.NegativeShadowResistance = resistsNeg[5];
+                        if (resistsNeg.Length > 6)
+                            creatureStats.NegativeArcaneResistance = resistsNeg[6];
                     }
                 }
             }
