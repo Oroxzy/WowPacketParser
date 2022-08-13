@@ -157,7 +157,7 @@ namespace WowPacketParser.SQL
                 case ClientType.BattleForAzeroth: // == ClientType.Classic
                     return new List<TargetedDbExpansion> { TargetedDbExpansion.BattleForAzeroth, TargetedDbExpansion.Classic };
                 case ClientType.Shadowlands: // == ClientType.BurningCrusadeClassic
-                    return new List<TargetedDbExpansion> { TargetedDbExpansion.Shadowlands, TargetedDbExpansion.BurningCrusadeClassic };
+                    return new List<TargetedDbExpansion> { TargetedDbExpansion.Shadowlands, TargetedDbExpansion.BurningCrusadeClassic, TargetedDbExpansion.WrathOfTheLichKingClassic };
                 default:
                     return new List<TargetedDbExpansion>();
             }

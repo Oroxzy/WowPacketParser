@@ -1031,6 +1031,8 @@ namespace WowPacketParser.Misc
                 return ClientType.ClassicSoM;
             if (IsBurningCrusadeClassicClientVersionBuild(build))
                 return ClientType.BurningCrusadeClassic;
+            if (IsWrathOfTheLichKingClassicClientVersionBuild(build))
+                return ClientType.WrathOfTheLichKingClassic;
             if (build >= ClientVersionBuild.V9_0_1_36216)
                 return ClientType.Shadowlands;
             if (build >= ClientVersionBuild.V8_0_1_27101)
@@ -1211,6 +1213,9 @@ namespace WowPacketParser.Misc
             if (IsBurningCrusadeClassicClientVersionBuild(Build))
                 return AddedInVersion(tbcExpansion, tbcMajor, tbcMinor);
 
+            if (IsWrathOfTheLichKingClassicClientVersionBuild(Build))
+                return true;
+
             return false;
         }
 
@@ -1221,6 +1226,9 @@ namespace WowPacketParser.Misc
 
             if (IsBurningCrusadeClassicClientVersionBuild(Build))
                 return AddedInVersion(tbcExpansion, tbcMajor, tbcMinor);
+
+            if (IsWrathOfTheLichKingClassicClientVersionBuild(Build))
+                return true;
 
             return AddedInVersion(retailExpansion, retailMajor, retailMinor);
         }
@@ -1242,7 +1250,8 @@ namespace WowPacketParser.Misc
         {
             return IsClassicVanillaClientVersionBuild(build) ||
                    IsClassicSeasonOfMasteryClientVersionBuild(build) ||
-                   IsBurningCrusadeClassicClientVersionBuild(build);
+                   IsBurningCrusadeClassicClientVersionBuild(build) ||
+                   IsWrathOfTheLichKingClassicClientVersionBuild(build);
         }
 
         public static bool IsClassicVanillaClientVersionBuild(ClientVersionBuild build)
@@ -1502,8 +1511,18 @@ namespace WowPacketParser.Misc
                 case ClientVersionBuild.V2_5_4_44171:
                 case ClientVersionBuild.V2_5_4_44400:
                 case ClientVersionBuild.V2_5_4_44833:
+                {
+                    return true;
+                }
+                default:
+                    return false;
+            }
+        }
 
-                // lie for now
+        public static bool IsWrathOfTheLichKingClassicClientVersionBuild(ClientVersionBuild build)
+        {
+            switch (build)
+            {
                 case ClientVersionBuild.V3_4_0_43659:
                 case ClientVersionBuild.V3_4_0_43682:
                 case ClientVersionBuild.V3_4_0_43746:
@@ -1648,6 +1667,8 @@ namespace WowPacketParser.Misc
                     if (AddedInVersion(2, 5, 3))
                         return 7;
                 }
+                else if (IsWrathOfTheLichKingClassicClientVersionBuild(Build))
+                    return 7;
 
                 return 6;
             }
@@ -1679,6 +1700,10 @@ namespace WowPacketParser.Misc
             {
                 if (AddedInVersion(2, 5, 3))
                     return 13;
+            }
+            else if (IsWrathOfTheLichKingClassicClientVersionBuild(Build))
+            {
+                return 13;
             }
             else
             {

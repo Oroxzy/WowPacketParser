@@ -113,9 +113,10 @@ namespace WowPacketParserModule.V2_5_1_38835.Parsers
             creature.DisplayTotalCount = packet.ReadUInt32("DisplayIdCount");
             creature.DisplayTotalProbability = packet.ReadSingle("TotalProbability");
 
-            creature.DisplayIDs = new uint[4];
-            creature.DisplayScale = new float[4];
-            creature.DisplayProbability = new float[4];
+            uint maxDisplayIds = ClientVersion.IsWrathOfTheLichKingClassicClientVersionBuild(ClientVersion.Build) ? 8u : 4u;
+            creature.DisplayIDs = new uint[maxDisplayIds];
+            creature.DisplayScale = new float[maxDisplayIds];
+            creature.DisplayProbability = new float[maxDisplayIds];
 
             for (uint i = 0; i < creature.DisplayTotalCount; ++i)
             {
@@ -123,7 +124,7 @@ namespace WowPacketParserModule.V2_5_1_38835.Parsers
                 float displayScale = packet.ReadSingle("DisplayScale", i);
                 float displayProbability = packet.ReadSingle("DisplayProbability", i);
 
-                if (i < 4)
+                if (i < maxDisplayIds)
                 {
                     creature.DisplayIDs[i] = displayId;
                     creature.DisplayScale[i] = displayScale;
