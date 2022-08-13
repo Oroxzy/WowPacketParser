@@ -32,7 +32,7 @@ namespace WowPacketParserModule.V5_4_7_17898.Parsers
             if (!hasData)
                 return; // nothing to do
 
-            creature.DisplayIDs = new uint?[4];
+            creature.DisplayIDs = new uint[4];
             creature.KillCredits = new uint?[2];
 
             creature.RacialLeader = packet.ReadBit("Racial Leader");

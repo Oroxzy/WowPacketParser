@@ -74,7 +74,7 @@ namespace WowPacketParserModule.V5_4_0_17359.Parsers
             creature.Type = packet.ReadInt32E<CreatureType>("Type");
             creature.KillCredits = new uint?[2];
             creature.KillCredits[1] = packet.ReadUInt32("Kill Credit 1");
-            creature.DisplayIDs = new uint?[4];
+            creature.DisplayIDs = new uint[4];
             creature.DisplayIDs[3] = packet.ReadUInt32("Display ID 3");
             creature.DisplayIDs[2] = packet.ReadUInt32("Display ID 2");
 

@@ -77,7 +77,7 @@ namespace WowPacketParserModule.V5_3_0_16981.Parsers
             if (lenS4 > 1)
                 creature.IconName = packet.ReadCString("Icon Name");
 
-            creature.DisplayIDs = new uint?[4];
+            creature.DisplayIDs = new uint[4];
             creature.DisplayIDs[1] = packet.ReadUInt32("CreatureDisplayID", 1);
             creature.DisplayIDs[0] = packet.ReadUInt32("CreatureDisplayID", 0);
             creature.MovementID = packet.ReadUInt32("MovementID");

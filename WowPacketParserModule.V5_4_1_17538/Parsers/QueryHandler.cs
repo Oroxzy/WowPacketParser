@@ -55,7 +55,7 @@ namespace WowPacketParserModule.V5_4_1_17538.Parsers
             if (lenS5 > 1)
                 creature.SubName = packet.ReadCString("Sub Name");
 
-            creature.DisplayIDs = new uint?[4];
+            creature.DisplayIDs = new uint[4];
             creature.DisplayIDs[0] = packet.ReadUInt32("Display ID 0");
             creature.DisplayIDs[3] = packet.ReadUInt32("Display ID 3");
 

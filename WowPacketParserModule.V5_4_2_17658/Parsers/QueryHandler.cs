@@ -43,7 +43,7 @@ namespace WowPacketParserModule.V5_4_2_17658.Parsers
 
             int bits1C = (int)packet.ReadBits(11);
 
-            creature.DisplayIDs = new uint?[4];
+            creature.DisplayIDs = new uint[4];
             creature.KillCredits = new uint?[2];
 
             creature.DisplayIDs[1] = packet.ReadUInt32("Display ID 1");

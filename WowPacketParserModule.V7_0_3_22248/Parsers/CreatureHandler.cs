@@ -64,7 +64,7 @@ namespace WowPacketParserModule.V7_0_3_22248.Parsers
             for (int i = 0; i < 2; ++i)
                 creature.KillCredits[i] = packet.ReadUInt32("ProxyCreatureID", i);
 
-            creature.DisplayIDs = new uint?[4];
+            creature.DisplayIDs = new uint[4];
             for (int i = 0; i < 4; ++i)
                 creature.DisplayIDs[i] = packet.ReadUInt32("CreatureDisplayID", i);
 

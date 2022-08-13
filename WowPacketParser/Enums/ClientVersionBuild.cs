@@ -551,6 +551,34 @@ namespace WowPacketParser.Enums
         V2_5_4_44036 = 44036, // both live and ptr
         V2_5_4_44171 = 44171, // both live and ptr
         V2_5_4_44400 = 44400, // both live and ptr
+        V2_5_4_44833 = 44833, // both live and ptr
+
+        // WotLK Classic
+        V3_4_0_43659 = 43659, // beta
+        V3_4_0_43682 = 43682, // beta
+        V3_4_0_43746 = 43746, // beta
+        V3_4_0_43788 = 43788, // beta
+        V3_4_0_43866 = 43866, // beta
+        V3_4_0_43881 = 43881, // submission
+        V3_4_0_43929 = 43929, // submission
+        V3_4_0_43955 = 43955, // beta
+        V3_4_0_44064 = 44064, // beta
+        V3_4_0_44184 = 44184, // beta
+        V3_4_0_44250 = 44250, // beta
+        V3_4_0_44301 = 44301, // beta
+        V3_4_0_44369 = 44369, // beta
+        V3_4_0_44463 = 44463, // beta
+        V3_4_0_44547 = 44547, // beta
+        V3_4_0_44644 = 44644, // beta
+        V3_4_0_44701 = 44701, // submission
+        V3_4_0_44729 = 44729, // beta
+        V3_4_0_44832 = 44832, // beta
+        V3_4_0_44925 = 44925, // submission
+        V3_4_0_44930 = 44930, // beta and ptr
+        V3_4_0_44996 = 44996, // submission
+        V3_4_0_45043 = 45043, // beta and ptr
+        V3_4_0_45064 = 45064, // submission
+        V3_4_0_45102 = 45102, // submission
 
         // Battle.net - should probably not mix this but oh well
         BattleNetV37165 = 37165,

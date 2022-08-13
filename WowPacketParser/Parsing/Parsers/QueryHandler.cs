@@ -152,7 +152,7 @@ namespace WowPacketParser.Parsing.Parsers
             }
 
             int displayIdCount = ClientVersion.AddedInVersion(ClientVersionBuild.V2_0_1_6180) ? 4 : 1;
-            creature.DisplayIDs = new uint?[displayIdCount];
+            creature.DisplayIDs = new uint[displayIdCount];
             for (int i = 0; i < displayIdCount; i++)
                 creature.DisplayIDs[i] = packet.ReadUInt32("Display ID", i);
 

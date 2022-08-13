@@ -32,7 +32,7 @@ namespace WowPacketParserModule.V5_4_8_18291.Parsers
             if (!hasData)
                 return; // nothing to do
 
-            creature.DisplayIDs = new uint?[4];
+            creature.DisplayIDs = new uint[4];
             creature.KillCredits = new uint?[2];
 
             uint bits24 = packet.ReadBits(11); //+7
