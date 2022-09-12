@@ -681,7 +681,13 @@ namespace WowPacketParserModule.V8_0_1_27101.Parsers
                 if (isExistingObject)
                     CoreParsers.UpdateHandler.ProcessExistingObject(ref obj, guid, packet, updateMaskArray, obj.UpdateFields, obj.DynamicUpdateFields, moves); // can't do "ref Storage.Objects[guid].Item1 directly
                 else
+                {
                     Storage.StoreNewObject(guid, obj, type, packet);
+
+                    // Only needed for pets.
+                    if (guid.GetHighType() == HighGuidType.Pet)
+                        Storage.StoreCreatureStats(obj as Unit, updateMaskArray, guid.GetHighType() == HighGuidType.Pet, packet);
+                }
             }
             else
             {
@@ -700,6 +706,10 @@ namespace WowPacketParserModule.V8_0_1_27101.Parsers
                     obj.UpdateFields = updates;
                     obj.DynamicUpdateFields = dynamicUpdates;
                     Storage.StoreNewObject(guid, obj, type, packet);
+
+                    // Only needed for pets.
+                    if (guid.GetHighType() == HighGuidType.Pet)
+                        Storage.StoreCreatureStats(obj as Unit, updateMaskArray, guid.GetHighType() == HighGuidType.Pet, packet);
                 }
             }
 

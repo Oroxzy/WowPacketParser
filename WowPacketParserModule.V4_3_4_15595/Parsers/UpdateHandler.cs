@@ -81,6 +81,10 @@ namespace WowPacketParserModule.V4_3_4_15595.Parsers
                 obj.UpdateFields = updates;
                 obj.DynamicUpdateFields = dynamicUpdates;
                 Storage.StoreNewObject(guid, obj, type, packet);
+
+                // Only needed for pets.
+                if (guid.GetHighType() == HighGuidType.Pet)
+                    Storage.StoreCreatureStats(obj as Unit, updateMaskArray, guid.GetHighType() == HighGuidType.Pet, packet);
             }   
 
             if (guid.HasEntry() && (objType == ObjectType.Unit || objType == ObjectType.GameObject))
