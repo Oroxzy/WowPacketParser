@@ -1420,3 +1420,23 @@ ALTER TABLE `creature_melee_damage`
 	CHANGE COLUMN `damage_min` `damage_min` INT(10) NOT NULL DEFAULT '0' AFTER `hits_count`,
 	CHANGE COLUMN `damage_average` `damage_average` INT(10) NOT NULL DEFAULT '0' AFTER `damage_min`,
 	CHANGE COLUMN `damage_max` `damage_max` INT(10) NOT NULL DEFAULT '0' AFTER `damage_average`;
+
+CREATE TABLE `replay_marked_creature` (
+	`guid` INT UNSIGNED NOT NULL,
+	`marker` INT NOT NULL DEFAULT '0',
+	PRIMARY KEY (`guid`)
+)
+COMMENT='creatures that have been manually marked from replay core'
+COLLATE='latin1_general_ci'
+ENGINE=InnoDB
+;
+
+CREATE TABLE `replay_marked_gameobject` (
+	`guid` INT UNSIGNED NOT NULL,
+	`marker` INT NOT NULL DEFAULT '0',
+	PRIMARY KEY (`guid`)
+)
+COMMENT='gameobjects that have been manually marked from replay core'
+COLLATE='latin1_general_ci'
+ENGINE=InnoDB
+;
