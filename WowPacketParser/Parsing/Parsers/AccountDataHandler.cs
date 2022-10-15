@@ -60,7 +60,9 @@ namespace WowPacketParser.Parsing.Parsers
         [Parser(Opcode.SMSG_UPDATE_ACCOUNT_DATA)]
         public static void HandleServerUpdateAccountData(Packet packet)
         {
-            packet.ReadGuid("GUID");
+            if (ClientVersion.AddedInVersion(ClientVersionBuild.V3_0_2_9056))
+                packet.ReadGuid("GUID");
+
             ReadUpdateAccountDataBlock(packet);
         }
 
