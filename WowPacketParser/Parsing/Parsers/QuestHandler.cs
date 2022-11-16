@@ -1243,6 +1243,17 @@ namespace WowPacketParser.Parsing.Parsers
             };
             Storage.QuestEnders.Add(questEnder, packet.TimeSpan);
             Storage.QuestOfferRewards.Add(offerReward, packet.TimeSpan);
+
+            if (ClientLocale.PacketLocale != LocaleConstant.enUS && offerReward.RewardText != string.Empty)
+            {
+                QuestOfferRewardLocale localesQuestOfferReward = new QuestOfferRewardLocale
+                {
+                    ID = entry,
+                    RewardText = offerReward.RewardText
+                };
+
+                Storage.LocalesQuestOfferRewards.Add(localesQuestOfferReward, packet.TimeSpan);
+            }
         }
 
         [Parser(Opcode.CMSG_QUEST_GIVER_CHOOSE_REWARD)]

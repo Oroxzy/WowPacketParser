@@ -234,6 +234,17 @@ namespace WowPacketParserModule.V5_4_2_17658.Parsers
 
             Storage.GossipPOIs.Add(gossipPOI, packet.TimeSpan);
 
+            if (ClientLocale.PacketLocale != LocaleConstant.enUS)
+            {
+                PointsOfInterestLocale localesPoi = new PointsOfInterestLocale
+                {
+                    ID = (uint)gossipPOI.ID,
+                    Name = gossipPOI.Name,
+                };
+
+                Storage.LocalesPointsOfInterest.Add(localesPoi, packet.TimeSpan);
+            }
+
             var lastGossipOption = CoreParsers.NpcHandler.LastGossipOption;
             var tempGossipOptionPOI = CoreParsers.NpcHandler.TempGossipOptionPOI;
 

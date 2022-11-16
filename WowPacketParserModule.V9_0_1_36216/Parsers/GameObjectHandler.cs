@@ -65,6 +65,19 @@ namespace WowPacketParserModule.V9_0_1_36216.Parsers
 
             Storage.GameObjectTemplates.Add(gameObject, packet.TimeSpan);
 
+            if (ClientLocale.PacketLocale != LocaleConstant.enUS)
+            {
+                GameObjectTemplateLocale localesGameObject = new GameObjectTemplateLocale
+                {
+                    ID = (uint)entry.Key,
+                    Name = gameObject.Name,
+                    CastBarCaption = gameObject.CastCaption,
+                    Unk1 = gameObject.UnkString,
+                };
+
+                Storage.LocalesGameObjects.Add(localesGameObject, packet.TimeSpan);
+            }
+
             ObjectName objectName = new ObjectName
             {
                 ObjectType = StoreNameType.GameObject,

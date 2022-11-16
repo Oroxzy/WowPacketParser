@@ -61,6 +61,17 @@ namespace WowPacketParserModule.V9_0_1_36216.Parsers
 
             Storage.GossipPOIs.Add(gossipPOI, packet.TimeSpan);
 
+            if (ClientLocale.PacketLocale != LocaleConstant.enUS)
+            {
+                PointsOfInterestLocale localesPoi = new PointsOfInterestLocale
+                {
+                    ID = (uint)gossipPOI.ID,
+                    Name = gossipPOI.Name,
+                };
+
+                Storage.LocalesPointsOfInterest.Add(localesPoi, packet.TimeSpan);
+            }
+
             if (tempGossipOptionPOI.HasSelection)
             {
                 if ((packet.TimeSpan - tempGossipOptionPOI.TimeSpan).Duration() <= TimeSpan.FromMilliseconds(2500))

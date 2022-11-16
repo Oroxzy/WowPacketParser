@@ -234,6 +234,7 @@ namespace WowPacketParser.Misc
             public static readonly bool gameobject_loot = Conf.GetBoolean("gameobject_loot", false);
             public static readonly bool gameobject_template = Conf.GetBoolean("gameobject_template", false);
             public static readonly bool gameobject_template_addon = Conf.GetBoolean("gameobject_template_addon", false);
+            public static readonly bool gameobject_template_locale = Conf.GetBoolean("gameobject_template_locale", false);
             public static readonly bool gameobject_unique_anim = Conf.GetBoolean("gameobject_unique_anim", false);
             public static readonly bool gossip_menu = Conf.GetBoolean("gossip_menu", false);
             public static readonly bool gossip_menu_option = Conf.GetBoolean("gossip_menu_option", false);
@@ -260,6 +261,7 @@ namespace WowPacketParser.Misc
             public static readonly bool player_levelstats = Conf.GetBoolean("player_levelstats", false);
             public static readonly bool player_levelup_info = Conf.GetBoolean("player_levelup_info", false);
             public static readonly bool points_of_interest = Conf.GetBoolean("points_of_interest", false);
+            public static readonly bool points_of_interest_locale = Conf.GetBoolean("points_of_interest_locale", false);
             public static readonly bool quest_ender = Conf.GetBoolean("quest_ender", false); 
             public static readonly bool quest_poi = Conf.GetBoolean("quest_poi", false);
             public static readonly bool quest_poi_points = Conf.GetBoolean("quest_poi_points", false);

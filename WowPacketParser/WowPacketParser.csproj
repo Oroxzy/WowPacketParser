@@ -679,6 +679,7 @@
     <Compile Include="Store\Objects\DynamicObject.cs" />
     <Compile Include="Store\Objects\DynamicObjectSpawn.cs" />
     <Compile Include="Store\Objects\FactionStandingUpdate.cs" />
+    <Compile Include="Store\Objects\GameObjectTemplateLocale.cs" />
     <Compile Include="Store\Objects\Guilds.cs" />
     <Compile Include="Store\Objects\ItemInstance.cs" />
     <Compile Include="Store\Objects\LocalesQuestObjective.cs" />
@@ -686,6 +687,7 @@
     <Compile Include="Store\Objects\MailTemplate.cs" />
     <Compile Include="Store\Objects\ObjectCreate.cs" />
     <Compile Include="Store\Objects\PlayerGuidLookupData.cs" />
+    <Compile Include="Store\Objects\PointsOfInterestLocale.cs" />
     <Compile Include="Store\Objects\SceneObject.cs" />
     <Compile Include="Store\Objects\Sounds.cs" />
     <Compile Include="Store\Objects\SpellCastData.cs" />
