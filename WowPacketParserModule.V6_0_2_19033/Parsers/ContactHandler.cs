@@ -11,7 +11,7 @@ namespace WowPacketParserModule.V6_0_2_19033.Parsers
         public static void HandleAddIgnoreOrMute(Packet packet)
         {
             var nameLength = packet.ReadBits(9);
-            if (ClientVersion.AddedInVersion(ClientVersionBuild.V9_1_5_40772))
+            if (ClientVersion.AddedInVersion(9, 1, 5, 1, 14, 1, 2, 5, 3))
                 packet.ReadPackedGuid128("AccountGUID");
             packet.ReadWoWString("Name", nameLength);
         }

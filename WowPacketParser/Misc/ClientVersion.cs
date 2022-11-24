@@ -1714,13 +1714,12 @@ namespace WowPacketParser.Misc
             {
                 return 13;
             }
-            else
+            else if (!IsClassicClientVersionBuild(Build))
             {
-                if (AddedInVersion(ClientVersionBuild.V9_1_5_40772))
-                    return 12;
-
                 if (AddedInVersion(ClientVersionBuild.V9_2_0_42423))
                     return 13;
+                else if (AddedInVersion(ClientVersionBuild.V9_1_5_40772))
+                    return 12;
             }
 
             return 8;
