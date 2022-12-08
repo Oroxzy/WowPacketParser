@@ -94,5 +94,18 @@ namespace WowPacketParserModule.V9_0_1_36216.Parsers
         {
             packet.ReadInt32("Ticks");
         }
+
+        [Parser(Opcode.CMSG_MOUNT_SPECIAL_ANIM)]
+        public static void HandleMountSpecialAnim(Packet packet)
+        {
+            if (ClientVersion.AddedInVersion(9, 0, 5, 1, 14, 0, 2, 5, 1))
+            {
+                uint count = packet.ReadUInt32("SpellVisualKitCount");
+                if (ClientVersion.AddedInVersion(9, 2, 0, 1, 14, 2, 2, 5, 3))
+                    packet.ReadInt32("SequenceVariation");
+                for (uint i = 0; i < 0; i++)
+                    packet.ReadInt32("SpellVisualKitID", i);
+            }
+        }
     }
 }

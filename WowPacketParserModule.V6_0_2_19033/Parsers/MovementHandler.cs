@@ -1088,6 +1088,14 @@ namespace WowPacketParserModule.V6_0_2_19033.Parsers
         public static void HandleSpecialMountAnim(Packet packet)
         {
             packet.ReadPackedGuid128("UnitGUID");
+            if (ClientVersion.AddedInVersion(9, 0, 5, 1, 14, 0, 2, 5, 1))
+            {
+                uint count = packet.ReadUInt32("SpellVisualKitCount");
+                if (ClientVersion.AddedInVersion(9, 2, 0, 1, 14, 2, 2, 5, 3))
+                    packet.ReadInt32("SequenceVariation");
+                for (uint i = 0; i < 0; i++)
+                    packet.ReadInt32("SpellVisualKitID", i);
+            }
         }
 
         [Parser(Opcode.SMSG_MOVE_KNOCK_BACK)]

@@ -55,6 +55,12 @@ namespace WowPacketParserModule.V9_0_1_36216.Parsers
                 packet.ReadByteE<Class>("ClassID", i);
                 packet.ReadByteE<Gender>("Gender", i);
 
+                if (ClientVersion.AddedInVersion(9, 2, 5, 1, 14, 3, 2, 5, 4))
+                {
+                    packet.ReadUInt64("GuildClubMemberID", i);
+                    packet.ReadByteE<Race>("RaceID", i);
+                }
+
                 packet.ResetBitReader();
 
                 var nameLen = packet.ReadBits(6);
@@ -64,7 +70,8 @@ namespace WowPacketParserModule.V9_0_1_36216.Parsers
                 packet.ReadBit("Authenticated", i);
                 packet.ReadBit("SorEligible", i);
 
-                Substructures.MythicPlusHandler.ReadDungeonScoreSummary(packet, i, "DungeonScoreSummary");
+                if (!ClientVersion.IsClassicClientVersionBuild(ClientVersion.Build))
+                    Substructures.MythicPlusHandler.ReadDungeonScoreSummary(packet, i, "DungeonScoreSummary");
 
                 packet.ReadWoWString("Name", nameLen, i);
                 packet.ReadWoWString("Note", noteLen, i);
@@ -81,6 +88,18 @@ namespace WowPacketParserModule.V9_0_1_36216.Parsers
             var length = packet.ReadBits(7);
             packet.ReadUInt32("Unused910");
             packet.ReadPackedGuid128("Unit");
+        }
+
+        [Parser(Opcode.CMSG_AUTO_GUILD_BANK_ITEM)]
+        public static void HandleGuildBankItem(Packet packet)
+        {
+            packet.ReadPackedGuid128("BankGuid");
+            packet.ReadByte("BankTab");
+            packet.ReadByte("BankSlot"); ;
+            packet.ReadByte("ContainerItemSlot");
+
+            if (packet.ReadBit())
+                packet.ReadByte("ContainerSlot");
         }
     }
 }
