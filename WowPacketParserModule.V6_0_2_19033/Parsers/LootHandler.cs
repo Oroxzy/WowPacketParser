@@ -216,5 +216,18 @@ namespace WowPacketParserModule.V6_0_2_19033.Parsers
             for (uint i = 0; i < count; i++)
                 packet.ReadPackedGuid128("Player", i);
         }
+
+        [Parser(Opcode.CMSG_LOOT_MASTER_GIVE)]
+        public static void HandleLootMasterGive(Packet packet)
+        {
+            uint count = packet.ReadUInt32("Count");
+            packet.ReadPackedGuid128("Loot GUID");
+
+            for (uint i = 0; i < count; i++)
+            {
+                packet.ReadPackedGuid128("Player GUID");
+                packet.ReadByte("Slot");
+            }
+        }
     }
 }

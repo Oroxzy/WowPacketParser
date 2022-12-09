@@ -152,21 +152,7 @@ namespace WowPacketParserModule.V2_5_1_38835.Parsers
             var hasAzeriteLevel = packet.ReadBit("HasAzeriteLevel");
 
             for (int i = 0; i < 6; i++)
-            {
-                packet.ReadByte("Bracket", i, "PvpData");
-                packet.ReadInt32("Rating", i, "PvpData");
-                packet.ReadInt32("Rank", i, "PvpData");
-                packet.ReadInt32("WeeklyPlayed", i, "PvpData");
-                packet.ReadInt32("WeeklyWon", i, "PvpData");
-                packet.ReadInt32("SeasonPlayed", i, "PvpData");
-                packet.ReadInt32("SeasonWon", i, "PvpData");
-                packet.ReadInt32("WeeklyBestRating", i, "PvpData");
-                packet.ReadInt32("Unk710", i, "PvpData");
-                packet.ReadInt32("Unk801_1", i, "PvpData");
-                packet.ReadInt32("Unk252_1", i, "PvpData");
-                packet.ResetBitReader();
-                packet.ReadBit("Unk801_2", i, "PvpData");
-            }
+                WowPacketParserModule.V9_0_1_36216.Parsers.CharacterHandler.ReadPVPBracketData(packet, i, "PVPBracketData");
 
             if (hasGuildData)
             {
