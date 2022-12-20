@@ -107,9 +107,7 @@ namespace WowPacketParserModule.V2_5_1_38707.Parsers
 
             packet.ReadInt32("TotalCount");
             packet.ReadInt32("DesiredDelay");
-
-            if (itemsCount > 0)
-                packet.ReadBool("OnlyUsable");
+            packet.ReadBool("OnlyUsable");
 
             for (var i = 0; i < itemsCount; i++)
                 ReadCliAuctionItem(packet, i);
