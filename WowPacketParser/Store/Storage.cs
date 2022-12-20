@@ -102,6 +102,29 @@ namespace WowPacketParser.Store
                 if (guid.GetHighType() != HighGuidType.Pet)
                     StoreCreatureEquipment(creature, obj.SourceSniffId);
             }
+            else if (obj.Type == ObjectType.GameObject)
+            {
+                GameObject go = obj as GameObject;
+
+                if (type == ObjectCreateType.Create2 &&
+                    Settings.SqlTables.gameobject_respawn_time &&
+                    guid.GetHighType() == HighGuidType.GameObject &&
+                    obj.OriginalMovement != null)
+                {
+                    Tuple<WowGuid, DateTime> lastDeath;
+                    if (GameObjectDespawnTimes.TryGetValue(obj.OriginalMovement.Position, out lastDeath))
+                    {
+                        CreatureRespawnTime respawnTime = new CreatureRespawnTime
+                        {
+                            OldGUID = Storage.GetObjectDbGuid(lastDeath.Item1),
+                            NewGUID = "@OGUID+" + go.DbGuid,
+                            RespawnTime = (uint)(packet.Time - lastDeath.Item2).TotalSeconds
+                        };
+                        GameObjectRespawnTimes.Add(respawnTime);
+                        GameObjectDespawnTimes.Remove(obj.OriginalMovement.Position);
+                    }
+                }
+            }
         }
         public static string GetObjectDbGuid(WowGuid guid)
         {
@@ -407,6 +430,22 @@ namespace WowPacketParser.Store
                 }
             }
         }
+
+        public static readonly DataBag<CreatureRespawnTime> GameObjectRespawnTimes = new DataBag<CreatureRespawnTime>(Settings.SqlTables.gameobject_respawn_time);
+        public static readonly Dictionary<Vector3, Tuple<WowGuid, DateTime>> GameObjectDespawnTimes = new Dictionary<Vector3, Tuple<WowGuid, DateTime>>();
+        public static void StoreGameObjectDespawnTime(WowGuid guid, DateTime time)
+        {
+            if (Settings.SqlTables.gameobject_respawn_time)
+            {
+                WoWObject obj;
+                if (Storage.Objects.TryGetValue(guid, out obj))
+                {
+                    GameObjectDespawnTimes.Remove(obj.OriginalMovement.Position);
+                    GameObjectDespawnTimes.Add(obj.OriginalMovement.Position, new Tuple<WowGuid, DateTime>(guid, time));
+                }
+            }
+        }
+
         public static readonly DataBag<SpellAuraFlags> SpellAuraFlags = new DataBag<SpellAuraFlags>(Settings.SqlTables.spell_aura_flags);
         public static readonly Dictionary<WowGuid, List<AuraUpdateData>> UnitAurasUpdates = new Dictionary<WowGuid, List<AuraUpdateData>>();
         public static void StoreUnitAurasUpdate(WowGuid guid, List<Aura> auras, DateTime time, bool isFullUpdate)
@@ -2846,6 +2885,7 @@ namespace WowPacketParser.Store
             CurrentTaxiNode = 0;
             LastCreatureCastGo.Clear();
             CreatureDeathTimes.Clear();
+            GameObjectDespawnTimes.Clear();
             LastCreatureKill = null;
             WowPacketParser.Parsing.Parsers.NpcHandler.CanBeDefaultGossipMenu = true;
         }
@@ -2882,6 +2922,7 @@ namespace WowPacketParser.Store
             GameObjectClientUseTimes.Clear();
             GameObjectCustomAnims.Clear();
             GameObjectDespawnAnims.Clear();
+            GameObjectRespawnTimes.Clear();
             GameObjectLoot.Clear();
             GameObjectTemplates.Clear();
             GameObjectTemplateQuestItems.Clear();

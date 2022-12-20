@@ -4521,6 +4521,9 @@ namespace WowPacketParser.Parsing.Parsers
             WowGuid guid = packet.ReadGuid("GUID");
             Storage.StoreObjectDestroyTime(guid, packet.Time);
 
+            if (guid.GetHighType() == HighGuidType.GameObject)
+                Storage.StoreGameObjectDespawnTime(guid, packet.Time);
+
             if (packet.CanRead())
                 packet.ReadBool("Despawn Animation");
         }

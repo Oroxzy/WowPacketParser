@@ -31,6 +31,9 @@ namespace WowPacketParserModule.V6_0_2_19033.Parsers
                 {
                     WowGuid guid = packet.ReadPackedGuid128("ObjectGUID", "Destroyed", i);
                     Storage.StoreObjectDestroyTime(guid, packet.Time);
+
+                    if (guid.GetHighType() == HighGuidType.GameObject)
+                        Storage.StoreGameObjectDespawnTime(guid, packet.Time);
                 }
                 for (var i = 0; i < outOfRangeObjCount; i++)
                 {

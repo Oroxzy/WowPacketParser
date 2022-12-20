@@ -1600,6 +1600,18 @@ namespace WowPacketParser.SQL.Builders
         }
 
         [BuilderMethod]
+        public static string GameObjectRespawnTime()
+        {
+            if (Storage.GameObjectRespawnTimes.IsEmpty())
+                return string.Empty;
+
+            if (!Settings.SqlTables.gameobject_respawn_time)
+                return string.Empty;
+
+            return SQLUtil.Insert(Storage.GameObjectRespawnTimes, false, true, "gameobject_respawn_time");
+        }
+
+        [BuilderMethod]
         public static string CreatureKillReptation()
         {
             if (Storage.CreatureKillReputations.IsEmpty())

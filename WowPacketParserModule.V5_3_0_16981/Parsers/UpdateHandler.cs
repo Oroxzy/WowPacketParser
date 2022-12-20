@@ -902,6 +902,9 @@ namespace WowPacketParserModule.V5_3_0_16981.Parsers
             packet.ParseBitStream(guid, 7, 1, 2, 5, 0, 3, 6, 4);
             WowGuid GUID = packet.WriteGuid("GUID", guid);
             Storage.StoreObjectDestroyTime(GUID, packet.Time);
+
+            if (GUID.GetHighType() == HighGuidType.GameObject)
+                Storage.StoreGameObjectDespawnTime(GUID, packet.Time);
         }
     }
 }

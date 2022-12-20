@@ -232,6 +232,7 @@ namespace WowPacketParser.Misc
             public static readonly bool creature_unique_text = Conf.GetBoolean("creature_unique_text", false);
             public static readonly bool gameobject_addon = Conf.GetBoolean("gameobject_addon", false);
             public static readonly bool gameobject_loot = Conf.GetBoolean("gameobject_loot", false);
+            public static readonly bool gameobject_respawn_time = Conf.GetBoolean("gameobject_respawn_time", false);
             public static readonly bool gameobject_template = Conf.GetBoolean("gameobject_template", false);
             public static readonly bool gameobject_template_addon = Conf.GetBoolean("gameobject_template_addon", false);
             public static readonly bool gameobject_template_locale = Conf.GetBoolean("gameobject_template_locale", false);

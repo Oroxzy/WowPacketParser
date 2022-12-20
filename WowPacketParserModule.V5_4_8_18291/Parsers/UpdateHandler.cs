@@ -33,6 +33,9 @@ namespace WowPacketParserModule.V5_4_8_18291.Parsers
 
             WowGuid GUID = packet.WriteGuid("GUID", guid);
             Storage.StoreObjectDestroyTime(GUID, packet.Time);
+
+            if (GUID.GetHighType() == HighGuidType.GameObject)
+                Storage.StoreGameObjectDespawnTime(GUID, packet.Time);
         }
 
         [HasSniffData] // in ReadCreateObjectBlock

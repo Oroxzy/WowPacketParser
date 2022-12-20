@@ -138,6 +138,7 @@
         creature_unique_text,
         gameobject_addon,
         gameobject_loot,
+        gameobject_respawn_time,
         gameobject_template,
         gameobject_template_addon,
         gameobject_template_locale,

@@ -946,6 +946,9 @@ namespace WowPacketParserModule.V5_4_2_17658.Parsers
 
             WowGuid GUID = packet.WriteGuid("GUID", guid);
             Storage.StoreObjectDestroyTime(GUID, packet.Time);
+
+            if (GUID.GetHighType() == HighGuidType.GameObject)
+                Storage.StoreGameObjectDespawnTime(GUID, packet.Time);
         }
 
         [Parser(Opcode.CMSG_OBJECT_UPDATE_FAILED)]
