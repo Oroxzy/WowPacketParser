@@ -754,7 +754,7 @@ namespace WowPacketParser.Enums.Version.V2_5_3_41750
             {Opcode.CMSG_CONTRIBUTION_LAST_UPDATE_REQUEST, 0x3556},
             // {Opcode.UNNAMED, 0x3557},
             // {Opcode.UNNAMED, 0x3558},
-            // {Opcode.UNNAMED, 0x3559},
+            {Opcode.CMSG_SET_AMMO, 0x3559},
             // {Opcode.UNNAMED, 0x355A},
             // {Opcode.UNNAMED, 0x355B},
             // {Opcode.UNNAMED, 0x355C},

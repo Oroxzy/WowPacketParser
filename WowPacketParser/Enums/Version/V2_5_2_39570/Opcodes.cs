@@ -592,6 +592,7 @@ namespace WowPacketParser.Enums.Version.V2_5_2_39570
             {Opcode.CMSG_SEND_MAIL, 0x35FB},
             {Opcode.CMSG_SEND_TEXT_EMOTE, 0x3488},
             {Opcode.CMSG_SERVER_TIME_OFFSET_REQUEST, 0x369A},
+            {Opcode.CMSG_SET_AMMO, 0x3559},
             {Opcode.CMSG_SET_ACHIEVEMENTS_HIDDEN, 0x3223},
             {Opcode.CMSG_SET_ACTION_BAR_TOGGLES, 0x3531},
             {Opcode.CMSG_SET_ACTION_BUTTON, 0x3558},
