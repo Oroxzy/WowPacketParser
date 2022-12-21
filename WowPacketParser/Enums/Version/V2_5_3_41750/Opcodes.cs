@@ -1018,7 +1018,7 @@ namespace WowPacketParser.Enums.Version.V2_5_3_41750
             {Opcode.CMSG_BATTLE_PAY_DISTRIBUTION_ASSIGN_TO_TARGET, 0x36C9},
             {Opcode.CMSG_CHARACTER_UPGRADE_MANUAL_UNREVOKE_REQUEST, 0x36CA},
             {Opcode.CMSG_CHARACTER_UPGRADE_START, 0x36CB},
-            // {Opcode.UNNAMED, 0x36CC},
+            {Opcode.CMSG_CHARACTER_CHECK_UPGRADE, 0x36CC},
             // {Opcode.UNNAMED, 0x36CD},
             {Opcode.CMSG_GUILD_SET_GUILD_MASTER, 0x36CE},
             {Opcode.CMSG_PETITION_RENAME_GUILD, 0x36CF},
