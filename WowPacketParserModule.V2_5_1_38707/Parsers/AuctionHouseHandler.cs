@@ -120,8 +120,10 @@ namespace WowPacketParserModule.V2_5_1_38707.Parsers
             packet.ReadInt64("BidPrice");
             packet.ReadInt64("BuyoutPrice");
             packet.ReadInt32("RunTime");
-            bool hasAddonInfo = ClientVersion.AddedInVersion(2, 5, 4) ? (bool)packet.ReadBit("HasAddonInfo") : false;
-            var count = packet.ReadBits("ItemsCount", 6);
+            bool hasAddonInfo = packet.ReadBit("HasAddonInfo");
+
+            int itemCountBits = ClientVersion.AddedInClassicVersion(1, 14, 3, 2, 5, 4) ? 6 : 5;
+            var count = packet.ReadBits("ItemsCount", itemCountBits);
             packet.ResetBitReader();
 
             if (hasAddonInfo)
@@ -187,21 +189,17 @@ namespace WowPacketParserModule.V2_5_1_38707.Parsers
         [Parser(Opcode.SMSG_AUCTION_OUTBID_NOTIFICATION)]
         public static void HandleAuctionOutbitNotification(Packet packet)
         {
-            packet.ReadUInt32("AuctionItemID");
+            packet.ReadUInt32("Command");
+            V6_0_2_19033.Parsers.AuctionHandler.ReadClientAuctionBidderNotification(packet, "Info");
             packet.ReadUInt64("BidAmount");
-            Substructures.ItemHandler.ReadItemInstance(packet);
-            packet.ReadByte("Unk");
-            packet.ReadUInt32("Unk2");
+            packet.ReadUInt64("BidIncrement");
         }
 
-        [Parser(Opcode.SMSG_AUCTION_OWNER_BID_NOTIFICATION)]
-        public static void HandleAuctionOwnerBidNotification(Packet packet)
+        [Parser(Opcode.SMSG_AUCTION_WON_NOTIFICATION)]
+        public static void HandleAuctionReplicateResponse(Packet packet)
         {
-            var mailListCount = packet.ReadUInt32("MailListCount");
-            packet.ReadInt32("Field_04");
-
-            for (var i = 0; i < mailListCount; i++)
-                V7_0_3_22248.Parsers.MailHandler.ReadMailListEntry(packet, "MailListEntry", i);
+            packet.ReadUInt32("Command");
+            V6_0_2_19033.Parsers.AuctionHandler.ReadClientAuctionBidderNotification(packet, "Info");
         }
     }
 }
