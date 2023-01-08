@@ -99,8 +99,6 @@ namespace WowPacketParserModule.V5_4_2_17658.Parsers
 
             packet.AddSniffData(StoreNameType.Unit, entry.Key, "QUERY_RESPONSE");
 
-            Storage.CreatureTemplates.Add(creature, packet.TimeSpan);
-
             if (ClientLocale.PacketLocale != LocaleConstant.enUS)
             {
                 CreatureTemplateLocale localesCreature = new CreatureTemplateLocale
@@ -114,14 +112,18 @@ namespace WowPacketParserModule.V5_4_2_17658.Parsers
 
                 Storage.LocalesCreatures.Add(localesCreature, packet.TimeSpan);
             }
-
-            ObjectName objectName = new ObjectName
+            else
             {
-                ObjectType = StoreNameType.Unit,
-                ID = entry.Key,
-                Name = creature.Name
-            };
-            Storage.ObjectNames.Add(objectName, packet.TimeSpan);
+                Storage.CreatureTemplates.Add(creature, packet.TimeSpan);
+
+                ObjectName objectName = new ObjectName
+                {
+                    ObjectType = StoreNameType.Unit,
+                    ID = entry.Key,
+                    Name = creature.Name
+                };
+                Storage.ObjectNames.Add(objectName, packet.TimeSpan);
+            }
         }
 
         [Parser(Opcode.CMSG_DB_QUERY_BULK)]
@@ -228,7 +230,23 @@ namespace WowPacketParserModule.V5_4_2_17658.Parsers
             packet.ReadUInt32("Entry");
 
             packet.AddSniffData(StoreNameType.PageText, (int)entry, "QUERY_RESPONSE");
-            Storage.PageTexts.Add(pageText, packet.TimeSpan);
+
+            if (ClientLocale.PacketLocale != LocaleConstant.enUS)
+            {
+                if (!string.IsNullOrEmpty(pageText.Text))
+                {
+                    PageTextLocale localesPageText = new PageTextLocale
+                    {
+                        ID = pageText.ID,
+                        Text = pageText.Text
+                    };
+                    Storage.LocalesPageText.Add(localesPageText, packet.TimeSpan);
+                }
+            }
+            else
+            {
+                Storage.PageTexts.Add(pageText, packet.TimeSpan);
+            }
         }
 
         [Parser(Opcode.SMSG_QUERY_PLAYER_NAME_RESPONSE)]

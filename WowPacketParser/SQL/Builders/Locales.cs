@@ -213,6 +213,31 @@ namespace WowPacketParser.SQL.Builders
         }
 
         [BuilderMethod]
+        public static string LocalesTrainer()
+        {
+            if (Storage.LocalesTrainer.IsEmpty())
+                return string.Empty;
+
+            if (!Settings.SqlTables.trainer_locale)
+                return string.Empty;
+
+            if (Settings.TargetedDbType == TargetedDbType.VMANGOS)
+            {
+                string result = "SET NAMES 'utf8';" + Environment.NewLine;
+                foreach (var locale in Storage.LocalesTrainer)
+                {
+                    result += "UPDATE `npc_trainer_greeting` SET `content_loc" + ClientLocale.GetLocaleIndexFromLocaleName(locale.Item1.Locale) + "`='" + SQLUtil.EscapeString(locale.Item1.Greeting) + "' WHERE `entry`=" + locale.Item1.TrainerEntry + ";" + Environment.NewLine;
+                }
+                return result;
+            }
+
+            // pass empty list, because we want to select the whole db table (faster than select only needed columns)
+            var trainerDb = SQLDatabase.Get(new RowList<Store.Objects.TrainerLocale>());
+
+            return "SET NAMES 'utf8';" + Environment.NewLine + SQLUtil.Compare(Storage.LocalesTrainer, trainerDb, StoreNameType.None) + Environment.NewLine + "SET NAMES 'latin1';";
+        }
+
+        [BuilderMethod]
         public static string LocalesPointsOfInterest()
         {
             if (Storage.LocalesPointsOfInterest.IsEmpty())

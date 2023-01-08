@@ -525,16 +525,22 @@ namespace WowPacketParserModule.V6_0_2_19033.Parsers
             pageText.Text = packet.ReadWoWString("Text", textLen);
 
             packet.AddSniffData(StoreNameType.PageText, (int)entry, "QUERY_RESPONSE");
-            Storage.PageTexts.Add(pageText, packet.TimeSpan);
-
-            if (ClientLocale.PacketLocale != LocaleConstant.enUS && pageText.Text != string.Empty)
+            
+            if (ClientLocale.PacketLocale != LocaleConstant.enUS)
             {
-                PageTextLocale localesPageText = new PageTextLocale
+                if (!string.IsNullOrEmpty(pageText.Text))
                 {
-                    ID = pageText.ID,
-                    Text = pageText.Text
-                };
-                Storage.LocalesPageText.Add(localesPageText, packet.TimeSpan);
+                    PageTextLocale localesPageText = new PageTextLocale
+                    {
+                        ID = pageText.ID,
+                        Text = pageText.Text
+                    };
+                    Storage.LocalesPageText.Add(localesPageText, packet.TimeSpan);
+                }
+            }
+            else
+            {
+                Storage.PageTexts.Add(pageText, packet.TimeSpan);
             }
         }
 

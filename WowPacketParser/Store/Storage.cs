@@ -2537,6 +2537,7 @@ namespace WowPacketParser.Store
         public static readonly DataBag<QuestRequestItemsLocale> LocalesQuestRequestItems = new DataBag<QuestRequestItemsLocale>(Settings.SqlTables.locales_quest);
         public static readonly DataBag<PageTextLocale> LocalesPageText = new DataBag<PageTextLocale>(Settings.SqlTables.page_text_locale);
         public static readonly DataBag<PointsOfInterestLocale> LocalesPointsOfInterest = new DataBag<PointsOfInterestLocale>(Settings.SqlTables.points_of_interest_locale);
+        public static readonly DataBag<TrainerLocale> LocalesTrainer = new DataBag<TrainerLocale>(Settings.SqlTables.trainer_locale);
 
         // Spell Casts
         public static readonly DataBag<PlaySpellVisualKit> SpellPlayVisualKit = new DataBag<PlaySpellVisualKit>(Settings.SqlTables.play_spell_visual_kit);
@@ -3048,12 +3049,15 @@ namespace WowPacketParser.Store
             SpellScriptTargets.Clear();
 
             LocalesCreatures.Clear();
+            LocalesGameObjects.Clear();
             LocalesQuests.Clear();
             LocalesQuestObjectives.Clear();
             LocalesQuestOfferRewards.Clear();
             LocalesQuestGreeting.Clear();
             LocalesQuestRequestItems.Clear();
             LocalesPageText.Clear();
+            LocalesPointsOfInterest.Clear();
+            LocalesTrainer.Clear();
 
             WorldStateInits.Clear();
             WorldStateUpdates.Clear();

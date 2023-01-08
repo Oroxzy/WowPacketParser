@@ -68,8 +68,6 @@ namespace WowPacketParserModule.V5_3_0_16981.Parsers
 
             packet.AddSniffData(StoreNameType.GameObject, entry.Key, "QUERY_RESPONSE");
 
-            Storage.GameObjectTemplates.Add(gameObject, packet.TimeSpan);
-
             if (ClientLocale.PacketLocale != LocaleConstant.enUS)
             {
                 GameObjectTemplateLocale localesGameObject = new GameObjectTemplateLocale
@@ -82,14 +80,18 @@ namespace WowPacketParserModule.V5_3_0_16981.Parsers
 
                 Storage.LocalesGameObjects.Add(localesGameObject, packet.TimeSpan);
             }
-
-            ObjectName objectName = new ObjectName
+            else
             {
-                ObjectType = StoreNameType.GameObject,
-                ID = entry.Key,
-                Name = gameObject.Name
-            };
-            Storage.ObjectNames.Add(objectName, packet.TimeSpan);
+                Storage.GameObjectTemplates.Add(gameObject, packet.TimeSpan);
+
+                ObjectName objectName = new ObjectName
+                {
+                    ObjectType = StoreNameType.GameObject,
+                    ID = entry.Key,
+                    Name = gameObject.Name
+                };
+                Storage.ObjectNames.Add(objectName, packet.TimeSpan);
+            }
         }
 
         [Parser(Opcode.SMSG_GAME_OBJECT_CUSTOM_ANIM)]

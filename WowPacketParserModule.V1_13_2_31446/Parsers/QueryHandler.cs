@@ -140,8 +140,6 @@ namespace WowPacketParserModule.V1_13_2_31446.Parsers
 
             packet.AddSniffData(StoreNameType.Unit, entry.Key, "QUERY_RESPONSE");
 
-            Storage.CreatureTemplates.Add(creature, packet.TimeSpan);
-
             if (ClientLocale.PacketLocale != LocaleConstant.enUS)
             {
                 CreatureTemplateLocale localesCreature = new CreatureTemplateLocale
@@ -154,14 +152,18 @@ namespace WowPacketParserModule.V1_13_2_31446.Parsers
                 };
                 Storage.LocalesCreatures.Add(localesCreature, packet.TimeSpan);
             }
-
-            ObjectName objectName = new ObjectName
+            else
             {
-                ObjectType = StoreNameType.Unit,
-                ID = entry.Key,
-                Name = creature.Name
-            };
-            Storage.ObjectNames.Add(objectName, packet.TimeSpan);
+                Storage.CreatureTemplates.Add(creature, packet.TimeSpan);
+
+                ObjectName objectName = new ObjectName
+                {
+                    ObjectType = StoreNameType.Unit,
+                    ID = entry.Key,
+                    Name = creature.Name
+                };
+                Storage.ObjectNames.Add(objectName, packet.TimeSpan);
+            }
         }
 
         [HasSniffData]
@@ -335,20 +337,25 @@ namespace WowPacketParserModule.V1_13_2_31446.Parsers
                 uint descriptionLength = packet.ReadBits(8);
                 questInfoObjective.Description = packet.ReadWoWString("Description", descriptionLength, i);
 
-                if (ClientLocale.PacketLocale != LocaleConstant.enUS && questInfoObjective.Description != string.Empty)
+                if (ClientLocale.PacketLocale != LocaleConstant.enUS)
                 {
-                    QuestObjectivesLocale localesQuestObjectives = new QuestObjectivesLocale
+                    if (!string.IsNullOrEmpty(questInfoObjective.Description))
                     {
-                        ID = (uint)objectiveId.Key,
-                        QuestId = (uint)id.Key,
-                        StorageIndex = questInfoObjective.StorageIndex,
-                        Description = questInfoObjective.Description
-                    };
+                        QuestObjectivesLocale localesQuestObjectives = new QuestObjectivesLocale
+                        {
+                            ID = (uint)objectiveId.Key,
+                            QuestId = (uint)id.Key,
+                            StorageIndex = questInfoObjective.StorageIndex,
+                            Description = questInfoObjective.Description
+                        };
 
-                    Storage.LocalesQuestObjectives.Add(localesQuestObjectives, packet.TimeSpan);
+                        Storage.LocalesQuestObjectives.Add(localesQuestObjectives, packet.TimeSpan);
+                    }
                 }
-
-                Storage.QuestObjectives.Add(questInfoObjective, packet.TimeSpan);
+                else
+                {
+                    Storage.QuestObjectives.Add(questInfoObjective, packet.TimeSpan);
+                }
             }
 
             quest.LogTitle = packet.ReadWoWString("LogTitle", logTitleLen);
@@ -379,8 +386,10 @@ namespace WowPacketParserModule.V1_13_2_31446.Parsers
 
                 Storage.LocalesQuests.Add(localesQuest, packet.TimeSpan);
             }
-
-            Storage.QuestTemplates.Add(quest, packet.TimeSpan);
+            else
+            {
+                Storage.QuestTemplates.Add(quest, packet.TimeSpan);
+            }
         }
     }
 }

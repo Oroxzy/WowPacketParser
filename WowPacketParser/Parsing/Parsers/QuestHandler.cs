@@ -392,7 +392,28 @@ namespace WowPacketParser.Parsing.Parsers
 
             packet.AddSniffData(StoreNameType.Quest, id.Key, "QUERY_RESPONSE");
 
-            Storage.QuestTemplates.Add(quest, packet.TimeSpan);
+            if (ClientLocale.PacketLocale != LocaleConstant.enUS)
+            {
+                LocalesQuest localesQuest = new LocalesQuest
+                {
+                    ID = (uint)id.Key,
+                    LogTitle = quest.LogTitle,
+                    LogDescription = quest.LogDescription,
+                    QuestDescription = quest.QuestDescription,
+                    AreaDescription = quest.AreaDescription,
+                    PortraitGiverText = quest.QuestGiverTextWindow,
+                    PortraitGiverName = quest.QuestGiverTargetName,
+                    PortraitTurnInText = quest.QuestTurnTextWindow,
+                    PortraitTurnInName = quest.QuestTurnTargetName,
+                    QuestCompletionLog = quest.QuestCompletionLog
+                };
+
+                Storage.LocalesQuests.Add(localesQuest, packet.TimeSpan);
+            }
+            else
+            {
+                Storage.QuestTemplates.Add(quest, packet.TimeSpan);
+            }
         }
 
         [HasSniffData]
@@ -559,7 +580,28 @@ namespace WowPacketParser.Parsing.Parsers
 
             packet.AddSniffData(StoreNameType.Quest, id.Key, "QUERY_RESPONSE");
 
-            Storage.QuestTemplates.Add(quest, packet.TimeSpan);
+            if (ClientLocale.PacketLocale != LocaleConstant.enUS)
+            {
+                LocalesQuest localesQuest = new LocalesQuest
+                {
+                    ID = (uint)id.Key,
+                    LogTitle = quest.LogTitle,
+                    LogDescription = quest.LogDescription,
+                    QuestDescription = quest.QuestDescription,
+                    AreaDescription = quest.AreaDescription,
+                    PortraitGiverText = quest.QuestGiverTextWindow,
+                    PortraitGiverName = quest.QuestGiverTargetName,
+                    PortraitTurnInText = quest.QuestTurnTextWindow,
+                    PortraitTurnInName = quest.QuestTurnTargetName,
+                    QuestCompletionLog = quest.QuestCompletionLog
+                };
+
+                Storage.LocalesQuests.Add(localesQuest, packet.TimeSpan);
+            }
+            else
+            {
+                Storage.QuestTemplates.Add(quest, packet.TimeSpan);
+            }
         }
 
         [Parser(Opcode.CMSG_QUEST_POI_QUERY)]
@@ -1076,7 +1118,23 @@ namespace WowPacketParser.Parsing.Parsers
                 QuestId = entry
             };
             Storage.QuestEnders.Add(questEnder, packet.TimeSpan);
-            Storage.QuestRequestItems.Add(requestItems, packet.TimeSpan);
+
+            if (ClientLocale.PacketLocale != LocaleConstant.enUS)
+            {
+                if (!string.IsNullOrEmpty(requestItems.CompletionText))
+                {
+                    QuestRequestItemsLocale localesQuestRequestItems = new QuestRequestItemsLocale
+                    {
+                        ID = (uint)entry,
+                        CompletionText = requestItems.CompletionText
+                    };
+                    Storage.LocalesQuestRequestItems.Add(localesQuestRequestItems, packet.TimeSpan);
+                }
+            }
+            else
+            {
+                Storage.QuestRequestItems.Add(requestItems, packet.TimeSpan);
+            }
         }
 
         [Parser(Opcode.SMSG_QUEST_GIVER_REQUEST_ITEMS, ClientVersionBuild.V4_3_4_15595, ClientVersionBuild.V5_1_0_16309)]
@@ -1131,7 +1189,23 @@ namespace WowPacketParser.Parsing.Parsers
                 QuestId = entry
             };
             Storage.QuestEnders.Add(questEnder, packet.TimeSpan);
-            Storage.QuestRequestItems.Add(requestItems, packet.TimeSpan);
+
+            if (ClientLocale.PacketLocale != LocaleConstant.enUS)
+            {
+                if (!string.IsNullOrEmpty(requestItems.CompletionText))
+                {
+                    QuestRequestItemsLocale localesQuestRequestItems = new QuestRequestItemsLocale
+                    {
+                        ID = (uint)entry,
+                        CompletionText = requestItems.CompletionText
+                    };
+                    Storage.LocalesQuestRequestItems.Add(localesQuestRequestItems, packet.TimeSpan);
+                }
+            }
+            else
+            {
+                Storage.QuestRequestItems.Add(requestItems, packet.TimeSpan);
+            }
         }
 
         [Parser(Opcode.SMSG_QUEST_GIVER_REQUEST_ITEMS, ClientVersionBuild.V5_1_0_16309)]
@@ -1185,7 +1259,23 @@ namespace WowPacketParser.Parsing.Parsers
                 QuestId = entry
             };
             Storage.QuestEnders.Add(questEnder, packet.TimeSpan);
-            Storage.QuestRequestItems.Add(requestItems, packet.TimeSpan);
+
+            if (ClientLocale.PacketLocale != LocaleConstant.enUS)
+            {
+                if (!string.IsNullOrEmpty(requestItems.CompletionText))
+                {
+                    QuestRequestItemsLocale localesQuestRequestItems = new QuestRequestItemsLocale
+                    {
+                        ID = (uint)entry,
+                        CompletionText = requestItems.CompletionText
+                    };
+                    Storage.LocalesQuestRequestItems.Add(localesQuestRequestItems, packet.TimeSpan);
+                }
+            }
+            else
+            {
+                Storage.QuestRequestItems.Add(requestItems, packet.TimeSpan);
+            }
         }
 
         [Parser(Opcode.SMSG_QUEST_GIVER_OFFER_REWARD_MESSAGE)]
@@ -1242,17 +1332,23 @@ namespace WowPacketParser.Parsing.Parsers
                 QuestId = entry
             };
             Storage.QuestEnders.Add(questEnder, packet.TimeSpan);
-            Storage.QuestOfferRewards.Add(offerReward, packet.TimeSpan);
 
-            if (ClientLocale.PacketLocale != LocaleConstant.enUS && offerReward.RewardText != string.Empty)
+            if (ClientLocale.PacketLocale != LocaleConstant.enUS)
             {
-                QuestOfferRewardLocale localesQuestOfferReward = new QuestOfferRewardLocale
+                if (!string.IsNullOrEmpty(offerReward.RewardText))
                 {
-                    ID = entry,
-                    RewardText = offerReward.RewardText
-                };
+                    QuestOfferRewardLocale localesQuestOfferReward = new QuestOfferRewardLocale
+                    {
+                        ID = (uint)entry,
+                        RewardText = offerReward.RewardText
+                    };
 
-                Storage.LocalesQuestOfferRewards.Add(localesQuestOfferReward, packet.TimeSpan);
+                    Storage.LocalesQuestOfferRewards.Add(localesQuestOfferReward, packet.TimeSpan);
+                }
+            }
+            else
+            {
+                Storage.QuestOfferRewards.Add(offerReward, packet.TimeSpan);
             }
         }
 

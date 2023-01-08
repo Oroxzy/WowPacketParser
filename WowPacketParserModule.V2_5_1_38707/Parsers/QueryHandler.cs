@@ -167,8 +167,6 @@ namespace WowPacketParserModule.V2_5_1_38835.Parsers
 
             packet.AddSniffData(StoreNameType.Unit, entry.Key, "QUERY_RESPONSE");
 
-            Storage.CreatureTemplates.Add(creature, packet.TimeSpan);
-
             if (ClientLocale.PacketLocale != LocaleConstant.enUS)
             {
                 CreatureTemplateLocale localesCreature = new CreatureTemplateLocale
@@ -182,14 +180,18 @@ namespace WowPacketParserModule.V2_5_1_38835.Parsers
 
                 Storage.LocalesCreatures.Add(localesCreature, packet.TimeSpan);
             }
-
-            ObjectName objectName = new ObjectName
+            else
             {
-                ObjectType = StoreNameType.Unit,
-                ID = entry.Key,
-                Name = creature.Name
-            };
-            Storage.ObjectNames.Add(objectName, packet.TimeSpan);
+                Storage.CreatureTemplates.Add(creature, packet.TimeSpan);
+
+                ObjectName objectName = new ObjectName
+                {
+                    ObjectType = StoreNameType.Unit,
+                    ID = entry.Key,
+                    Name = creature.Name
+                };
+                Storage.ObjectNames.Add(objectName, packet.TimeSpan);
+            }
         }
 
         [HasSniffData]
@@ -255,8 +257,6 @@ namespace WowPacketParserModule.V2_5_1_38835.Parsers
 
             packet.AddSniffData(StoreNameType.GameObject, entry.Key, "QUERY_RESPONSE");
 
-            Storage.GameObjectTemplates.Add(gameObject, packet.TimeSpan);
-
             if (ClientLocale.PacketLocale != LocaleConstant.enUS)
             {
                 GameObjectTemplateLocale localesGameObject = new GameObjectTemplateLocale
@@ -269,15 +269,18 @@ namespace WowPacketParserModule.V2_5_1_38835.Parsers
 
                 Storage.LocalesGameObjects.Add(localesGameObject, packet.TimeSpan);
             }
-
-            ObjectName objectName = new ObjectName
+            else
             {
-                ObjectType = StoreNameType.GameObject,
-                ID = entry.Key,
-                Name = gameObject.Name
-            };
+                Storage.GameObjectTemplates.Add(gameObject, packet.TimeSpan);
 
-            Storage.ObjectNames.Add(objectName, packet.TimeSpan);
+                ObjectName objectName = new ObjectName
+                {
+                    ObjectType = StoreNameType.GameObject,
+                    ID = entry.Key,
+                    Name = gameObject.Name
+                };
+                Storage.ObjectNames.Add(objectName, packet.TimeSpan);
+            }
         }
     }
 }

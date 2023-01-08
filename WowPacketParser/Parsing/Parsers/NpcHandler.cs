@@ -257,15 +257,32 @@ namespace WowPacketParser.Parsing.Parsers
 
             if (trainerId > 0)
             {
-                Storage.Trainers.Add(trainer, packet.TimeSpan);
-
-                if (LastGossipOption.HasSelection)
+                if (ClientLocale.PacketLocale != LocaleConstant.enUS)
                 {
-                    if ((packet.TimeSpan - LastGossipOption.TimeSpan).Duration() <= TimeSpan.FromMilliseconds(2500))
-                        Storage.CreatureTrainers.Add(new CreatureTrainer { CreatureId = LastGossipOption.Guid.GetEntry(), MenuID = LastGossipOption.MenuId, OptionIndex = LastGossipOption.OptionIndex, TrainerId = trainer.Id }, packet.TimeSpan);
+                    if (!string.IsNullOrEmpty(trainer.Greeting))
+                    {
+                        TrainerLocale localeTrainer = new TrainerLocale
+                        {
+                            Id = trainerId,
+                            TrainerEntry = entry,
+                            Greeting = trainer.Greeting,
+                        };
+
+                        Storage.LocalesTrainer.Add(localeTrainer, packet.TimeSpan);
+                    }
                 }
                 else
-                    Storage.CreatureTrainers.Add(new CreatureTrainer { CreatureId = LastGossipOption.Guid.GetEntry(), MenuID = 0, OptionIndex = 0, TrainerId = trainer.Id }, packet.TimeSpan);
+                {
+                    Storage.Trainers.Add(trainer, packet.TimeSpan);
+
+                    if (LastGossipOption.HasSelection)
+                    {
+                        if ((packet.TimeSpan - LastGossipOption.TimeSpan).Duration() <= TimeSpan.FromMilliseconds(2500))
+                            Storage.CreatureTrainers.Add(new CreatureTrainer { CreatureId = LastGossipOption.Guid.GetEntry(), MenuID = LastGossipOption.MenuId, OptionIndex = LastGossipOption.OptionIndex, TrainerId = trainer.Id }, packet.TimeSpan);
+                    }
+                    else
+                        Storage.CreatureTrainers.Add(new CreatureTrainer { CreatureId = LastGossipOption.Guid.GetEntry(), MenuID = 0, OptionIndex = 0, TrainerId = trainer.Id }, packet.TimeSpan);
+                }  
             }
 
             LastGossipOption.Reset();

@@ -182,6 +182,7 @@
         spell_target_position,
         spell_unique_caster,
         trainer,
+        trainer_locale,
         vehicle_template_accessory,
 
         hotfix_data,

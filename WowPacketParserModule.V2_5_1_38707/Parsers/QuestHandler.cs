@@ -182,20 +182,25 @@ namespace WowPacketParserModule.V2_5_1_38835.Parsers
                 uint descriptionLength = packet.ReadBits(8);
                 questInfoObjective.Description = packet.ReadWoWString("Description", descriptionLength, i);
 
-                if (ClientLocale.PacketLocale != LocaleConstant.enUS && questInfoObjective.Description != string.Empty)
+                if (ClientLocale.PacketLocale != LocaleConstant.enUS)
                 {
-                    QuestObjectivesLocale localesQuestObjectives = new QuestObjectivesLocale
+                    if (!string.IsNullOrEmpty(questInfoObjective.Description))
                     {
-                        ID = (uint)objectiveId.Key,
-                        QuestId = (uint)id.Key,
-                        StorageIndex = questInfoObjective.StorageIndex,
-                        Description = questInfoObjective.Description
-                    };
+                        QuestObjectivesLocale localesQuestObjectives = new QuestObjectivesLocale
+                        {
+                            ID = (uint)objectiveId.Key,
+                            QuestId = (uint)id.Key,
+                            StorageIndex = questInfoObjective.StorageIndex,
+                            Description = questInfoObjective.Description
+                        };
 
-                    Storage.LocalesQuestObjectives.Add(localesQuestObjectives, packet.TimeSpan);
+                        Storage.LocalesQuestObjectives.Add(localesQuestObjectives, packet.TimeSpan);
+                    }
                 }
-
-                Storage.QuestObjectives.Add(questInfoObjective, packet.TimeSpan);
+                else
+                {
+                    Storage.QuestObjectives.Add(questInfoObjective, packet.TimeSpan);
+                }
             }
 
             quest.LogTitle = packet.ReadWoWString("LogTitle", logTitleLen);
@@ -226,8 +231,10 @@ namespace WowPacketParserModule.V2_5_1_38835.Parsers
 
                 Storage.LocalesQuests.Add(localesQuest, packet.TimeSpan);
             }
-
-            Storage.QuestTemplates.Add(quest, packet.TimeSpan);
+            else
+            {
+                Storage.QuestTemplates.Add(quest, packet.TimeSpan);
+            }
         }
     }
 }

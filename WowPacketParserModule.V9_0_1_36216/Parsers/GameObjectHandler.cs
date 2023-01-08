@@ -63,8 +63,6 @@ namespace WowPacketParserModule.V9_0_1_36216.Parsers
 
             gameObject.ContentTuningId = packet.ReadInt32("ContentTuningId");
 
-            Storage.GameObjectTemplates.Add(gameObject, packet.TimeSpan);
-
             if (ClientLocale.PacketLocale != LocaleConstant.enUS)
             {
                 GameObjectTemplateLocale localesGameObject = new GameObjectTemplateLocale
@@ -77,15 +75,18 @@ namespace WowPacketParserModule.V9_0_1_36216.Parsers
 
                 Storage.LocalesGameObjects.Add(localesGameObject, packet.TimeSpan);
             }
-
-            ObjectName objectName = new ObjectName
+            else
             {
-                ObjectType = StoreNameType.GameObject,
-                ID = entry.Key,
-                Name = gameObject.Name
-            };
+                Storage.GameObjectTemplates.Add(gameObject, packet.TimeSpan);
 
-            Storage.ObjectNames.Add(objectName, packet.TimeSpan);
+                ObjectName objectName = new ObjectName
+                {
+                    ObjectType = StoreNameType.GameObject,
+                    ID = entry.Key,
+                    Name = gameObject.Name
+                };
+                Storage.ObjectNames.Add(objectName, packet.TimeSpan);
+            }
         }
     }
 }
