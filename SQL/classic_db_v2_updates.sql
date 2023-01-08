@@ -1445,3 +1445,11 @@ ALTER TABLE `creature_pet_remaining_cooldown`
 	CHANGE COLUMN `category_cooldown` `category_cooldown` INT(10) NOT NULL DEFAULT '0' AFTER `category`;
 ALTER TABLE `creature_pet_remaining_cooldown`
 	CHANGE COLUMN `mod_rate` `mod_rate` FLOAT NOT NULL DEFAULT '1' AFTER `category_cooldown`;
+
+CREATE TABLE `gameobject_respawn_time` (
+	`old_guid` INT(10) UNSIGNED NOT NULL,
+	`new_guid` INT(10) UNSIGNED NOT NULL,
+	`respawn_time` INT(10) UNSIGNED NOT NULL COMMENT 'time in seconds',
+	PRIMARY KEY (`old_guid`, `new_guid`)
+)
+ COLLATE 'latin1_general_ci' ENGINE=InnoDB ROW_FORMAT=Compact COMMENT='stores the time in seconds between the despawn of a gameobject, and the spawn of another on the same position\r\nrespawn time is reduced dynamically if there are too many players in the same area, so beware of abnormally low values';

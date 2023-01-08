@@ -1484,6 +1484,18 @@ CREATE TABLE IF NOT EXISTS `gameobject_quest_item` (
 -- Data exporting was unselected.
 
 
+-- Dumping structure for table sniffs_new_test.gameobject_respawn_time
+DROP TABLE IF EXISTS `gameobject_respawn_time`;
+CREATE TABLE IF NOT EXISTS `gameobject_respawn_time` (
+  `old_guid` int(10) unsigned NOT NULL,
+  `new_guid` int(10) unsigned NOT NULL,
+  `respawn_time` int(10) unsigned NOT NULL COMMENT 'time in seconds',
+  PRIMARY KEY (`old_guid`,`new_guid`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci ROW_FORMAT=COMPACT COMMENT='stores the time in seconds between the despawn of a gameobject, and the spawn of another on the same position\r\nrespawn time is reduced dynamically if there are too many players in the same area, so beware of abnormally low values';
+
+-- Data exporting was unselected.
+
+
 -- Dumping structure for table sniffs_new_test.gameobject_template
 DROP TABLE IF EXISTS `gameobject_template`;
 CREATE TABLE IF NOT EXISTS `gameobject_template` (
