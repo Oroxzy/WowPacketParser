@@ -752,8 +752,8 @@ CREATE TABLE IF NOT EXISTS `creature_pet_remaining_cooldown` (
   `spell_id` int(10) unsigned NOT NULL DEFAULT '0',
   `cooldown` int(10) unsigned NOT NULL DEFAULT '0',
   `category` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `category_cooldown` int(10) unsigned NOT NULL DEFAULT '0',
-  `mod_rate` float unsigned NOT NULL DEFAULT '1',
+  `category_cooldown` int(10) NOT NULL DEFAULT '0',
+  `mod_rate` float NOT NULL DEFAULT '1',
   `time_since_cast` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'milliseconds since last SMSG_SPELL_GO for this spell',
   `sniff_id` smallint(5) unsigned NOT NULL DEFAULT '0' COMMENT 'points to sniff_file table',
   `sniff_build` mediumint(8) unsigned NOT NULL DEFAULT '0',
@@ -3092,6 +3092,28 @@ CREATE TABLE IF NOT EXISTS `raid_target_icon_update` (
   `target_type` varchar(16) COLLATE latin1_general_ci NOT NULL,
   PRIMARY KEY (`unixtimems`,`icon`,`target_guid`,`target_type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci;
+
+-- Data exporting was unselected.
+
+
+-- Dumping structure for table sniffs_new_test.replay_marked_creature
+DROP TABLE IF EXISTS `replay_marked_creature`;
+CREATE TABLE IF NOT EXISTS `replay_marked_creature` (
+  `guid` int(10) unsigned NOT NULL,
+  `marker` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`guid`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci COMMENT='creatures that have been manually marked from replay core';
+
+-- Data exporting was unselected.
+
+
+-- Dumping structure for table sniffs_new_test.replay_marked_gameobject
+DROP TABLE IF EXISTS `replay_marked_gameobject`;
+CREATE TABLE IF NOT EXISTS `replay_marked_gameobject` (
+  `guid` int(10) unsigned NOT NULL,
+  `marker` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`guid`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci COMMENT='gameobjects that have been manually marked from replay core';
 
 -- Data exporting was unselected.
 

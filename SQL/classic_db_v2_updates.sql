@@ -1440,3 +1440,8 @@ COMMENT='gameobjects that have been manually marked from replay core'
 COLLATE='latin1_general_ci'
 ENGINE=InnoDB
 ;
+
+ALTER TABLE `creature_pet_remaining_cooldown`
+	CHANGE COLUMN `category_cooldown` `category_cooldown` INT(10) NOT NULL DEFAULT '0' AFTER `category`;
+ALTER TABLE `creature_pet_remaining_cooldown`
+	CHANGE COLUMN `mod_rate` `mod_rate` FLOAT NOT NULL DEFAULT '1' AFTER `category_cooldown`;
