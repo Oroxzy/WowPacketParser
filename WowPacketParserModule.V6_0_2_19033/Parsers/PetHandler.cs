@@ -70,7 +70,7 @@ namespace WowPacketParserModule.V6_0_2_19033.Parsers
         {
             cooldown.SpellID = (uint)packet.ReadInt32("SpellID", idx);
             cooldown.Cooldown = (uint)packet.ReadInt32("Duration", idx);
-            cooldown.CategoryCooldown = (uint)packet.ReadInt32("CategoryDuration", idx);
+            cooldown.CategoryCooldown = packet.ReadInt32("CategoryDuration", idx);
             cooldown.Category = (uint)packet.ReadInt16("Category", idx);
         }
 

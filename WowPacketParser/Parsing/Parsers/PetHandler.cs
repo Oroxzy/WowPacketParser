@@ -92,7 +92,7 @@ namespace WowPacketParser.Parsing.Parsers
 
                 cooldown.Category = packet.ReadUInt16("Category", i);
                 cooldown.Cooldown = packet.ReadUInt32("Cooldown", i);
-                cooldown.CategoryCooldown = packet.ReadUInt32("Category Cooldown", i);
+                cooldown.CategoryCooldown = packet.ReadInt32("Category Cooldown", i);
 
                 if (isMinion)
                 {

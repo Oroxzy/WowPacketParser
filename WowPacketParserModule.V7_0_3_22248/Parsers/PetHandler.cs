@@ -24,8 +24,8 @@ namespace WowPacketParserModule.V7_0_3_22248.Parsers
         {
             cooldown.SpellID = (uint)packet.ReadInt32("SpellID", idx);
             cooldown.Cooldown = (uint)packet.ReadInt32("Duration", idx);
-            cooldown.CategoryCooldown = (uint)packet.ReadInt32("CategoryDuration", idx);
-            cooldown.ModRate = (uint)packet.ReadSingle("ModRate", idx);
+            cooldown.CategoryCooldown = packet.ReadInt32("CategoryDuration", idx);
+            cooldown.ModRate = packet.ReadSingle("ModRate", idx);
             cooldown.Category = (uint)packet.ReadInt16("Category", idx);
         }
 

@@ -428,7 +428,7 @@ namespace WowPacketParser.Store.Objects
         public uint? Category;
 
         [DBFieldName("category_cooldown", true)]
-        public uint? CategoryCooldown;
+        public int? CategoryCooldown;
 
         [DBFieldName("mod_rate")]
         public float? ModRate;
