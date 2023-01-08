@@ -65,8 +65,6 @@ namespace WowPacketParserModule.V7_0_3_22248.Parsers
                         if (ClientVersion.AddedInVersion(ClientVersionBuild.V7_0_3_22248) && ClientVersion.RemovedInVersion(ClientVersionBuild.V7_3_5_25848))
                             bct.ConditionID = db2File.ReadUInt32("ConditionID");
 
-                        Storage.BroadcastTexts.Add(bct, packet.TimeSpan);
-
                         if (ClientLocale.PacketLocale != LocaleConstant.enUS)
                         {
                             BroadcastTextLocale lbct = new BroadcastTextLocale
@@ -77,6 +75,11 @@ namespace WowPacketParserModule.V7_0_3_22248.Parsers
                             };
                             Storage.BroadcastTextLocales.Add(lbct, packet.TimeSpan);
                         }
+                        else
+                        {
+                            Storage.BroadcastTexts.Add(bct, packet.TimeSpan);
+                        }
+
                         break;
                     }
                     default:

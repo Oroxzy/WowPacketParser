@@ -235,17 +235,19 @@ namespace WowPacketParserModule.V5_4_7_17898.Parsers
             gossipPOI.Importance = packet.ReadUInt32("Data");
             gossipPOI.Name = packet.ReadCString("Icon Name");
 
-            Storage.GossipPOIs.Add(gossipPOI, packet.TimeSpan);
-
             if (ClientLocale.PacketLocale != LocaleConstant.enUS)
             {
                 PointsOfInterestLocale localesPoi = new PointsOfInterestLocale
                 {
-                    ID = (uint)gossipPOI.ID,
+                    ID = gossipPOI.ID.ToString(),
                     Name = gossipPOI.Name,
                 };
 
                 Storage.LocalesPointsOfInterest.Add(localesPoi, packet.TimeSpan);
+            }
+            else
+            {
+                Storage.GossipPOIs.Add(gossipPOI, packet.TimeSpan);
             }
 
             var lastGossipOption = CoreParsers.NpcHandler.LastGossipOption;

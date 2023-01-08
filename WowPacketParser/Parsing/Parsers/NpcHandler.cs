@@ -92,17 +92,19 @@ namespace WowPacketParser.Parsing.Parsers
                 ++LastGossipPOIEntry;
             }
 
-            Storage.GossipPOIs.Add(gossipPOI, packet.TimeSpan);
-
             if (ClientLocale.PacketLocale != LocaleConstant.enUS)
             {
                 PointsOfInterestLocale localesPoi = new PointsOfInterestLocale
                 {
-                    ID = (uint)gossipPOI.ID,
+                    ID = gossipPOI.ID.ToString(),
                     Name = gossipPOI.Name,
                 };
 
                 Storage.LocalesPointsOfInterest.Add(localesPoi, packet.TimeSpan);
+            }
+            else
+            {
+                Storage.GossipPOIs.Add(gossipPOI, packet.TimeSpan);
             }
 
             if (TempGossipOptionPOI.HasSelection)

@@ -22,8 +22,10 @@ namespace WowPacketParser.SQL.Builders
                 string result = "SET NAMES 'utf8';" + Environment.NewLine;
                 foreach (var locale in Storage.LocalesCreatures)
                 {
-                    result += "UPDATE `locales_creature` SET `name_loc" + ClientLocale.GetLocaleIndexFromLocaleName(locale.Item1.Locale) + "`='" + SQLUtil.EscapeString(locale.Item1.Name) + "' WHERE `entry`=" + locale.Item1.ID + ";" + Environment.NewLine;
-                    result += "UPDATE `locales_creature` SET `subname_loc" + ClientLocale.GetLocaleIndexFromLocaleName(locale.Item1.Locale) + "`='" + SQLUtil.EscapeString(locale.Item1.Title) + "' WHERE `entry`=" + locale.Item1.ID + ";" + Environment.NewLine;
+                    if (!string.IsNullOrEmpty(locale.Item1.Name))
+                        result += "UPDATE `locales_creature` SET `name_loc" + ClientLocale.GetLocaleIndexFromLocaleName(locale.Item1.Locale) + "`='" + SQLUtil.EscapeString(locale.Item1.Name) + "' WHERE `entry`=" + locale.Item1.ID + ";" + Environment.NewLine;
+                    if (!string.IsNullOrEmpty(locale.Item1.Title))
+                        result += "UPDATE `locales_creature` SET `subname_loc" + ClientLocale.GetLocaleIndexFromLocaleName(locale.Item1.Locale) + "`='" + SQLUtil.EscapeString(locale.Item1.Title) + "' WHERE `entry`=" + locale.Item1.ID + ";" + Environment.NewLine;
                 }
                 return result;
             }
