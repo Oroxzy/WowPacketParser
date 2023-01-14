@@ -909,6 +909,7 @@ namespace WowPacketParser.Misc
                 case ClientVersionBuild.V1_14_3_46575:
                 case ClientVersionBuild.V2_5_1_38598:
                 case ClientVersionBuild.V2_5_1_38644:
+                case ClientVersionBuild.V2_5_1_38677:
                 case ClientVersionBuild.V2_5_1_38707:
                 case ClientVersionBuild.V2_5_1_38741:
                 case ClientVersionBuild.V2_5_1_38757:
@@ -922,6 +923,7 @@ namespace WowPacketParser.Misc
                 case ClientVersionBuild.V2_5_1_39640:
                 case ClientVersionBuild.V2_5_2_39570:
                 case ClientVersionBuild.V2_5_2_39618:
+                case ClientVersionBuild.V2_5_2_39801:
                 case ClientVersionBuild.V2_5_2_39926:
                 case ClientVersionBuild.V2_5_2_40011:
                 case ClientVersionBuild.V2_5_2_40045:
@@ -1473,6 +1475,7 @@ namespace WowPacketParser.Misc
             {
                 case ClientVersionBuild.V2_5_1_38598:
                 case ClientVersionBuild.V2_5_1_38644:
+                case ClientVersionBuild.V2_5_1_38677:
                 case ClientVersionBuild.V2_5_1_38707:
                 case ClientVersionBuild.V2_5_1_38741:
                 case ClientVersionBuild.V2_5_1_38757:
@@ -1486,6 +1489,7 @@ namespace WowPacketParser.Misc
                 case ClientVersionBuild.V2_5_1_39640:
                 case ClientVersionBuild.V2_5_2_39570:
                 case ClientVersionBuild.V2_5_2_39618:
+                case ClientVersionBuild.V2_5_2_39801:
                 case ClientVersionBuild.V2_5_2_39926:
                 case ClientVersionBuild.V2_5_2_40011:
                 case ClientVersionBuild.V2_5_2_40045:
@@ -1571,6 +1575,7 @@ namespace WowPacketParser.Misc
             {
                 case ClientVersionBuild.V2_5_1_38598:
                 case ClientVersionBuild.V2_5_1_38644:
+                case ClientVersionBuild.V2_5_1_38677:
                 case ClientVersionBuild.V2_5_1_38707:
                 case ClientVersionBuild.V2_5_1_38741:
                 case ClientVersionBuild.V2_5_1_38757:
@@ -1596,6 +1601,7 @@ namespace WowPacketParser.Misc
             {
                 case ClientVersionBuild.V2_5_2_39570:
                 case ClientVersionBuild.V2_5_2_39618:
+                case ClientVersionBuild.V2_5_2_39801:
                 case ClientVersionBuild.V2_5_2_39926:
                 case ClientVersionBuild.V2_5_2_40011:
                 case ClientVersionBuild.V2_5_2_40045:

@@ -505,6 +505,7 @@ namespace WowPacketParser.Enums
         // TBC Classic
         V2_5_1_38598 = 38598, // ptr
         V2_5_1_38644 = 38644,
+        V2_5_1_38677 = 38677,
         V2_5_1_38707 = 38707, // pre patch
         V2_5_1_38741 = 38741,
         V2_5_1_38757 = 38757,
@@ -519,6 +520,7 @@ namespace WowPacketParser.Enums
 
         V2_5_2_39570 = 39570, // ptr
         V2_5_2_39618 = 39618, // ptr
+        V2_5_2_39801 = 39801, // ptr
         V2_5_2_39926 = 39926, // ptr
         V2_5_2_40011 = 40011, // both live and ptr
         V2_5_2_40045 = 40045, // live
