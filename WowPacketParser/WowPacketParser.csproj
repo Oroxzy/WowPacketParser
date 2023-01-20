@@ -676,6 +676,7 @@
     <Compile Include="Store\Objects\CreatureTemplateScaling.cs" />
     <Compile Include="Store\Objects\ChatPacketData.cs" />
     <Compile Include="Store\Objects\CreatureTrainer.cs" />
+    <Compile Include="Store\Objects\CreatureVisibilityDistance.cs" />
     <Compile Include="Store\Objects\DynamicObject.cs" />
     <Compile Include="Store\Objects\DynamicObjectSpawn.cs" />
     <Compile Include="Store\Objects\FactionStandingUpdate.cs" />

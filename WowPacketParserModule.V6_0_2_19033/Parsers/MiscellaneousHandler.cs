@@ -53,7 +53,7 @@ namespace WowPacketParserModule.V6_0_2_19033.Parsers
             weatherUpdate.Grade = packet.ReadSingle("Intensity");
             weatherUpdate.Instant = packet.ReadBit("Abrupt"); // Type
 
-            weatherUpdate.UnixTimeMs = (ulong)Utilities.GetUnixTimeMsFromDateTime(packet.Time);
+            weatherUpdate.UnixTimeMs = (ulong)packet.UnixTimeMs;
             Storage.WeatherUpdates.Add(weatherUpdate, packet.TimeSpan);
         }
 
@@ -485,7 +485,7 @@ namespace WowPacketParserModule.V6_0_2_19033.Parsers
             PlayMusic musicEntry = new PlayMusic
             {
                 Music = sound,
-                UnixTimeMs = (ulong)Utilities.GetUnixTimeMsFromDateTime(packet.Time)
+                UnixTimeMs = (ulong)packet.UnixTimeMs
             };
             Storage.Music.Add(musicEntry, packet.TimeSpan);
         }

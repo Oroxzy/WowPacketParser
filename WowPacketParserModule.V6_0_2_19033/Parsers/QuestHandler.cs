@@ -100,7 +100,7 @@ namespace WowPacketParserModule.V6_0_2_19033.Parsers
                     ObjectId = objectId,
                     ObjectType = objectType,
                     QuestId = id,
-                    UnixTimeMs = (ulong)Utilities.GetUnixTimeMsFromDateTime(packet.Time)
+                    UnixTimeMs = (ulong)packet.UnixTimeMs
                 };
                 Storage.QuestClientCompleteTimes.Add(questComplete, packet.TimeSpan);
             }
@@ -127,7 +127,7 @@ namespace WowPacketParserModule.V6_0_2_19033.Parsers
                     ObjectId = objectId,
                     ObjectType = objectType,
                     QuestId = (uint)id,
-                    UnixTimeMs = (ulong)Utilities.GetUnixTimeMsFromDateTime(packet.Time)
+                    UnixTimeMs = (ulong)packet.UnixTimeMs
                 };
                 Storage.QuestClientAcceptTimes.Add(questAccept, packet.TimeSpan);
             }
@@ -809,7 +809,7 @@ namespace WowPacketParserModule.V6_0_2_19033.Parsers
         {
             QuestCompleteTime questComplete = new QuestCompleteTime();
             questComplete.QuestId = (uint)packet.ReadInt32<QuestId>("QuestID");
-            questComplete.UnixTimeMs = (ulong)Utilities.GetUnixTimeMsFromDateTime(packet.Time);
+            questComplete.UnixTimeMs = (ulong)packet.UnixTimeMs;
             Storage.QuestCompleteTimes.Add(questComplete);
         }
 

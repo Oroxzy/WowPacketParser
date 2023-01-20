@@ -46,6 +46,7 @@ namespace WowPacketParser.Misc
 
         public int Opcode { get; set; } // setter can't be private because it's used in multiple_packets
         public DateTime Time { get; }
+        public long UnixTimeMs => Utilities.GetUnixTimeMsFromDateTime(Time);
         public TimeSpan TimeSpan { get; }
         public Direction Direction { get; }
         public int Number { get; }

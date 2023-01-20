@@ -749,7 +749,7 @@ namespace WowPacketParser.Parsing.Parsers
         {
             QuestCompleteTime questComplete = new QuestCompleteTime();
             questComplete.QuestId = (uint)packet.ReadInt32<QuestId>("QuestID");
-            questComplete.UnixTimeMs = (ulong)Utilities.GetUnixTimeMsFromDateTime(packet.Time);
+            questComplete.UnixTimeMs = (ulong)packet.UnixTimeMs;
             Storage.QuestCompleteTimes.Add(questComplete);
         }
 
@@ -766,7 +766,7 @@ namespace WowPacketParser.Parsing.Parsers
         {
             QuestFailTime questFail = new QuestFailTime();
             questFail.QuestId = (uint)packet.ReadInt32<QuestId>("QuestID");
-            questFail.UnixTimeMs = (ulong)Utilities.GetUnixTimeMsFromDateTime(packet.Time);
+            questFail.UnixTimeMs = (ulong)packet.UnixTimeMs;
             Storage.QuestFailTimes.Add(questFail);
         }
 
@@ -897,7 +897,7 @@ namespace WowPacketParser.Parsing.Parsers
                     ObjectId = objectId,
                     ObjectType = objectType,
                     QuestId = id,
-                    UnixTimeMs = (ulong)Utilities.GetUnixTimeMsFromDateTime(packet.Time)
+                    UnixTimeMs = (ulong)packet.UnixTimeMs
                 };
                 Storage.QuestClientAcceptTimes.Add(questAccept, packet.TimeSpan);
             }
@@ -1371,7 +1371,7 @@ namespace WowPacketParser.Parsing.Parsers
                     ObjectId = objectId,
                     ObjectType = objectType,
                     QuestId = id,
-                    UnixTimeMs = (ulong)Utilities.GetUnixTimeMsFromDateTime(packet.Time)
+                    UnixTimeMs = (ulong)packet.UnixTimeMs
                 };
                 Storage.QuestClientCompleteTimes.Add(questComplete, packet.TimeSpan);
             }

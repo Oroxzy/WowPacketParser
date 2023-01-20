@@ -84,7 +84,7 @@ namespace WowPacketParserModule.V5_3_0_16981.Parsers
             weatherUpdate.Grade = packet.ReadSingle("Grade");
             weatherUpdate.Instant = packet.ReadBit("Instant");
 
-            weatherUpdate.UnixTimeMs = (ulong)Utilities.GetUnixTimeMsFromDateTime(packet.Time);
+            weatherUpdate.UnixTimeMs = (ulong)packet.UnixTimeMs;
             Storage.WeatherUpdates.Add(weatherUpdate, packet.TimeSpan);
         }
 
@@ -99,6 +99,17 @@ namespace WowPacketParserModule.V5_3_0_16981.Parsers
             pos.X = packet.ReadSingle();
             CoreParsers.MovementHandler.CurrentMapId = (uint)packet.ReadInt32<MapId>("Map");
             packet.AddValue("Position", pos);
+
+            if (Storage.CurrentActivePlayer != null &&
+               !Storage.CurrentActivePlayer.IsEmpty() &&
+                Storage.Objects.ContainsKey(Storage.CurrentActivePlayer))
+            {
+                WoWObject player = Storage.Objects[Storage.CurrentActivePlayer].Item1;
+                player.Movement.Position.X = pos.X;
+                player.Movement.Position.Y = pos.Y;
+                player.Movement.Position.Z = pos.Z;
+                player.Movement.Orientation = pos.O;
+            }
 
             Storage.ClearDataOnMapChange();
             packet.AddSniffData(StoreNameType.Map, (int)CoreParsers.MovementHandler.CurrentMapId, "NEW_WORLD");

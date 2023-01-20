@@ -253,7 +253,7 @@ namespace WowPacketParserModule.V6_0_2_19033.Parsers
             packet.ReadPackedGuid128("Guid");
             LogoutTime logoutTime = new LogoutTime()
             {
-                UnixTimeMs = (ulong)Utilities.GetUnixTimeMsFromDateTime(packet.Time)
+                UnixTimeMs = (ulong)packet.UnixTimeMs
             };
             Storage.LogoutTimes.Add(logoutTime);
         }

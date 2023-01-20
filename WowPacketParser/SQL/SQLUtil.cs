@@ -747,7 +747,7 @@ namespace WowPacketParser.SQL
             return string.Empty;
         }
 
-        public static string MakeSniffIdListUpdate<T>(RowList<T> rows) where T : ITableWithSniffIdList, new()
+        public static string MakeSniffIdListUpdate<T>(RowList<T> rows, string tableNameOverride = null) where T : ITableWithSniffIdList, new()
         {
             string result = "";
             foreach (var row in rows)
@@ -756,12 +756,12 @@ namespace WowPacketParser.SQL
                 tempRowList.Add(row);
 
                 foreach (var sniffId in row.Data.SniffIdList)
-                    result += "UPDATE " + SQLUtil.GetTableName<T>() + " SET `sniff_id_list` = RTRIM(CONCAT(@SNIFFID+" + sniffId + ", ' ', `sniff_id_list`)) WHERE " + new SQLWhere<T>(tempRowList, true).Build() + ";" + Environment.NewLine;
+                    result += "UPDATE " + (tableNameOverride != null ? tableNameOverride : SQLUtil.GetTableName<T>()) + " SET `sniff_id_list` = RTRIM(CONCAT(@SNIFFID+" + sniffId + ", ' ', `sniff_id_list`)) WHERE " + new SQLWhere<T>(tempRowList, true).Build() + ";" + Environment.NewLine;
             }
             return result;
         }
 
-        public static string MakeInsertWithSniffIdList<T>(IEnumerable<Tuple<T, TimeSpan?>> storeList, bool withDelete = true, bool withIgnore = false) where T : ITableWithSniffIdList, new()
+        public static string MakeInsertWithSniffIdList<T>(IEnumerable<Tuple<T, TimeSpan?>> storeList, bool withDelete = true, bool withIgnore = false, string tableNameOverride = null) where T : ITableWithSniffIdList, new()
         {
             RowList<T> rows = new RowList<T>();
             foreach (var elem1 in storeList)
@@ -784,12 +784,12 @@ namespace WowPacketParser.SQL
                 }
             }
 
-            string result = new SQLInsert<T>(rows, withDelete, withIgnore).Build();
+            string result = new SQLInsert<T>(rows, withDelete, withIgnore, tableNameOverride).Build();
 
             if (!String.IsNullOrEmpty(result))
             {
                 result += Environment.NewLine;
-                result += SQLUtil.MakeSniffIdListUpdate<T>(rows);
+                result += SQLUtil.MakeSniffIdListUpdate<T>(rows, tableNameOverride);
                 result += Environment.NewLine;
             }
 

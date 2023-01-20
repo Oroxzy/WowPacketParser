@@ -237,8 +237,14 @@ namespace WowPacketParserModule.V8_0_1_27101.Parsers
 
             ReadMovementMonsterSpline(monsterMove, packet, pos, "MovementMonsterSpline");
 
-            if (monsterMove != null && (Settings.SaveTransports || (monsterMove.TransportGuid == null || monsterMove.TransportGuid.IsEmpty())))
-                obj.AddWaypoint(monsterMove, pos, packet.Time);
+            if (monsterMove != null)
+            {
+                if (guid == Storage.CurrentActivePlayer)
+                    Storage.CurrentMoveSplineExpireTime = packet.UnixTimeMs + (long)monsterMove.MoveTime;
+
+                if (Settings.SaveTransports || (monsterMove.TransportGuid == null || monsterMove.TransportGuid.IsEmpty()))
+                    obj.AddWaypoint(monsterMove, pos, packet.Time);
+            }
         }
 
         [Parser(Opcode.SMSG_PHASE_SHIFT_CHANGE)]

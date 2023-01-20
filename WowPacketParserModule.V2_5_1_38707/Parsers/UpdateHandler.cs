@@ -200,7 +200,7 @@ namespace WowPacketParserModule.V2_5_1_38707.Parsers
 
             BitArray updateMaskArray = null;
             var moves = ReadMovementUpdateBlock(packet, guid, obj, index);
-            Storage.StoreObjectCreateTime(guid, map, moves, packet.Time, type);
+            Storage.StoreObjectCreateTime(guid, map, moves, packet, type);
 
             if (ClientVersion.IsUsingNewUpdateFieldSystem())
             {
@@ -578,6 +578,9 @@ namespace WowPacketParserModule.V2_5_1_38707.Parsers
                                 packet.ReadInt32("Unknown4", index, "Unknown901", i);
                             }
                         }
+
+                        if (guid == Storage.CurrentActivePlayer)
+                            Storage.CurrentMoveSplineExpireTime = packet.UnixTimeMs + (long)monsterMove.MoveTime;
 
                         if (pointsCount > 0 && (Settings.SaveTransports || (moveInfo.TransportGuid == null || moveInfo.TransportGuid.IsEmpty())))
                         {

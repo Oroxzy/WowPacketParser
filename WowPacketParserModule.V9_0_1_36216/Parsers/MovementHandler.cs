@@ -2,6 +2,7 @@
 using WowPacketParser.Misc;
 using WowPacketParser.Parsing;
 using WowPacketParser.Store;
+using WowPacketParser.Store.Objects;
 
 namespace WowPacketParserModule.V9_0_1_36216.Parsers
 {
@@ -12,11 +13,22 @@ namespace WowPacketParserModule.V9_0_1_36216.Parsers
         public static void HandleNewWorld(Packet packet)
         {
             WowPacketParser.Parsing.Parsers.MovementHandler.CurrentMapId = (uint)packet.ReadInt32<MapId>("Map");
-            packet.ReadVector4("Position");
+            Vector4 pos = packet.ReadVector4("Position");
             packet.ReadInt32("Unused901_1");
             packet.ReadInt32("Unused901_2");
             packet.ReadUInt32("Reason");
             packet.ReadVector3("MovementOffset");
+
+            if (Storage.CurrentActivePlayer != null &&
+               !Storage.CurrentActivePlayer.IsEmpty() &&
+                Storage.Objects.ContainsKey(Storage.CurrentActivePlayer))
+            {
+                WoWObject player = Storage.Objects[Storage.CurrentActivePlayer].Item1;
+                player.Movement.Position.X = pos.X;
+                player.Movement.Position.Y = pos.Y;
+                player.Movement.Position.Z = pos.Z;
+                player.Movement.Orientation = pos.O;
+            }
 
             Storage.ClearDataOnMapChange();
             packet.AddSniffData(StoreNameType.Map, (int)WowPacketParser.Parsing.Parsers.MovementHandler.CurrentMapId, "NEW_WORLD");

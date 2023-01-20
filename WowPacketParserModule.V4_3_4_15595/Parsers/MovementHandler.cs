@@ -52,8 +52,14 @@ namespace WowPacketParserModule.V4_3_4_15595.Parsers
 
             ReadMovementMonsterSpline(monsterMove, packet, pos, "MovementMonsterSpline");
 
-            if (obj != null && monsterMove != null)
-                obj.AddWaypoint(monsterMove, pos, packet.Time);
+            if (monsterMove != null)
+            {
+                if (guid == Storage.CurrentActivePlayer)
+                    Storage.CurrentMoveSplineExpireTime = packet.UnixTimeMs + (long)monsterMove.MoveTime;
+
+                if (obj != null && (Settings.SaveTransports || (monsterMove.TransportGuid == null || monsterMove.TransportGuid.IsEmpty())))
+                    obj.AddWaypoint(monsterMove, pos, packet.Time);
+            }
         }
 
         public static void ReadMovementMonsterSpline(ServerSideMovement monsterMove, Packet packet, Vector3 pos, params object[] indexes)
@@ -162,11 +168,22 @@ namespace WowPacketParserModule.V4_3_4_15595.Parsers
         [Parser(Opcode.SMSG_NEW_WORLD)]
         public static void HandleNewWorld434(Packet packet)
         {
-            packet.ReadSingle("X");
-            packet.ReadSingle("Orientation");
-            packet.ReadSingle("Y");
+            float x = packet.ReadSingle("X");
+            float o = packet.ReadSingle("Orientation");
+            float y = packet.ReadSingle("Y");
             CoreParsers.MovementHandler.CurrentMapId = (uint)packet.ReadInt32<MapId>("MapID");
-            packet.ReadSingle("Z"); // seriously...
+            float z = packet.ReadSingle("Z"); // seriously...
+
+            if (Storage.CurrentActivePlayer != null &&
+               !Storage.CurrentActivePlayer.IsEmpty() &&
+                Storage.Objects.ContainsKey(Storage.CurrentActivePlayer))
+            {
+                WoWObject player = Storage.Objects[Storage.CurrentActivePlayer].Item1;
+                player.Movement.Position.X = x;
+                player.Movement.Position.Y = y;
+                player.Movement.Position.Z = z;
+                player.Movement.Orientation = o;
+            }
 
             Storage.ClearDataOnMapChange();
             packet.AddSniffData(StoreNameType.Map, (int)CoreParsers.MovementHandler.CurrentMapId, "NEW_WORLD");
@@ -1747,7 +1764,7 @@ namespace WowPacketParserModule.V4_3_4_15595.Parsers
             speedUpdate.SpeedRate = packet.ReadSingle("Speed") / MovementInfo.DEFAULT_RUN_SPEED;
             packet.ParseBitStream(guid, 2, 1);
             WowGuid moverGuid = packet.WriteGuid("Guid", guid);
-            speedUpdate.UnixTimeMs = (ulong)Utilities.GetUnixTimeMsFromDateTime(packet.Time);
+            speedUpdate.UnixTimeMs = (ulong)packet.UnixTimeMs;
             Storage.StoreUnitSpeedUpdate(moverGuid, speedUpdate);
         }
 
@@ -2882,7 +2899,7 @@ namespace WowPacketParserModule.V4_3_4_15595.Parsers
             speedUpdate.SpeedType = SpeedType.Fly;
             speedUpdate.SpeedRate = packet.ReadSingle("Speed") / MovementInfo.DEFAULT_FLY_SPEED;
             WowGuid moverGuid = packet.WriteGuid("Guid", guid);
-            speedUpdate.UnixTimeMs = (ulong)Utilities.GetUnixTimeMsFromDateTime(packet.Time);
+            speedUpdate.UnixTimeMs = (ulong)packet.UnixTimeMs;
             Storage.StoreUnitSpeedUpdate(moverGuid, speedUpdate);
         }
 
@@ -2902,7 +2919,7 @@ namespace WowPacketParserModule.V4_3_4_15595.Parsers
             packet.ReadXORByte(guid, 7);
             packet.ReadXORByte(guid, 3);
             WowGuid moverGuid = packet.WriteGuid("Guid", guid);
-            speedUpdate.UnixTimeMs = (ulong)Utilities.GetUnixTimeMsFromDateTime(packet.Time);
+            speedUpdate.UnixTimeMs = (ulong)packet.UnixTimeMs;
             Storage.StoreUnitSpeedUpdate(moverGuid, speedUpdate);
         }
 
@@ -2938,7 +2955,7 @@ namespace WowPacketParserModule.V4_3_4_15595.Parsers
             packet.ReadXORByte(guid, 5);
             packet.ReadXORByte(guid, 7);
             WowGuid moverGuid = packet.WriteGuid("Guid", guid);
-            speedUpdate.UnixTimeMs = (ulong)Utilities.GetUnixTimeMsFromDateTime(packet.Time);
+            speedUpdate.UnixTimeMs = (ulong)packet.UnixTimeMs;
             Storage.StoreUnitSpeedUpdate(moverGuid, speedUpdate);
         }
 
@@ -4021,7 +4038,7 @@ namespace WowPacketParserModule.V4_3_4_15595.Parsers
 
             WowGuid moverGuid = packet.WriteGuid("Guid", guid);
             packet.AddValue("Position", pos);
-            speedUpdate.UnixTimeMs = (ulong)Utilities.GetUnixTimeMsFromDateTime(packet.Time);
+            speedUpdate.UnixTimeMs = (ulong)packet.UnixTimeMs;
             Storage.StoreUnitSpeedUpdate(moverGuid, speedUpdate);
             Storage.StorePlayerMovement(moverGuid, info, packet);
         }
@@ -4159,7 +4176,7 @@ namespace WowPacketParserModule.V4_3_4_15595.Parsers
 
             WowGuid moverGuid = packet.WriteGuid("Guid", guid);
             packet.AddValue("Position", pos);
-            speedUpdate.UnixTimeMs = (ulong)Utilities.GetUnixTimeMsFromDateTime(packet.Time);
+            speedUpdate.UnixTimeMs = (ulong)packet.UnixTimeMs;
             Storage.StoreUnitSpeedUpdate(moverGuid, speedUpdate);
             Storage.StorePlayerMovement(moverGuid, info, packet);
         }
@@ -4295,7 +4312,7 @@ namespace WowPacketParserModule.V4_3_4_15595.Parsers
 
             WowGuid moverGuid = packet.WriteGuid("Guid", guid);
             packet.AddValue("Position", pos);
-            speedUpdate.UnixTimeMs = (ulong)Utilities.GetUnixTimeMsFromDateTime(packet.Time);
+            speedUpdate.UnixTimeMs = (ulong)packet.UnixTimeMs;
             Storage.StoreUnitSpeedUpdate(moverGuid, speedUpdate);
             Storage.StorePlayerMovement(moverGuid, info, packet);
         }
@@ -4581,7 +4598,7 @@ namespace WowPacketParserModule.V4_3_4_15595.Parsers
             packet.ReadXORByte(guid, 4);
             packet.ReadXORByte(guid, 2);
             WowGuid moverGuid = packet.WriteGuid("Guid", guid);
-            speedUpdate.UnixTimeMs = (ulong)Utilities.GetUnixTimeMsFromDateTime(packet.Time);
+            speedUpdate.UnixTimeMs = (ulong)packet.UnixTimeMs;
             Storage.StoreUnitSpeedUpdate(moverGuid, speedUpdate);
         }
 
@@ -4601,7 +4618,7 @@ namespace WowPacketParserModule.V4_3_4_15595.Parsers
             packet.ReadXORByte(guid, 7);
             packet.ReadXORByte(guid, 4);
             WowGuid moverGuid = packet.WriteGuid("Guid", guid);
-            speedUpdate.UnixTimeMs = (ulong)Utilities.GetUnixTimeMsFromDateTime(packet.Time);
+            speedUpdate.UnixTimeMs = (ulong)packet.UnixTimeMs;
             Storage.StoreUnitSpeedUpdate(moverGuid, speedUpdate);
         }
 
@@ -4614,7 +4631,7 @@ namespace WowPacketParserModule.V4_3_4_15595.Parsers
             speedUpdate.SpeedRate = packet.ReadSingle("Rate") / MovementInfo.DEFAULT_TURN_RATE;
             packet.ParseBitStream(guid, 1, 5, 3, 2, 7, 4, 6, 0);
             WowGuid moverGuid = packet.WriteGuid("Guid", guid);
-            speedUpdate.UnixTimeMs = (ulong)Utilities.GetUnixTimeMsFromDateTime(packet.Time);
+            speedUpdate.UnixTimeMs = (ulong)packet.UnixTimeMs;
             Storage.StoreUnitSpeedUpdate(moverGuid, speedUpdate);
         }
 
@@ -4634,7 +4651,7 @@ namespace WowPacketParserModule.V4_3_4_15595.Parsers
             speedUpdate.SpeedRate = packet.ReadSingle("Rate") / MovementInfo.DEFAULT_PITCH_RATE;
             packet.ReadXORByte(guid, 4);
             WowGuid moverGuid = packet.WriteGuid("Guid", guid);
-            speedUpdate.UnixTimeMs = (ulong)Utilities.GetUnixTimeMsFromDateTime(packet.Time);
+            speedUpdate.UnixTimeMs = (ulong)packet.UnixTimeMs;
             Storage.StoreUnitSpeedUpdate(moverGuid, speedUpdate);
         }
 
@@ -4775,7 +4792,7 @@ namespace WowPacketParserModule.V4_3_4_15595.Parsers
             packet.ReadXORByte(guid, 7);
             packet.ReadXORByte(guid, 2);
             WowGuid moverGuid = packet.WriteGuid("Guid", guid);
-            speedUpdate.UnixTimeMs = (ulong)Utilities.GetUnixTimeMsFromDateTime(packet.Time);
+            speedUpdate.UnixTimeMs = (ulong)packet.UnixTimeMs;
             Storage.StoreUnitSpeedUpdate(moverGuid, speedUpdate);
         }
 
@@ -4929,7 +4946,7 @@ namespace WowPacketParserModule.V4_3_4_15595.Parsers
 
             WowGuid moverGuid = packet.WriteGuid("Guid", guid);
             packet.AddValue("Position", pos);
-            speedUpdate.UnixTimeMs = (ulong)Utilities.GetUnixTimeMsFromDateTime(packet.Time);
+            speedUpdate.UnixTimeMs = (ulong)packet.UnixTimeMs;
             Storage.StoreUnitSpeedUpdate(moverGuid, speedUpdate);
             Storage.StorePlayerMovement(moverGuid, info, packet);
         }
@@ -5171,7 +5188,7 @@ namespace WowPacketParserModule.V4_3_4_15595.Parsers
 
             WowGuid moverGuid = packet.WriteGuid("Guid", guid);
             packet.AddValue("Position", pos);
-            speedUpdate.UnixTimeMs = (ulong)Utilities.GetUnixTimeMsFromDateTime(packet.Time);
+            speedUpdate.UnixTimeMs = (ulong)packet.UnixTimeMs;
             Storage.StoreUnitSpeedUpdate(moverGuid, speedUpdate);
             Storage.StorePlayerMovement(moverGuid, info, packet);
         }
@@ -5410,7 +5427,7 @@ namespace WowPacketParserModule.V4_3_4_15595.Parsers
 
             WowGuid moverGuid = packet.WriteGuid("Guid", guid);
             packet.AddValue("Position", pos);
-            speedUpdate.UnixTimeMs = (ulong)Utilities.GetUnixTimeMsFromDateTime(packet.Time);
+            speedUpdate.UnixTimeMs = (ulong)packet.UnixTimeMs;
             Storage.StoreUnitSpeedUpdate(moverGuid, speedUpdate);
             Storage.StorePlayerMovement(moverGuid, info, packet);
         }
@@ -5532,7 +5549,7 @@ namespace WowPacketParserModule.V4_3_4_15595.Parsers
 
             WowGuid moverGuid = packet.WriteGuid("Guid", guid);
             packet.AddValue("Position", pos);
-            speedUpdate.UnixTimeMs = (ulong)Utilities.GetUnixTimeMsFromDateTime(packet.Time);
+            speedUpdate.UnixTimeMs = (ulong)packet.UnixTimeMs;
             Storage.StoreUnitSpeedUpdate(moverGuid, speedUpdate);
             Storage.StorePlayerMovement(moverGuid, info, packet);
         }
@@ -5655,7 +5672,7 @@ namespace WowPacketParserModule.V4_3_4_15595.Parsers
 
             WowGuid moverGuid = packet.WriteGuid("Guid", guid);
             packet.AddValue("Position", pos);
-            speedUpdate.UnixTimeMs = (ulong)Utilities.GetUnixTimeMsFromDateTime(packet.Time);
+            speedUpdate.UnixTimeMs = (ulong)packet.UnixTimeMs;
             Storage.StoreUnitSpeedUpdate(moverGuid, speedUpdate);
             Storage.StorePlayerMovement(moverGuid, info, packet);
         }
@@ -5793,7 +5810,7 @@ namespace WowPacketParserModule.V4_3_4_15595.Parsers
 
             WowGuid moverGuid = packet.WriteGuid("Guid", guid);
             packet.AddValue("Position", pos);
-            speedUpdate.UnixTimeMs = (ulong)Utilities.GetUnixTimeMsFromDateTime(packet.Time);
+            speedUpdate.UnixTimeMs = (ulong)packet.UnixTimeMs;
             Storage.StoreUnitSpeedUpdate(moverGuid, speedUpdate);
             Storage.StorePlayerMovement(moverGuid, info, packet);
         }
@@ -5928,7 +5945,7 @@ namespace WowPacketParserModule.V4_3_4_15595.Parsers
 
             WowGuid moverGuid = packet.WriteGuid("Guid", guid);
             packet.AddValue("Position", pos);
-            speedUpdate.UnixTimeMs = (ulong)Utilities.GetUnixTimeMsFromDateTime(packet.Time);
+            speedUpdate.UnixTimeMs = (ulong)packet.UnixTimeMs;
             Storage.StoreUnitSpeedUpdate(moverGuid, speedUpdate);
             Storage.StorePlayerMovement(moverGuid, info, packet);
         }
@@ -7225,7 +7242,7 @@ namespace WowPacketParserModule.V4_3_4_15595.Parsers
             packet.ReadXORByte(guid, 3);
             packet.ReadXORByte(guid, 4);
             WowGuid moverGuid = packet.WriteGuid("Guid", guid);
-            speedUpdate.UnixTimeMs = (ulong)Utilities.GetUnixTimeMsFromDateTime(packet.Time);
+            speedUpdate.UnixTimeMs = (ulong)packet.UnixTimeMs;
             Storage.StoreUnitSpeedUpdate(moverGuid, speedUpdate);
         }
 
@@ -7246,7 +7263,7 @@ namespace WowPacketParserModule.V4_3_4_15595.Parsers
             packet.ReadXORByte(guid, 5);
             packet.ReadXORByte(guid, 7);
             WowGuid moverGuid = packet.WriteGuid("Guid", guid);
-            speedUpdate.UnixTimeMs = (ulong)Utilities.GetUnixTimeMsFromDateTime(packet.Time);
+            speedUpdate.UnixTimeMs = (ulong)packet.UnixTimeMs;
             Storage.StoreUnitSpeedUpdate(moverGuid, speedUpdate);
         }
 
@@ -7267,7 +7284,7 @@ namespace WowPacketParserModule.V4_3_4_15595.Parsers
             packet.ReadXORByte(guid, 2);
             packet.ReadXORByte(guid, 6);
             WowGuid moverGuid = packet.WriteGuid("Guid", guid);
-            speedUpdate.UnixTimeMs = (ulong)Utilities.GetUnixTimeMsFromDateTime(packet.Time);
+            speedUpdate.UnixTimeMs = (ulong)packet.UnixTimeMs;
             Storage.StoreUnitSpeedUpdate(moverGuid, speedUpdate);
         }
 
@@ -7288,7 +7305,7 @@ namespace WowPacketParserModule.V4_3_4_15595.Parsers
             packet.ReadXORByte(guid, 7);
             packet.ReadXORByte(guid, 4);
             WowGuid moverGuid = packet.WriteGuid("Guid", guid);
-            speedUpdate.UnixTimeMs = (ulong)Utilities.GetUnixTimeMsFromDateTime(packet.Time);
+            speedUpdate.UnixTimeMs = (ulong)packet.UnixTimeMs;
             Storage.StoreUnitSpeedUpdate(moverGuid, speedUpdate);
         }
 
@@ -7309,7 +7326,7 @@ namespace WowPacketParserModule.V4_3_4_15595.Parsers
             packet.ReadXORByte(guid, 7);
             packet.ReadXORByte(guid, 2);
             WowGuid moverGuid = packet.WriteGuid("Guid", guid);
-            speedUpdate.UnixTimeMs = (ulong)Utilities.GetUnixTimeMsFromDateTime(packet.Time);
+            speedUpdate.UnixTimeMs = (ulong)packet.UnixTimeMs;
             Storage.StoreUnitSpeedUpdate(moverGuid, speedUpdate);
         }
 
@@ -7330,7 +7347,7 @@ namespace WowPacketParserModule.V4_3_4_15595.Parsers
             packet.ReadXORByte(guid, 7);
             packet.ReadXORByte(guid, 3);
             WowGuid moverGuid = packet.WriteGuid("Guid", guid);
-            speedUpdate.UnixTimeMs = (ulong)Utilities.GetUnixTimeMsFromDateTime(packet.Time);
+            speedUpdate.UnixTimeMs = (ulong)packet.UnixTimeMs;
             Storage.StoreUnitSpeedUpdate(moverGuid, speedUpdate);
         }
 
@@ -7351,7 +7368,7 @@ namespace WowPacketParserModule.V4_3_4_15595.Parsers
             packet.ReadXORByte(guid, 6);
             packet.ReadXORByte(guid, 4);
             WowGuid moverGuid = packet.WriteGuid("Guid", guid);
-            speedUpdate.UnixTimeMs = (ulong)Utilities.GetUnixTimeMsFromDateTime(packet.Time);
+            speedUpdate.UnixTimeMs = (ulong)packet.UnixTimeMs;
             Storage.StoreUnitSpeedUpdate(moverGuid, speedUpdate);
         }
 
@@ -7372,7 +7389,7 @@ namespace WowPacketParserModule.V4_3_4_15595.Parsers
             packet.ReadXORByte(guid, 3);
             packet.ReadXORByte(guid, 5);
             WowGuid moverGuid = packet.WriteGuid("Guid", guid);
-            speedUpdate.UnixTimeMs = (ulong)Utilities.GetUnixTimeMsFromDateTime(packet.Time);
+            speedUpdate.UnixTimeMs = (ulong)packet.UnixTimeMs;
             Storage.StoreUnitSpeedUpdate(moverGuid, speedUpdate);
         }
 

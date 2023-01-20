@@ -25,7 +25,7 @@ namespace WowPacketParserModule.V6_0_2_19033.Parsers
             {
                 PositionX = pos.X,
                 PositionY = pos.Y,
-                UnixTimeMs = (ulong)Utilities.GetUnixTimeMsFromDateTime(packet.Time)
+                UnixTimeMs = (ulong)packet.UnixTimeMs
             };
             Storage.StorePlayerMinimapPing(guid, ping);
         }
@@ -423,7 +423,7 @@ namespace WowPacketParserModule.V6_0_2_19033.Parsers
                 IsFullUpdate = false,
                 Icon = packet.ReadSByte("Symbol"),
                 TargetGUID = packet.ReadPackedGuid128("Target"),
-                UnixTimeMs = (ulong)Utilities.GetUnixTimeMsFromDateTime(packet.Time)
+                UnixTimeMs = (ulong)packet.UnixTimeMs
             };
             packet.ReadPackedGuid128("ChangedBy");
             Storage.RaidTargetIconUpdates.Add(iconUpdate);
@@ -444,7 +444,7 @@ namespace WowPacketParserModule.V6_0_2_19033.Parsers
                         IsFullUpdate = true,
                         TargetGUID = packet.ReadPackedGuid128("Target", i),
                         Icon = packet.ReadSByte("Symbol", i),
-                        UnixTimeMs = (ulong)Utilities.GetUnixTimeMsFromDateTime(packet.Time)
+                        UnixTimeMs = (ulong)packet.UnixTimeMs
                     };
                     Storage.RaidTargetIconUpdates.Add(iconUpdate);
                 }
@@ -456,7 +456,7 @@ namespace WowPacketParserModule.V6_0_2_19033.Parsers
                     IsFullUpdate = true,
                     TargetGUID = null,
                     Icon = -1,
-                    UnixTimeMs = (ulong)Utilities.GetUnixTimeMsFromDateTime(packet.Time)
+                    UnixTimeMs = (ulong)packet.UnixTimeMs
                 };
                 Storage.RaidTargetIconUpdates.Add(iconUpdate);
             }

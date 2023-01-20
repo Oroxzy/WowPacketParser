@@ -45,6 +45,25 @@ namespace WowPacketParser.Store.Objects.UpdateFields.LegacyImplementation
             }
         }
 
+        public WowGuid FarsightObject
+        {
+            get
+            {
+                if (Enums.Version.UpdateFields.GetUpdateField(ActivePlayerField.ACTIVE_PLAYER_FARSIGHT) > 0)
+                {
+                    return GetGuidValue(ActivePlayerField.ACTIVE_PLAYER_FARSIGHT);
+                }
+                else if (Enums.Version.UpdateFields.GetUpdateField(ActivePlayerField.ACTIVE_PLAYER_FIELD_FARSIGHT) > 0)
+                {
+                    return GetGuidValue(ActivePlayerField.ACTIVE_PLAYER_FIELD_FARSIGHT);
+                }
+                else
+                {
+                    return GetGuidValue(PlayerField.PLAYER_FARSIGHT);
+                }
+            }
+        }
+
         public int XP => (ClientVersion.AddedInVersion(ClientVersionBuild.V8_0_1_27101) ?
             UpdateFields.GetValue<ActivePlayerField, int>(ActivePlayerField.ACTIVE_PLAYER_FIELD_XP) :
             UpdateFields.GetValue<PlayerField, int>(PlayerField.PLAYER_XP));

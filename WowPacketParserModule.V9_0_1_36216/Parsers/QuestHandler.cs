@@ -472,7 +472,7 @@ namespace WowPacketParserModule.V9_0_1_36216.Parsers
                     ObjectId = objectId,
                     ObjectType = objectType,
                     QuestId = id,
-                    UnixTimeMs = (ulong)Utilities.GetUnixTimeMsFromDateTime(packet.Time)
+                    UnixTimeMs = (ulong)packet.UnixTimeMs
                 };
                 Storage.QuestClientCompleteTimes.Add(questComplete, packet.TimeSpan);
             }

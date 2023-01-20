@@ -160,7 +160,7 @@ namespace WowPacketParser.Parsing.Parsers
                     IsFullUpdate = isFullUpdate,
                     Icon = (sbyte)packet.ReadSByteE<TargetIcon>("Icon Id", i),
                     TargetGUID = packet.ReadGuid("Target Guid", i),
-                    UnixTimeMs = (ulong)Utilities.GetUnixTimeMsFromDateTime(packet.Time)
+                    UnixTimeMs = (ulong)packet.UnixTimeMs
                 };
                 Storage.RaidTargetIconUpdates.Add(iconUpdate);
             }
@@ -172,7 +172,7 @@ namespace WowPacketParser.Parsing.Parsers
                     IsFullUpdate = isFullUpdate,
                     Icon = -1,
                     TargetGUID = null,
-                    UnixTimeMs = (ulong)Utilities.GetUnixTimeMsFromDateTime(packet.Time)
+                    UnixTimeMs = (ulong)packet.UnixTimeMs
                 };
                 Storage.RaidTargetIconUpdates.Add(iconUpdate);
             }

@@ -29,7 +29,7 @@ namespace WowPacketParserModule.V7_0_3_22248.Parsers
             Storage.CurrentActivePlayer = WowGuid64.Empty;
             LogoutTime logoutTime = new LogoutTime()
             {
-                UnixTimeMs = (ulong)Utilities.GetUnixTimeMsFromDateTime(packet.Time)
+                UnixTimeMs = (ulong)packet.UnixTimeMs
             };
             Storage.LogoutTimes.Add(logoutTime);
         }

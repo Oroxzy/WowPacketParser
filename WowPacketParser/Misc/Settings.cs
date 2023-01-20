@@ -230,6 +230,7 @@ namespace WowPacketParser.Misc
             public static readonly bool creature_unique_faction = Conf.GetBoolean("creature_unique_faction", false);
             public static readonly bool creature_unique_gossip = Conf.GetBoolean("creature_unique_gossip", false);
             public static readonly bool creature_unique_text = Conf.GetBoolean("creature_unique_text", false);
+            public static readonly bool creature_visibility_distance = Conf.GetBoolean("creature_visibility_distance", false);
             public static readonly bool gameobject_addon = Conf.GetBoolean("gameobject_addon", false);
             public static readonly bool gameobject_loot = Conf.GetBoolean("gameobject_loot", false);
             public static readonly bool gameobject_respawn_time = Conf.GetBoolean("gameobject_respawn_time", false);
@@ -237,6 +238,7 @@ namespace WowPacketParser.Misc
             public static readonly bool gameobject_template_addon = Conf.GetBoolean("gameobject_template_addon", false);
             public static readonly bool gameobject_template_locale = Conf.GetBoolean("gameobject_template_locale", false);
             public static readonly bool gameobject_unique_anim = Conf.GetBoolean("gameobject_unique_anim", false);
+            public static readonly bool gameobject_visibility_distance = Conf.GetBoolean("gameobject_visibility_distance", false);
             public static readonly bool gossip_menu = Conf.GetBoolean("gossip_menu", false);
             public static readonly bool gossip_menu_option = Conf.GetBoolean("gossip_menu_option", false);
             public static readonly bool item_loot = Conf.GetBoolean("item_loot", false);

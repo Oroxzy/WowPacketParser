@@ -349,7 +349,7 @@ namespace WowPacketParserModule.V8_0_1_27101.Parsers
                             {
                                 CreaturePowerValuesUpdate powerUpdate = new CreaturePowerValuesUpdate();
                                 powerUpdate.PowerType = (uint)powerType;
-                                powerUpdate.UnixTimeMs = (ulong)Utilities.GetUnixTimeMsFromDateTime(packet.Time);
+                                powerUpdate.UnixTimeMs = (ulong)packet.UnixTimeMs;
 
                                 if (oldUnitData.Power[powerType] != unit.UnitData.Power[powerType])
                                 {
@@ -494,7 +494,7 @@ namespace WowPacketParserModule.V8_0_1_27101.Parsers
                 }
                 if (hasData)
                 {
-                    creatureUpdate.UnixTimeMs = (ulong)Utilities.GetUnixTimeMsFromDateTime(packet.Time);
+                    creatureUpdate.UnixTimeMs = (ulong)packet.UnixTimeMs;
                     Storage.StoreUnitValuesUpdate(guid, creatureUpdate);
                 }
             }
@@ -543,7 +543,7 @@ namespace WowPacketParserModule.V8_0_1_27101.Parsers
                 }
                 if (hasData)
                 {
-                    goUpdate.UnixTimeMs = (ulong)Utilities.GetUnixTimeMsFromDateTime(packet.Time);
+                    goUpdate.UnixTimeMs = (ulong)packet.UnixTimeMs;
                     Storage.StoreGameObjectUpdate(guid, goUpdate);
                 }
             }
@@ -564,7 +564,7 @@ namespace WowPacketParserModule.V8_0_1_27101.Parsers
 
             BitArray updateMaskArray = null;
             var moves = ReadMovementUpdateBlock(packet, guid, obj, index);
-            Storage.StoreObjectCreateTime(guid, map, moves, packet.Time, type);
+            Storage.StoreObjectCreateTime(guid, map, moves, packet, type);
 
             if (ClientVersion.AddedInVersion(ClientVersionBuild.V8_1_0_28724))
             {
@@ -985,6 +985,9 @@ namespace WowPacketParserModule.V8_0_1_27101.Parsers
                                 packet.ReadInt32("Unknown4", index, "Unknown901", i);
                             }
                         }
+
+                        if (guid == Storage.CurrentActivePlayer)
+                            Storage.CurrentMoveSplineExpireTime = packet.UnixTimeMs + (long)monsterMove.MoveTime;
 
                         if (pointsCount > 0 && (Settings.SaveTransports || (moveInfo.TransportGuid == null || moveInfo.TransportGuid.IsEmpty())))
                         {

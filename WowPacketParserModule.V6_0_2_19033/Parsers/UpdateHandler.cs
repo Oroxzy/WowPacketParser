@@ -84,7 +84,7 @@ namespace WowPacketParserModule.V6_0_2_19033.Parsers
                 obj = CoreParsers.UpdateHandler.CreateObject(objType, map);
 
             var moves = ReadMovementUpdateBlock(packet, guid, obj, index);
-            Storage.StoreObjectCreateTime(guid, map, moves, packet.Time, type);
+            Storage.StoreObjectCreateTime(guid, map, moves, packet, type);
 
             BitArray updateMaskArray = null;
             var updates = CoreParsers.UpdateHandler.ReadValuesUpdateBlockOnCreate(packet, objType, index, out updateMaskArray);
@@ -254,6 +254,9 @@ namespace WowPacketParserModule.V6_0_2_19033.Parsers
                             var spot = packet.ReadVector3("Points", index, i);
                             monsterMove.SplinePoints.Add(spot);
                         }
+
+                        if (guid == Storage.CurrentActivePlayer)
+                            Storage.CurrentMoveSplineExpireTime = packet.UnixTimeMs + (long)monsterMove.MoveTime;
 
                         if (pointsCount > 0 && (Settings.SaveTransports || (moveInfo.TransportGuid == null || moveInfo.TransportGuid.IsEmpty())))
                         {

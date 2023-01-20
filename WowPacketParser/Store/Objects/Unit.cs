@@ -251,6 +251,10 @@ namespace WowPacketParser.Store.Objects
 
         public void AddWaypoint(ServerSideMovement movementData, Vector3 startPosition, DateTime packetTime)
         {
+            // update current position to spline start
+            if (Movement != null)
+                Movement.Position = startPosition;
+
             List<ServerSideMovement> list = null;
             if ((Type == ObjectType.Unit) && ((UnitData.Flags & (uint)UnitFlags.IsInCombat) == 0))
                 list = Waypoints;

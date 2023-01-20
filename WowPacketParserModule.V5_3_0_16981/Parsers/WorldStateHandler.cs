@@ -24,7 +24,7 @@ namespace WowPacketParserModule.V5_3_0_16981.Parsers
                 wsData.ZoneId = zoneId;
                 wsData.AreaId = areaId;
                 CoreParsers.WorldStateHandler.ReadWorldStateBlock(out wsData.Variable, out wsData.Value, packet);
-                wsData.UnixTimeMs = (ulong)Utilities.GetUnixTimeMsFromDateTime(packet.Time);
+                wsData.UnixTimeMs = (ulong)packet.UnixTimeMs;
                 Storage.WorldStateInits.Add(wsData);
                 packet.AddSniffData(StoreNameType.WorldState, wsData.Variable, wsData.Value.ToString());
             }  

@@ -104,7 +104,7 @@ namespace WowPacketParser.Parsing.Parsers
                     ItemClientUse newItemuse = new ItemClientUse
                     {
                         Entry = (uint)Storage.Objects[guid].Item1.ObjectData.EntryID,
-                        UnixTimeMs = (ulong)Utilities.GetUnixTimeMsFromDateTime(packet.Time),
+                        UnixTimeMs = (ulong)packet.UnixTimeMs,
                     };
                     Storage.ItemClientUseTimes.Add(newItemuse, packet.TimeSpan);
                 }
@@ -127,7 +127,7 @@ namespace WowPacketParser.Parsing.Parsers
                 ItemClientUse newItemuse = new ItemClientUse
                 {
                     Entry = (uint)Storage.Objects[guid].Item1.ObjectData.EntryID,
-                    UnixTimeMs = (ulong)Utilities.GetUnixTimeMsFromDateTime(packet.Time),
+                    UnixTimeMs = (ulong)packet.UnixTimeMs,
                 };
                 Storage.ItemClientUseTimes.Add(newItemuse, packet.TimeSpan);
             }

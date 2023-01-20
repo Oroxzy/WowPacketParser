@@ -93,7 +93,7 @@ namespace WowPacketParserModule.V5_4_7_17898.Parsers
         {
             ObjectType objType = ObjectTypeConverter.Convert(packet.ReadByteE<ObjectTypeLegacy>("Object Type", index));
             var moves = ReadMovementUpdateBlock(packet, guid, index);
-            Storage.StoreObjectCreateTime(guid, map, moves, packet.Time, type);
+            Storage.StoreObjectCreateTime(guid, map, moves, packet, type);
 
             BitArray updateMaskArray = null;
             var updates = CoreParsers.UpdateHandler.ReadValuesUpdateBlockOnCreate(packet, objType, index, out updateMaskArray);
@@ -569,6 +569,9 @@ namespace WowPacketParserModule.V5_4_7_17898.Parsers
                     if (moveInfo.TransportGuid != null)
                         monsterMove.TransportGuid = moveInfo.TransportGuid;
                     monsterMove.TransportSeat = moveInfo.TransportSeat;
+
+                    if (guid == Storage.CurrentActivePlayer)
+                        Storage.CurrentMoveSplineExpireTime = packet.UnixTimeMs + (long)monsterMove.MoveTime;
 
                     if ((Settings.SaveTransports || moveInfo.TransportGuid == null || moveInfo.TransportGuid.IsEmpty()) &&
                         Storage.Objects.ContainsKey(guid))

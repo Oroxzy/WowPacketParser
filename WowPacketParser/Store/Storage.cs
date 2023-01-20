@@ -17,6 +17,8 @@ namespace WowPacketParser.Store
 
         /* Key: Guid */
         public static uint CurrentTaxiNode = 0;
+        public static long CurrentMoveSplineExpireTime = 0;
+        public static bool IsCurrentPlayerWatchingCinematic = false;
         public static WowGuid CurrentActivePlayer = WowGuid64.Empty;
         public static void SetCurrentActivePlayer(WowGuid guid, DateTime time)
         {
@@ -310,7 +312,7 @@ namespace WowPacketParser.Store
             }
         }
         public static readonly Dictionary<WowGuid, List<ObjectCreate>> ObjectCreate1Times = new Dictionary<WowGuid, List<ObjectCreate>>();
-        public static void StoreObjectCreate1Time(WowGuid guid, uint map, MovementInfo movement, DateTime time)
+        public static void StoreObjectCreate1Time(WowGuid guid, uint map, MovementInfo movement, Packet packet)
         {
             if (guid.GetObjectType() != ObjectType.Unit &&
                 guid.GetObjectType() != ObjectType.GameObject &&
@@ -318,6 +320,42 @@ namespace WowPacketParser.Store
                 guid.GetObjectType() != ObjectType.Player &&
                 guid.GetObjectType() != ObjectType.ActivePlayer)
                 return;
+
+            if (((guid.GetHighType() == HighGuidType.Creature && Settings.SqlTables.creature_visibility_distance) ||
+                (guid.GetHighType() == HighGuidType.GameObject && Settings.SqlTables.gameobject_visibility_distance)) &&
+                CurrentActivePlayer != null && !CurrentActivePlayer.IsEmpty() &&
+                Objects.ContainsKey(CurrentActivePlayer) && !IsCurrentPlayerWatchingCinematic && 
+                CurrentMoveSplineExpireTime < packet.UnixTimeMs &&
+               (movement.TransportGuid == null || movement.TransportGuid.IsEmpty()))
+            {
+                Player player = Objects[CurrentActivePlayer].Item1 as Player;
+
+                if (player != null &&
+                   (player.Movement.TransportGuid == null || player.Movement.TransportGuid.IsEmpty()) &&
+                   (player.ActivePlayerData.FarsightObject == null || player.ActivePlayerData.FarsightObject.IsEmpty()) &&
+                   !player.UnitData.Flags.HasAnyFlag(UnitFlags.OnTaxi) &&
+                   (player.UnitData.ChannelData == null || player.UnitData.ChannelData.SpellID == 0))
+                {
+                    CreatureVisibilityDistance visDist = new CreatureVisibilityDistance
+                    {
+                        Entry = guid.GetEntry(),
+                        Map = map,
+                        Distance = (uint)Utilities.GetDistance3D(
+                        player.Movement.Position.X,
+                        player.Movement.Position.Y,
+                        player.Movement.Position.Z,
+                        movement.Position.X,
+                        movement.Position.Y,
+                        movement.Position.Z),
+                        SniffId = packet.SniffId
+                    };
+
+                    if (guid.GetHighType() == HighGuidType.Creature)
+                        CreatureVisibilityDistances.Add(visDist);
+                    else
+                        GameObjectVisibilityDistances.Add(visDist);
+                }
+            }
 
             if (guid.GetObjectType() == ObjectType.Unit && !Settings.SqlTables.creature_create1_time)
                 return;
@@ -335,7 +373,7 @@ namespace WowPacketParser.Store
                 return;
 
             ObjectCreate createData = new ObjectCreate();
-            createData.UnixTimeMs = (ulong)Utilities.GetUnixTimeMsFromDateTime(time);
+            createData.UnixTimeMs = (ulong)packet.UnixTimeMs;
             if (movement != null)
             {
                 createData.Map = map;
@@ -397,17 +435,17 @@ namespace WowPacketParser.Store
                 Storage.ObjectCreate2Times.Add(guid, createList);
             }
         }
-        public static void StoreObjectCreateTime(WowGuid guid, uint map, MovementInfo movement, DateTime time, ObjectCreateType type)
+        public static void StoreObjectCreateTime(WowGuid guid, uint map, MovementInfo movement, Packet packet, ObjectCreateType type)
         {
             if (type == ObjectCreateType.Create1)
-                StoreObjectCreate1Time(guid, map, movement, time);
+                StoreObjectCreate1Time(guid, map, movement, packet);
             else if (type == ObjectCreateType.Create2)
-                StoreObjectCreate2Time(guid, map, movement, time);
+                StoreObjectCreate2Time(guid, map, movement, packet.Time);
 
             WoWObject obj;
             if (Storage.Objects.TryGetValue(guid, out obj))
             {
-                obj.LastCreateTime = time;
+                obj.LastCreateTime = packet.Time;
                 obj.LastCreateType = type;
             }
         }
@@ -1206,7 +1244,7 @@ namespace WowPacketParser.Store
                 StoreCharacterReputation(repData);
             }
 
-            update.UnixTimeMs = (ulong)Utilities.GetUnixTimeMsFromDateTime(packet.Time);
+            update.UnixTimeMs = (ulong)packet.UnixTimeMs;
             Storage.FactionStandingUpdates.Add(update);
         }
         public static void ClearTemporaryReputationList()
@@ -1219,6 +1257,9 @@ namespace WowPacketParser.Store
         public static readonly List<PlayerMovement> PlayerMovements = new List<PlayerMovement>();
         public static void StorePlayerMovement(WowGuid moverGuid, MovementInfo moveInfo, Packet packet)
         {
+            if (Objects.ContainsKey(moverGuid))
+                Objects[moverGuid].Item1.Movement = moveInfo;
+
             if (!Settings.SqlTables.player_movement_client &&
                 !Settings.SqlTables.creature_movement_client)
                 return;
@@ -1261,6 +1302,8 @@ namespace WowPacketParser.Store
         public static readonly DataBag<CreatureStats> CreatureStats = new DataBag<CreatureStats>(Settings.SqlTables.creature_stats);
         public static readonly DataBag<CreatureStats> CreatureStatsDirty = new DataBag<CreatureStats>(Settings.SqlTables.creature_stats);
         public static readonly DataBag<CreatureUniqueEquipment> CreatureUniqueEquipments = new DataBag<CreatureUniqueEquipment>(Settings.SqlTables.creature_unique_equipment);
+        public static readonly DataBag<CreatureVisibilityDistance> CreatureVisibilityDistances = new DataBag<CreatureVisibilityDistance>(Settings.SqlTables.creature_visibility_distance);
+        public static readonly DataBag<CreatureVisibilityDistance> GameObjectVisibilityDistances = new DataBag<CreatureVisibilityDistance>(Settings.SqlTables.gameobject_visibility_distance);
 
         public static void StoreCreatureEquipment(Unit npc, int sniffId)
         {
@@ -2180,7 +2223,7 @@ namespace WowPacketParser.Store
                     textEntry.Text = text.Text;
                     textEntry.Type = text.TypeOriginal;
                     textEntry.Language = text.Language;
-                    textEntry.UnixTimeMs = (ulong)Utilities.GetUnixTimeMsFromDateTime(packet.Time);
+                    textEntry.UnixTimeMs = (ulong)packet.UnixTimeMs;
                     textEntry.SenderGUID = text.SenderGUID;
                     textEntry.ReceiverGUID = text.ReceiverGUID;
                     Storage.CreatureTexts.Add(textEntry);
@@ -2198,7 +2241,7 @@ namespace WowPacketParser.Store
                         Text = text.Text,
                         Type = text.TypeOriginal,
                         ChannelName = text.ChannelName,
-                        UnixTimeMs = (ulong)Utilities.GetUnixTimeMsFromDateTime(packet.Time)
+                        UnixTimeMs = (ulong)packet.UnixTimeMs
                     };
                     Storage.CharacterTexts.Add(textEntry);
                 }
@@ -2209,7 +2252,7 @@ namespace WowPacketParser.Store
                 {
                     var worldText = new WorldText
                     {
-                        UnixTimeMs = (ulong)Utilities.GetUnixTimeMsFromDateTime(packet.Time),
+                        UnixTimeMs = (ulong)packet.UnixTimeMs,
                         Type = text.TypeOriginal,
                         Language = text.Language,
                         Text = text.Text
@@ -2877,6 +2920,8 @@ namespace WowPacketParser.Store
         public static void ClearTemporaryData()
         {
             CurrentActivePlayer = WowGuid64.Empty;
+            CurrentMoveSplineExpireTime = 0;
+            IsCurrentPlayerWatchingCinematic = false;
             ClearDataOnMapChange();
         }
 
@@ -2928,6 +2973,7 @@ namespace WowPacketParser.Store
             GameObjectTemplates.Clear();
             GameObjectTemplateQuestItems.Clear();
             GameObjectUpdates.Clear();
+            GameObjectVisibilityDistances.Clear();
 
             ItemClientUseTimes.Clear();
             ItemTemplates.Clear();
@@ -2945,6 +2991,7 @@ namespace WowPacketParser.Store
             CreatureStats.Clear();
             CreatureStatsDirty.Clear();
             CreatureUniqueEquipments.Clear();
+            CreatureVisibilityDistances.Clear();
 
             CreatureKillReputations.Clear();
             CreatureRespawnTimes.Clear();

@@ -1634,5 +1634,29 @@ namespace WowPacketParser.SQL.Builders
 
             return SQLUtil.MakeInsertWithSniffIdList(Storage.CreatureUniqueEmotes, false, true);
         }
+
+        [BuilderMethod]
+        public static string CreatureVisibilityDistances()
+        {
+            if (Storage.CreatureVisibilityDistances.IsEmpty())
+                return string.Empty;
+
+            if (!Settings.SqlTables.creature_visibility_distance)
+                return string.Empty;
+
+            return SQLUtil.MakeInsertWithSniffIdList(Storage.CreatureVisibilityDistances, false, true);
+        }
+
+        [BuilderMethod]
+        public static string GameObjectVisibilityDistances()
+        {
+            if (Storage.GameObjectVisibilityDistances.IsEmpty())
+                return string.Empty;
+
+            if (!Settings.SqlTables.gameobject_visibility_distance)
+                return string.Empty;
+
+            return SQLUtil.MakeInsertWithSniffIdList(Storage.GameObjectVisibilityDistances, false, true, "gameobject_visibility_distance");
+        }
     }
 }

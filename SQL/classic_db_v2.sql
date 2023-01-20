@@ -1208,6 +1208,19 @@ CREATE TABLE IF NOT EXISTS `creature_values_update` (
 -- Data exporting was unselected.
 
 
+-- Dumping structure for table sniffs_new_test.creature_visibility_distance
+DROP TABLE IF EXISTS `creature_visibility_distance`;
+CREATE TABLE IF NOT EXISTS `creature_visibility_distance` (
+  `entry` int(10) unsigned NOT NULL,
+  `map` int(10) unsigned NOT NULL,
+  `distance` int(10) unsigned NOT NULL COMMENT 'distance from player at time of create object',
+  `sniff_id_list` text COLLATE latin1_general_ci NOT NULL,
+  PRIMARY KEY (`entry`,`distance`,`map`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci ROW_FORMAT=COMPACT COMMENT='max visibility distances';
+
+-- Data exporting was unselected.
+
+
 -- Dumping structure for table sniffs_new_test.dynamicobject
 DROP TABLE IF EXISTS `dynamicobject`;
 CREATE TABLE IF NOT EXISTS `dynamicobject` (
@@ -1589,6 +1602,19 @@ CREATE TABLE IF NOT EXISTS `gameobject_values_update` (
   `anim_progress` int(10) unsigned DEFAULT NULL,
   `custom_param` int(10) unsigned DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci COMMENT='values updates from SMSG_UPDATE_OBJECT';
+
+-- Data exporting was unselected.
+
+
+-- Dumping structure for table sniffs_new_test.gameobject_visibility_distance
+DROP TABLE IF EXISTS `gameobject_visibility_distance`;
+CREATE TABLE IF NOT EXISTS `gameobject_visibility_distance` (
+  `entry` int(10) unsigned NOT NULL,
+  `map` int(10) unsigned NOT NULL,
+  `distance` int(10) unsigned NOT NULL COMMENT 'distance from player at time of create object',
+  `sniff_id_list` text COLLATE latin1_general_ci NOT NULL,
+  PRIMARY KEY (`entry`,`distance`,`map`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci ROW_FORMAT=COMPACT COMMENT='max visibility distances';
 
 -- Data exporting was unselected.
 

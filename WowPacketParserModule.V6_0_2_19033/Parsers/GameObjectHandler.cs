@@ -118,7 +118,7 @@ namespace WowPacketParserModule.V6_0_2_19033.Parsers
             GameObjectCustomAnim animData = new GameObjectCustomAnim();
             animData.AnimId = packet.ReadInt32("CustomAnim");
             animData.AsDespawn = packet.ReadBit("PlayAsDespawn");
-            animData.UnixTimeMs = (ulong)Utilities.GetUnixTimeMsFromDateTime(packet.Time);
+            animData.UnixTimeMs = (ulong)packet.UnixTimeMs;
             Storage.StoreGameObjectCustomAnim(guid, animData, packet.SniffId);
             packet.AddSniffData(StoreNameType.GameObject, (int)guid.GetEntry(), "CUSTOM_ANIM");
         }

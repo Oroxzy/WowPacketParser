@@ -1,7 +1,10 @@
-﻿namespace WowPacketParser.Store.Objects.UpdateFields
+﻿using WowPacketParser.Misc;
+
+namespace WowPacketParser.Store.Objects.UpdateFields
 {
     public interface IActivePlayerData
     {
+        WowGuid FarsightObject { get; }
         ulong Coinage { get; }
         int XP { get; }
         ISkillInfo Skill { get; }

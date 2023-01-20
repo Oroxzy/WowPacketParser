@@ -287,7 +287,7 @@ namespace WowPacketParser.Parsing.Parsers
                 packet.ReadBool("Accept");
             Storage.ClientReleaseSpiritTimes.Add(new WowPacketParser.Store.Objects.ClientReleaseSpirit
             {
-                UnixTimeMs = (ulong)Utilities.GetUnixTimeMsFromDateTime(packet.Time)
+                UnixTimeMs = (ulong)packet.UnixTimeMs
             }, packet.TimeSpan);
         }
 
@@ -398,9 +398,10 @@ namespace WowPacketParser.Parsing.Parsers
         [Parser(Opcode.SMSG_TRIGGER_MOVIE)]
         public static void HandleTriggerSequence(Packet packet)
         {
+            Storage.IsCurrentPlayerWatchingCinematic = true;
             CinematicBegin cinematic = new CinematicBegin
             {
-                UnixTimeMs = (ulong)Utilities.GetUnixTimeMsFromDateTime(packet.Time),
+                UnixTimeMs = (ulong)packet.UnixTimeMs,
                 CinematicId = packet.ReadUInt32("CinematicID")
             };
             Storage.CinematicBeginTimes.Add(cinematic);
@@ -413,9 +414,10 @@ namespace WowPacketParser.Parsing.Parsers
         [Parser(Opcode.CMSG_COMPLETE_CINEMATIC)]
         public static void HandleCompleteCinematic(Packet packet)
         {
+            Storage.IsCurrentPlayerWatchingCinematic = false;
             CinematicEnd cinematic = new CinematicEnd
             {
-                UnixTimeMs = (ulong)Utilities.GetUnixTimeMsFromDateTime(packet.Time)
+                UnixTimeMs = (ulong)packet.UnixTimeMs
             };
             Storage.CinematicEndTimes.Add(cinematic);
         }
@@ -458,7 +460,7 @@ namespace WowPacketParser.Parsing.Parsers
             PlayMusic musicEntry = new PlayMusic
             {
                 Music = sound,
-                UnixTimeMs = (ulong)Utilities.GetUnixTimeMsFromDateTime(packet.Time)
+                UnixTimeMs = (ulong)packet.UnixTimeMs
             };
             Storage.Music.Add(musicEntry, packet.TimeSpan);
         }
@@ -478,7 +480,7 @@ namespace WowPacketParser.Parsing.Parsers
 
             weatherUpdate.Instant = packet.ReadByte("Instant Change");
 
-            weatherUpdate.UnixTimeMs = (ulong)Utilities.GetUnixTimeMsFromDateTime(packet.Time);
+            weatherUpdate.UnixTimeMs = (ulong)packet.UnixTimeMs;
             Storage.WeatherUpdates.Add(weatherUpdate, packet.TimeSpan);
         }
 

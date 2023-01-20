@@ -86,7 +86,7 @@ namespace WowPacketParserModule.V7_0_3_22248.Parsers
                 obj = CoreParsers.UpdateHandler.CreateObject(objType, map);
 
             var moves = ReadMovementUpdateBlock(packet, guid, obj, index);
-            Storage.StoreObjectCreateTime(guid, map, moves, packet.Time, type);
+            Storage.StoreObjectCreateTime(guid, map, moves, packet, type);
 
             BitArray updateMaskArray = null;
             var updates = CoreParsers.UpdateHandler.ReadValuesUpdateBlockOnCreate(packet, objType, index, out updateMaskArray);
@@ -325,6 +325,9 @@ namespace WowPacketParserModule.V7_0_3_22248.Parsers
                             packet.ReadUInt32("ProgressCurveID", index);
                             packet.ReadUInt32("ParabolicCurveID", index);
                         }
+
+                        if (guid == Storage.CurrentActivePlayer)
+                            Storage.CurrentMoveSplineExpireTime = packet.UnixTimeMs + (long)monsterMove.MoveTime;
 
                         if (pointsCount > 0 && (Settings.SaveTransports || (moveInfo.TransportGuid == null || moveInfo.TransportGuid.IsEmpty())))
                         {
