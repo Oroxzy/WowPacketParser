@@ -587,5 +587,13 @@ namespace WowPacketParserModule.V6_0_2_19033.Parsers
         {
             packet.ReadBit("Raid");
         }
+
+        [Parser(Opcode.CMSG_GROUP_CHANGE_SUB_GROUP)]
+        public static void HandleGroupChangesubgroup(Packet packet)
+        {
+            packet.ReadPackedGuid128("Guid");
+            packet.ReadSByte("PartyIndex");
+            packet.ReadByte("NewSubGroup");
+        }
     }
 }

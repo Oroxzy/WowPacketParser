@@ -11,7 +11,7 @@ namespace WowPacketParserModule.V2_5_1_38707.Parsers
         {
             LfgHandler.ReadCliRideTicket(packet);
 
-            if (ClientVersion.AddedInClassicVersion(1, 14, 2, 2, 5, 4))
+            if (ClientVersion.AddedInClassicVersion(1, 14, 3, 2, 5, 4))
                 packet.ReadByte("Unk254");
 
             uint queueCount = packet.ReadUInt32("QueueCount");
@@ -37,11 +37,12 @@ namespace WowPacketParserModule.V2_5_1_38707.Parsers
             packet.ReadInt32("AverageWaitTime");
             packet.ReadInt32("WaitTime");
 
-            if (ClientVersion.AddedInClassicVersion(1, 14, 2, 2, 5, 4))
-                packet.ReadUInt32("Unk254");
+            if (ClientVersion.AddedInVersion(9, 2, 0, 1, 14, 3, 2, 5, 4))
+                packet.ReadInt32("Unk254");
 
             packet.ReadBit("AsGroup");
             packet.ReadBit("EligibleForMatchmaking");
+            packet.ReadBit("SuspendedQueue");
         }
 
         [Parser(Opcode.SMSG_BATTLEFIELD_STATUS_NEED_CONFIRMATION)]
