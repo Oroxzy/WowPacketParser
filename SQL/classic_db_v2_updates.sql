@@ -1469,3 +1469,7 @@ CREATE TABLE IF NOT EXISTS `gameobject_visibility_distance` (
   `sniff_id_list` text COLLATE latin1_general_ci NOT NULL,
   PRIMARY KEY (`entry`,`distance`,`map`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci ROW_FORMAT=COMPACT COMMENT='max visibility distances';
+
+ALTER TABLE `sniff_file`
+	CHANGE COLUMN `name` `name` VARCHAR(128) NOT NULL COLLATE 'utf8_unicode_ci' AFTER `author`,
+	ADD UNIQUE INDEX `name` (`name`);
