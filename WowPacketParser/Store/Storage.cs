@@ -312,6 +312,48 @@ namespace WowPacketParser.Store
             }
         }
         public static readonly Dictionary<WowGuid, List<ObjectCreate>> ObjectCreate1Times = new Dictionary<WowGuid, List<ObjectCreate>>();
+        public static void AddVisibilityDistance(uint entry, uint map, uint distance, int sniffId, Dictionary<uint /*entry*/, Dictionary<uint /*map*/, Dictionary<uint /*distance*/, SortedSet<int> /*sniffIdList*/>>> container)
+        {
+            if (container.ContainsKey(entry))
+            {
+                if (container[entry].ContainsKey(map))
+                {
+                    if (container[entry][map].ContainsKey(distance))
+                    {
+                        container[entry][map][distance].Add(sniffId);
+                    }
+                    else
+                    {
+                        SortedSet<int> sniffIds = new SortedSet<int>();
+                        sniffIds.Add(sniffId);
+                        container[entry][map].Add(distance, sniffIds);
+                    }
+                }
+                else
+                {
+                    SortedSet<int> sniffIds = new SortedSet<int>();
+                    sniffIds.Add(sniffId);
+
+                    Dictionary<uint, SortedSet<int>> distances = new Dictionary<uint, SortedSet<int>>();
+                    distances.Add(distance, sniffIds);
+
+                    container[entry].Add(map, distances);
+                }
+            }
+            else
+            {
+                SortedSet<int> sniffIds = new SortedSet<int>();
+                sniffIds.Add(sniffId);
+
+                Dictionary<uint, SortedSet<int>> distances = new Dictionary<uint, SortedSet<int>>();
+                distances.Add(distance, sniffIds);
+
+                Dictionary<uint, Dictionary<uint, SortedSet<int>>> maps = new Dictionary<uint, Dictionary<uint, SortedSet<int>>>();
+                maps.Add(map, distances);
+
+                container.Add(entry, maps);
+            }
+        }
         public static void StoreObjectCreate1Time(WowGuid guid, uint map, MovementInfo movement, Packet packet)
         {
             if (guid.GetObjectType() != ObjectType.Unit &&
@@ -336,24 +378,18 @@ namespace WowPacketParser.Store
                    !player.UnitData.Flags.HasAnyFlag(UnitFlags.OnTaxi) &&
                    (player.UnitData.ChannelData == null || player.UnitData.ChannelData.SpellID == 0))
                 {
-                    CreatureVisibilityDistance visDist = new CreatureVisibilityDistance
-                    {
-                        Entry = guid.GetEntry(),
-                        Map = map,
-                        Distance = (uint)Utilities.GetDistance3D(
+                    uint distance = (uint)Utilities.GetDistance3D(
                         player.Movement.Position.X,
                         player.Movement.Position.Y,
                         player.Movement.Position.Z,
                         movement.Position.X,
                         movement.Position.Y,
-                        movement.Position.Z),
-                        SniffId = packet.SniffId
-                    };
+                        movement.Position.Z);
 
                     if (guid.GetHighType() == HighGuidType.Creature)
-                        CreatureVisibilityDistances.Add(visDist);
+                        AddVisibilityDistance(guid.GetEntry(), map, distance, packet.SniffId, CreatureVisibilityDistances);
                     else
-                        GameObjectVisibilityDistances.Add(visDist);
+                        AddVisibilityDistance(guid.GetEntry(), map, distance, packet.SniffId, GameObjectVisibilityDistances);
                 }
             }
 
@@ -824,7 +860,7 @@ namespace WowPacketParser.Store
                     CreatureUniqueEmotes.Add(uniqueEmote);
                 }
 
-                if (!Settings.SqlTables.creature_emote)
+                if (!Settings.SqlTables.creature_emote && !Settings.SqlTables.creature_unique_text)
                     return;
             }
             else if (guid.GetObjectType() == ObjectType.Player ||
@@ -1302,8 +1338,8 @@ namespace WowPacketParser.Store
         public static readonly DataBag<CreatureStats> CreatureStats = new DataBag<CreatureStats>(Settings.SqlTables.creature_stats);
         public static readonly DataBag<CreatureStats> CreatureStatsDirty = new DataBag<CreatureStats>(Settings.SqlTables.creature_stats);
         public static readonly DataBag<CreatureUniqueEquipment> CreatureUniqueEquipments = new DataBag<CreatureUniqueEquipment>(Settings.SqlTables.creature_unique_equipment);
-        public static readonly DataBag<CreatureVisibilityDistance> CreatureVisibilityDistances = new DataBag<CreatureVisibilityDistance>(Settings.SqlTables.creature_visibility_distance);
-        public static readonly DataBag<CreatureVisibilityDistance> GameObjectVisibilityDistances = new DataBag<CreatureVisibilityDistance>(Settings.SqlTables.gameobject_visibility_distance);
+        public static readonly Dictionary<uint /*entry*/, Dictionary<uint /*map*/, Dictionary<uint /*distance*/, SortedSet<int> /*sniffIdList*/>>> CreatureVisibilityDistances = new Dictionary<uint, Dictionary<uint, Dictionary<uint, SortedSet<int>>>>();
+        public static readonly Dictionary<uint /*entry*/, Dictionary<uint /*map*/, Dictionary<uint /*distance*/, SortedSet<int> /*sniffIdList*/>>> GameObjectVisibilityDistances = new Dictionary<uint, Dictionary<uint, Dictionary<uint, SortedSet<int>>>>();
 
         public static void StoreCreatureEquipment(Unit npc, int sniffId)
         {
