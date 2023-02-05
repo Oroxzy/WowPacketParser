@@ -309,7 +309,14 @@ namespace WowPacketParser.Misc
 
         public T AddValue<T>(string name, T obj, params object[] indexes)
         {
-            WriteLine("{0}{1}: {2}", GetIndexString(indexes), name, obj);
+            if (!Settings.DumpFormatWithText())
+                return obj;
+
+            if (Writer == null)
+                Writer = new StringBuilder();
+
+            Writer.AppendLine($"{GetIndexString(indexes)}{name}: {obj}");
+
             return obj;
         }
     }
