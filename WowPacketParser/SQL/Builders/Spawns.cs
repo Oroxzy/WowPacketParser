@@ -535,96 +535,38 @@ namespace WowPacketParser.SQL.Builders
                     }
                 }
 
-                bool isFlyingOrCyclic = true;
-                if (creature.Waypoints != null && creature.OriginalMovement.Position != null)
+                bool isFlyingOrCyclic = creature.HasOnlyCyclicMovement;
+                row.Data.WaypointCount = creature.TotalMovementsCount;
+                row.Data.WanderDistance = creature.MaxTravelDistanceFromSpawn;
+
+                // Likely to be waypoints if distance is big
+                if (row.Data.WanderDistance > 20)
+                    row.Data.MovementType = (uint)(isFlyingOrCyclic ? 3 : 2);
+
+                if (Settings.SqlTables.creature_movement_server && creature.Waypoints != null &&
+                   (row.Data.MovementType >= 2 || Settings.TargetedDbType == TargetedDbType.WPP))
                 {
-                    float maxDistanceFromSpawn = 0;
-                    foreach (ServerSideMovement waypoint in creature.Waypoints)
+                    if (creature.WaypointSplines != null)
                     {
-                        if (waypoint == null)
-                            break;
-
-                        bool hasDest = waypoint.EndPositionX != 0 ||
-                                       waypoint.EndPositionY != 0 ||
-                                       waypoint.EndPositionZ != 0;
-
-                        float posX = hasDest ? waypoint.EndPositionX : waypoint.StartPositionX;
-                        float posY = hasDest ? waypoint.EndPositionY : waypoint.StartPositionY;
-                        float posZ = hasDest ? waypoint.EndPositionZ : waypoint.StartPositionZ;
-
-                        // Get max wander distance
-                        float distanceFromSpawn = Utilities.GetDistance3D(creature.OriginalMovement.Position.X, creature.OriginalMovement.Position.Y, creature.OriginalMovement.Position.Z, posX, posY, posZ);
-                        if (distanceFromSpawn > maxDistanceFromSpawn)
-                            maxDistanceFromSpawn = distanceFromSpawn;
-
-                        if (ClientVersion.RemovedInVersion(ClientVersionBuild.V2_0_1_6180))
+                        foreach (ServerSideMovementSpline waypoint in creature.WaypointSplines)
                         {
-                            if (!waypoint.SplineFlags.HasAnyFlag(SplineFlagVanilla.Flying | SplineFlagVanilla.Cyclic | SplineFlagVanilla.EnterCycle))
-                                isFlyingOrCyclic = false;
-                        }
-                        else if (ClientVersion.RemovedInVersion(ClientVersionBuild.V3_0_2_9056))
-                        {
-                            if (!waypoint.SplineFlags.HasAnyFlag(SplineFlagTBC.Flying | SplineFlagTBC.Cyclic | SplineFlagTBC.EnterCycle))
-                                isFlyingOrCyclic = false;
-                        }
-                        else if (ClientVersion.RemovedInVersion(ClientVersionBuild.V4_2_2_14545))
-                        {
-                            if (!waypoint.SplineFlags.HasAnyFlag(SplineFlag.Cyclic | SplineFlag.EnterCycle) &&
-                                !((SplineFlag)waypoint.SplineFlags).HasFlag(SplineFlag.Flying | SplineFlag.CatmullRom | SplineFlag.UncompressedPath))
-                                isFlyingOrCyclic = false;
-                        }
-                        else if (ClientVersion.RemovedInVersion(ClientVersionBuild.V4_3_4_15595))
-                        {
-                            if (!waypoint.SplineFlags.HasAnyFlag(SplineFlag422.Cyclic | SplineFlag422.EnterCycle) &&
-                                !((SplineFlag422)waypoint.SplineFlags).HasFlag(SplineFlag422.Flying | SplineFlag422.CatmullRom | SplineFlag422.UncompressedPath))
-                                isFlyingOrCyclic = false;
-                        }
-                        else if (ClientVersion.RemovedInVersion(ClientVersionBuild.V7_0_3_22248))
-                        {
-                            if (!waypoint.SplineFlags.HasAnyFlag(SplineFlag434.Cyclic | SplineFlag434.EnterCycle) &&
-                                !((SplineFlag434)waypoint.SplineFlags).HasFlag(SplineFlag434.Flying | SplineFlag434.CatmullRom | SplineFlag434.UncompressedPath))
-                                isFlyingOrCyclic = false;
-                        }
-                        else
-                        {
-                            if (!waypoint.SplineFlags.HasAnyFlag(SplineFlag703.Cyclic | SplineFlag703.EnterCycle) &&
-                                !((SplineFlag703)waypoint.SplineFlags).HasFlag(SplineFlag703.Flying | SplineFlag703.CatmullRom | SplineFlag703.UncompressedPath))
-                                isFlyingOrCyclic = false;
+                            var movementSplineRow = new Row<ServerSideMovementSpline>();
+                            movementSplineRow.Data = waypoint;
+                            movementSplineRow.Data.GUID = "@CGUID+" + creature.DbGuid;
+                            movementSplineRow.Comment += StoreGetters.GetName(StoreNameType.Unit, (int)unit.Key.GetEntry(), false);
+                            movementSplineRows.Add(movementSplineRow);
                         }
                     }
-                    row.Data.WaypointCount = (uint)creature.Waypoints.Count;
-                    row.Data.WanderDistance = maxDistanceFromSpawn;
 
-                    // Likely to be waypoints if distance is big
-                    if (row.Data.WanderDistance > 20)
-                        row.Data.MovementType = (uint)(isFlyingOrCyclic ? 3 : 2);
-
-
-                    if (Settings.SqlTables.creature_movement_server &&
-                       (row.Data.MovementType >= 2 || Settings.TargetedDbType == TargetedDbType.WPP))
+                    foreach (ServerSideMovement waypoint in creature.Waypoints)
                     {
-                        if (creature.WaypointSplines != null)
-                        {
-                            foreach (ServerSideMovementSpline waypoint in creature.WaypointSplines)
-                            {
-                                var movementSplineRow = new Row<ServerSideMovementSpline>();
-                                movementSplineRow.Data = waypoint;
-                                movementSplineRow.Data.GUID = "@CGUID+" + creature.DbGuid;
-                                movementSplineRow.Comment += StoreGetters.GetName(StoreNameType.Unit, (int)unit.Key.GetEntry(), false);
-                                movementSplineRows.Add(movementSplineRow);
-                            }
-                        }
-
-                        foreach (ServerSideMovement waypoint in creature.Waypoints)
-                        {
-                            var movementRow = new Row<ServerSideMovement>();
-                            movementRow.Data = waypoint;
-                            movementRow.Data.GUID = "@CGUID+" + creature.DbGuid;
-                            if (waypoint.TransportGuid != null && !waypoint.TransportGuid.IsEmpty())
-                                Storage.GetObjectDbGuidEntryType(waypoint.TransportGuid, out movementRow.Data.TransportGUID, out movementRow.Data.TransportId, out movementRow.Data.TransportType);
-                            movementRow.Comment += StoreGetters.GetName(StoreNameType.Unit, (int)unit.Key.GetEntry(), false);
-                            movementRows.Add(movementRow);
-                        }
+                        var movementRow = new Row<ServerSideMovement>();
+                        movementRow.Data = waypoint;
+                        movementRow.Data.GUID = "@CGUID+" + creature.DbGuid;
+                        if (waypoint.TransportGuid != null && !waypoint.TransportGuid.IsEmpty())
+                            Storage.GetObjectDbGuidEntryType(waypoint.TransportGuid, out movementRow.Data.TransportGUID, out movementRow.Data.TransportId, out movementRow.Data.TransportType);
+                        movementRow.Comment += StoreGetters.GetName(StoreNameType.Unit, (int)unit.Key.GetEntry(), false);
+                        movementRows.Add(movementRow);
                     }
                 }
 

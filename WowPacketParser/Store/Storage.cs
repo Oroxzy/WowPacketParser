@@ -6,6 +6,7 @@ using WowPacketParser.Store.Objects;
 using System.Linq;
 using System.Collections;
 using WowPacketParser.Enums.Version;
+using WowPacketParser.SQL;
 
 namespace WowPacketParser.Store
 {
@@ -312,47 +313,29 @@ namespace WowPacketParser.Store
             }
         }
         public static readonly Dictionary<WowGuid, List<ObjectCreate>> ObjectCreate1Times = new Dictionary<WowGuid, List<ObjectCreate>>();
-        public static void AddVisibilityDistance(uint entry, uint map, uint distance, int sniffId, Dictionary<uint /*entry*/, Dictionary<uint /*map*/, Dictionary<uint /*distance*/, SortedSet<int> /*sniffIdList*/>>> container)
+        public static void AddVisibilityDistance(uint entry, uint map, uint distance, int sniffId, RowList<CreatureVisibilityDistance> container)
         {
-            if (container.ContainsKey(entry))
+            foreach (var itr in container)
             {
-                if (container[entry].ContainsKey(map))
+                if (entry == itr.Data.Entry &&
+                    map == itr.Data.Map &&
+                    distance == itr.Data.Distance)
                 {
-                    if (container[entry][map].ContainsKey(distance))
-                    {
-                        container[entry][map][distance].Add(sniffId);
-                    }
-                    else
-                    {
-                        SortedSet<int> sniffIds = new SortedSet<int>();
-                        sniffIds.Add(sniffId);
-                        container[entry][map].Add(distance, sniffIds);
-                    }
-                }
-                else
-                {
-                    SortedSet<int> sniffIds = new SortedSet<int>();
-                    sniffIds.Add(sniffId);
-
-                    Dictionary<uint, SortedSet<int>> distances = new Dictionary<uint, SortedSet<int>>();
-                    distances.Add(distance, sniffIds);
-
-                    container[entry].Add(map, distances);
+                    itr.Data.SniffIdList.Add(sniffId);
+                    return;
                 }
             }
-            else
+
+            CreatureVisibilityDistance dist = new CreatureVisibilityDistance
             {
-                SortedSet<int> sniffIds = new SortedSet<int>();
-                sniffIds.Add(sniffId);
-
-                Dictionary<uint, SortedSet<int>> distances = new Dictionary<uint, SortedSet<int>>();
-                distances.Add(distance, sniffIds);
-
-                Dictionary<uint, Dictionary<uint, SortedSet<int>>> maps = new Dictionary<uint, Dictionary<uint, SortedSet<int>>>();
-                maps.Add(map, distances);
-
-                container.Add(entry, maps);
-            }
+                Entry = entry,
+                Map = map,
+                Distance = distance,
+                SniffId = sniffId
+            };
+            dist.SniffIdList = new SortedSet<int>();
+            dist.SniffIdList.Add(sniffId);
+            container.Add(dist);
         }
         public static void StoreObjectCreate1Time(WowGuid guid, uint map, MovementInfo movement, Packet packet)
         {
@@ -1338,8 +1321,8 @@ namespace WowPacketParser.Store
         public static readonly DataBag<CreatureStats> CreatureStats = new DataBag<CreatureStats>(Settings.SqlTables.creature_stats);
         public static readonly DataBag<CreatureStats> CreatureStatsDirty = new DataBag<CreatureStats>(Settings.SqlTables.creature_stats);
         public static readonly DataBag<CreatureUniqueEquipment> CreatureUniqueEquipments = new DataBag<CreatureUniqueEquipment>(Settings.SqlTables.creature_unique_equipment);
-        public static readonly Dictionary<uint /*entry*/, Dictionary<uint /*map*/, Dictionary<uint /*distance*/, SortedSet<int> /*sniffIdList*/>>> CreatureVisibilityDistances = new Dictionary<uint, Dictionary<uint, Dictionary<uint, SortedSet<int>>>>();
-        public static readonly Dictionary<uint /*entry*/, Dictionary<uint /*map*/, Dictionary<uint /*distance*/, SortedSet<int> /*sniffIdList*/>>> GameObjectVisibilityDistances = new Dictionary<uint, Dictionary<uint, Dictionary<uint, SortedSet<int>>>>();
+        public static readonly RowList<CreatureVisibilityDistance> CreatureVisibilityDistances = new RowList<CreatureVisibilityDistance>();
+        public static readonly RowList<CreatureVisibilityDistance> GameObjectVisibilityDistances = new RowList<CreatureVisibilityDistance>();
 
         public static void StoreCreatureEquipment(Unit npc, int sniffId)
         {

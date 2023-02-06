@@ -1686,29 +1686,12 @@ namespace WowPacketParser.SQL.Builders
 
             if (!Settings.SqlTables.creature_visibility_distance)
                 return string.Empty;
-
-            RowList <CreatureVisibilityDistance> rows = new RowList<CreatureVisibilityDistance>();
-            foreach (var itrEntry in Storage.CreatureVisibilityDistances)
-            {
-                foreach (var itrMap in itrEntry.Value)
-                {
-                    foreach (var itrDistance in itrMap.Value)
-                    {
-                        CreatureVisibilityDistance row = new CreatureVisibilityDistance();
-                        row.Entry = itrEntry.Key;
-                        row.Map = itrMap.Key;
-                        row.Distance = itrDistance.Key;
-                        row.SniffIdList = itrDistance.Value;
-                        rows.Add(row);
-                    }
-                }
-            }
-
-            string result = new SQLInsert<CreatureVisibilityDistance>(rows, false, true, null).Build();
+            
+            string result = new SQLInsert<CreatureVisibilityDistance>(Storage.CreatureVisibilityDistances, false, true, null).Build();
             if (!String.IsNullOrEmpty(result))
             {
                 result += Environment.NewLine;
-                result += SQLUtil.MakeSniffIdListUpdate<CreatureVisibilityDistance>(rows, null);
+                result += SQLUtil.MakeSniffIdListUpdate<CreatureVisibilityDistance>(Storage.CreatureVisibilityDistances, null);
                 result += Environment.NewLine;
             }
 
@@ -1727,28 +1710,11 @@ namespace WowPacketParser.SQL.Builders
             if (!Settings.SqlTables.gameobject_visibility_distance)
                 return string.Empty;
 
-            RowList<CreatureVisibilityDistance> rows = new RowList<CreatureVisibilityDistance>();
-            foreach (var itrEntry in Storage.GameObjectVisibilityDistances)
-            {
-                foreach (var itrMap in itrEntry.Value)
-                {
-                    foreach (var itrDistance in itrMap.Value)
-                    {
-                        CreatureVisibilityDistance row = new CreatureVisibilityDistance();
-                        row.Entry = itrEntry.Key;
-                        row.Map = itrMap.Key;
-                        row.Distance = itrDistance.Key;
-                        row.SniffIdList = itrDistance.Value;
-                        rows.Add(row);
-                    }
-                }
-            }
-            
-            string result = new SQLInsert<CreatureVisibilityDistance>(rows, false, true, "gameobject_visibility_distance").Build();
+            string result = new SQLInsert<CreatureVisibilityDistance>(Storage.GameObjectVisibilityDistances, false, true, "gameobject_visibility_distance").Build();
             if (!String.IsNullOrEmpty(result))
             {
                 result += Environment.NewLine;
-                result += SQLUtil.MakeSniffIdListUpdate<CreatureVisibilityDistance>(rows, "gameobject_visibility_distance");
+                result += SQLUtil.MakeSniffIdListUpdate<CreatureVisibilityDistance>(Storage.GameObjectVisibilityDistances, "gameobject_visibility_distance");
                 result += Environment.NewLine;
             }
 

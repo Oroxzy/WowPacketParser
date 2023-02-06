@@ -22,6 +22,11 @@ namespace WowPacketParser.Store.Objects
         public List<ServerSideMovementSpline> WaypointSplines;
         public List<ServerSideMovementSpline> CombatMovementSplines;
 
+        // OOC movement data
+        public uint TotalMovementsCount = 0;
+        public float MaxTravelDistanceFromSpawn = 0.0f;
+        public bool HasOnlyCyclicMovement = true;
+
         // Spell timer calculation
         public DateTime? EnterCombatTime;
         public bool DontSaveCombatSpellTimers;
@@ -249,6 +254,52 @@ namespace WowPacketParser.Store.Objects
             }
         }
 
+        private void CheckMaxMovementDistance(Vector3 position)
+        {
+            // Get max wander distance
+            float distanceFromSpawn = Utilities.GetDistance3D(OriginalMovement.Position.X, OriginalMovement.Position.Y, OriginalMovement.Position.Z, position.X, position.Y, position.Z);
+            if (distanceFromSpawn > MaxTravelDistanceFromSpawn)
+                MaxTravelDistanceFromSpawn = distanceFromSpawn;
+        }
+
+        private void CheckCyclicMovement(uint splineFlags)
+        {
+            if (ClientVersion.RemovedInVersion(ClientVersionBuild.V2_0_1_6180))
+            {
+                if (!splineFlags.HasAnyFlag(SplineFlagVanilla.Flying | SplineFlagVanilla.Cyclic | SplineFlagVanilla.EnterCycle))
+                    HasOnlyCyclicMovement = false;
+            }
+            else if (ClientVersion.RemovedInVersion(ClientVersionBuild.V3_0_2_9056))
+            {
+                if (!splineFlags.HasAnyFlag(SplineFlagTBC.Flying | SplineFlagTBC.Cyclic | SplineFlagTBC.EnterCycle))
+                    HasOnlyCyclicMovement = false;
+            }
+            else if (ClientVersion.RemovedInVersion(ClientVersionBuild.V4_2_2_14545))
+            {
+                if (!splineFlags.HasAnyFlag(SplineFlag.Cyclic | SplineFlag.EnterCycle) &&
+                    !((SplineFlag)splineFlags).HasFlag(SplineFlag.Flying | SplineFlag.CatmullRom | SplineFlag.UncompressedPath))
+                    HasOnlyCyclicMovement = false;
+            }
+            else if (ClientVersion.RemovedInVersion(ClientVersionBuild.V4_3_4_15595))
+            {
+                if (!splineFlags.HasAnyFlag(SplineFlag422.Cyclic | SplineFlag422.EnterCycle) &&
+                    !((SplineFlag422)splineFlags).HasFlag(SplineFlag422.Flying | SplineFlag422.CatmullRom | SplineFlag422.UncompressedPath))
+                    HasOnlyCyclicMovement = false;
+            }
+            else if (ClientVersion.RemovedInVersion(ClientVersionBuild.V7_0_3_22248))
+            {
+                if (!splineFlags.HasAnyFlag(SplineFlag434.Cyclic | SplineFlag434.EnterCycle) &&
+                    !((SplineFlag434)splineFlags).HasFlag(SplineFlag434.Flying | SplineFlag434.CatmullRom | SplineFlag434.UncompressedPath))
+                    HasOnlyCyclicMovement = false;
+            }
+            else
+            {
+                if (!splineFlags.HasAnyFlag(SplineFlag703.Cyclic | SplineFlag703.EnterCycle) &&
+                    !((SplineFlag703)splineFlags).HasFlag(SplineFlag703.Flying | SplineFlag703.CatmullRom | SplineFlag703.UncompressedPath))
+                    HasOnlyCyclicMovement = false;
+            }
+        }
+
         public void AddWaypoint(ServerSideMovement movementData, Vector3 startPosition, DateTime packetTime)
         {
             // update current position to spline start
@@ -257,9 +308,42 @@ namespace WowPacketParser.Store.Objects
 
             List<ServerSideMovement> list = null;
             if ((Type == ObjectType.Unit) && ((UnitData.Flags & (uint)UnitFlags.IsInCombat) == 0))
+            {
+                if (Settings.SqlTables.creature && OriginalMovement != null)
+                {
+                    TotalMovementsCount++;
+                    if (HasOnlyCyclicMovement)
+                        CheckCyclicMovement(movementData.SplineFlags);
+                    CheckMaxMovementDistance(startPosition);
+                    if (movementData.SplinePoints != null)
+                    {
+                        foreach (Vector3 vector in movementData.SplinePoints)
+                        {
+                            CheckMaxMovementDistance(vector);
+                        }
+                    }
+                }
+
+                if (!Settings.SqlTables.creature_movement_server)
+                    return;
+
                 list = Waypoints;
+            }
             else
+            {
+                if (Type == ObjectType.Unit)
+                {
+                    if (!Settings.SqlTables.creature_movement_server_combat)
+                        return;
+                }
+                else
+                {
+                    if (!Settings.SqlTables.player_movement_server)
+                        return;
+                }
+
                 list = CombatMovements;
+            }
 
             movementData.Point = (uint)list.Count + 1;
             movementData.StartPositionX = startPosition.X;
