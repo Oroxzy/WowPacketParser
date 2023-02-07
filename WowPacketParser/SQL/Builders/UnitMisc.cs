@@ -1686,17 +1686,32 @@ namespace WowPacketParser.SQL.Builders
 
             if (!Settings.SqlTables.creature_visibility_distance)
                 return string.Empty;
-            
-            string result = new SQLInsert<CreatureVisibilityDistance>(Storage.CreatureVisibilityDistances, false, true, null).Build();
-            if (!String.IsNullOrEmpty(result))
+
+            RowList<CreatureVisibilityDistance> rows = new RowList<CreatureVisibilityDistance>();
+            foreach (var itrEntry in Storage.CreatureVisibilityDistances)
             {
-                result += Environment.NewLine;
-                result += SQLUtil.MakeSniffIdListUpdate<CreatureVisibilityDistance>(Storage.CreatureVisibilityDistances, null);
-                result += Environment.NewLine;
+                foreach (var itrMap in itrEntry.Value)
+                {
+                    CreatureVisibilityDistance row = new CreatureVisibilityDistance();
+                    row.Entry = itrEntry.Key;
+                    row.Map = itrMap.Key;
+                    row.Distance = (uint)itrMap.Value.median.GetQuantile();
+                    row.SniffIdList = itrMap.Value.sniffIds;
+                    rows.Add(row);
+                }
+                itrEntry.Value.Clear(); // free memory
             }
 
             // not used anywhere else so empty to free up memory
             Storage.CreatureVisibilityDistances.Clear();
+
+            string result = new SQLInsert<CreatureVisibilityDistance>(rows, false, true, null).Build();
+            if (!String.IsNullOrEmpty(result))
+            {
+                result += Environment.NewLine;
+                result += SQLUtil.MakeSniffIdListUpdate<CreatureVisibilityDistance>(rows, null);
+                result += Environment.NewLine;
+            }
 
             return result ;
         }
@@ -1710,16 +1725,31 @@ namespace WowPacketParser.SQL.Builders
             if (!Settings.SqlTables.gameobject_visibility_distance)
                 return string.Empty;
 
-            string result = new SQLInsert<CreatureVisibilityDistance>(Storage.GameObjectVisibilityDistances, false, true, "gameobject_visibility_distance").Build();
-            if (!String.IsNullOrEmpty(result))
+            RowList<CreatureVisibilityDistance> rows = new RowList<CreatureVisibilityDistance>();
+            foreach (var itrEntry in Storage.GameObjectVisibilityDistances)
             {
-                result += Environment.NewLine;
-                result += SQLUtil.MakeSniffIdListUpdate<CreatureVisibilityDistance>(Storage.GameObjectVisibilityDistances, "gameobject_visibility_distance");
-                result += Environment.NewLine;
+                foreach (var itrMap in itrEntry.Value)
+                {
+                    CreatureVisibilityDistance row = new CreatureVisibilityDistance();
+                    row.Entry = itrEntry.Key;
+                    row.Map = itrMap.Key;
+                    row.Distance = (uint)itrMap.Value.median.GetQuantile();
+                    row.SniffIdList = itrMap.Value.sniffIds;
+                    rows.Add(row);
+                }
+                itrEntry.Value.Clear(); // free memory
             }
 
             // not used anywhere else so empty to free up memory
             Storage.GameObjectVisibilityDistances.Clear();
+
+            string result = new SQLInsert<CreatureVisibilityDistance>(rows, false, true, "gameobject_visibility_distance").Build();
+            if (!String.IsNullOrEmpty(result))
+            {
+                result += Environment.NewLine;
+                result += SQLUtil.MakeSniffIdListUpdate<CreatureVisibilityDistance>(rows, "gameobject_visibility_distance");
+                result += Environment.NewLine;
+            }
 
             return result;
         }

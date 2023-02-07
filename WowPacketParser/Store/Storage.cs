@@ -20,16 +20,19 @@ namespace WowPacketParser.Store
         public static uint CurrentTaxiNode = 0;
         public static long CurrentMoveSplineExpireTime = 0;
         public static bool IsCurrentPlayerWatchingCinematic = false;
+        public static bool HasCurrentPlayerMovedSinceEnterWorld = false;
+
         public static WowGuid CurrentActivePlayer = WowGuid64.Empty;
         public static void SetCurrentActivePlayer(WowGuid guid, DateTime time)
         {
-            Storage.CurrentActivePlayer = guid;
+            CurrentActivePlayer = guid;
+            HasCurrentPlayerMovedSinceEnterWorld = false;
             ActivePlayerCreateTime activePlayer = new ActivePlayerCreateTime
             {
                 Guid = guid,
                 Time = time,
             };
-            Storage.PlayerActiveCreateTime.Add(activePlayer);
+            PlayerActiveCreateTime.Add(activePlayer);
 
             // initial spells packet is sent before create object for own player
             if (CharacterSpells.ContainsKey(WowGuid64.Empty))
@@ -40,7 +43,7 @@ namespace WowPacketParser.Store
                 }
                 else
                 {
-                    Storage.CharacterSpells.Add(guid, CharacterSpells[WowGuid64.Empty]);
+                    CharacterSpells.Add(guid, CharacterSpells[WowGuid64.Empty]);
                 }
                 CharacterSpells.Remove(WowGuid64.Empty);
             }
@@ -53,7 +56,7 @@ namespace WowPacketParser.Store
                 }
                 else
                 {
-                    Storage.CharacterReputations.Add(guid, CharacterReputations[WowGuid64.Empty]);
+                   CharacterReputations.Add(guid, CharacterReputations[WowGuid64.Empty]);
                 }
                 CharacterReputations.Remove(WowGuid64.Empty);
             }
@@ -313,29 +316,34 @@ namespace WowPacketParser.Store
             }
         }
         public static readonly Dictionary<WowGuid, List<ObjectCreate>> ObjectCreate1Times = new Dictionary<WowGuid, List<ObjectCreate>>();
-        public static void AddVisibilityDistance(uint entry, uint map, uint distance, int sniffId, RowList<CreatureVisibilityDistance> container)
+        public static void AddVisibilityDistance(uint entry, uint map, float distance, int sniffId, Dictionary<uint /*entry*/, Dictionary<uint /*map*/, VisibilityDistanceData>> container)
         {
-            foreach (var itr in container)
+            if (container.ContainsKey(entry))
             {
-                if (entry == itr.Data.Entry &&
-                    map == itr.Data.Map &&
-                    distance == itr.Data.Distance)
+                if (container[entry].ContainsKey(map))
                 {
-                    itr.Data.SniffIdList.Add(sniffId);
-                    return;
+                    container[entry][map].median.Add(distance);
+                    container[entry][map].sniffIds.Add(sniffId);
+                }
+                else
+                {
+                    VisibilityDistanceData data = new VisibilityDistanceData();
+                    data.median.Add(distance);
+                    data.sniffIds.Add(sniffId);
+                    container[entry].Add(map, data);
                 }
             }
-
-            CreatureVisibilityDistance dist = new CreatureVisibilityDistance
+            else
             {
-                Entry = entry,
-                Map = map,
-                Distance = distance,
-                SniffId = sniffId
-            };
-            dist.SniffIdList = new SortedSet<int>();
-            dist.SniffIdList.Add(sniffId);
-            container.Add(dist);
+                VisibilityDistanceData data = new VisibilityDistanceData();
+                data.median.Add(distance);
+                data.sniffIds.Add(sniffId);
+
+                Dictionary<uint, VisibilityDistanceData> mapDict = new Dictionary<uint, VisibilityDistanceData>();
+                mapDict.Add(map, data);
+
+                container.Add(entry, mapDict);
+            }
         }
         public static void StoreObjectCreate1Time(WowGuid guid, uint map, MovementInfo movement, Packet packet)
         {
@@ -348,8 +356,9 @@ namespace WowPacketParser.Store
 
             if (((guid.GetHighType() == HighGuidType.Creature && Settings.SqlTables.creature_visibility_distance) ||
                 (guid.GetHighType() == HighGuidType.GameObject && Settings.SqlTables.gameobject_visibility_distance)) &&
+                !IsCurrentPlayerWatchingCinematic && HasCurrentPlayerMovedSinceEnterWorld &&
                 CurrentActivePlayer != null && !CurrentActivePlayer.IsEmpty() &&
-                Objects.ContainsKey(CurrentActivePlayer) && !IsCurrentPlayerWatchingCinematic && 
+                Objects.ContainsKey(CurrentActivePlayer) &&
                 CurrentMoveSplineExpireTime < packet.UnixTimeMs &&
                (movement.TransportGuid == null || movement.TransportGuid.IsEmpty()))
             {
@@ -369,13 +378,10 @@ namespace WowPacketParser.Store
                         movement.Position.Y,
                         movement.Position.Z);
 
-                    if (distance > 10)
-                    {
-                        if (guid.GetHighType() == HighGuidType.Creature)
-                            AddVisibilityDistance(guid.GetEntry(), map, (uint)(Math.Round(distance / 10.0f) * 10), packet.SniffId, CreatureVisibilityDistances);
-                        else
-                            AddVisibilityDistance(guid.GetEntry(), map, (uint)(Math.Round(distance / 10.0f) * 10), packet.SniffId, GameObjectVisibilityDistances);
-                    }
+                    if (guid.GetHighType() == HighGuidType.Creature)
+                        AddVisibilityDistance(guid.GetEntry(), map, distance, packet.SniffId, CreatureVisibilityDistances);
+                    else
+                        AddVisibilityDistance(guid.GetEntry(), map, distance, packet.SniffId, GameObjectVisibilityDistances);
                 }
             }
 
@@ -1282,6 +1288,9 @@ namespace WowPacketParser.Store
             if (Objects.ContainsKey(moverGuid))
                 Objects[moverGuid].Item1.Movement = moveInfo;
 
+            if (moverGuid == CurrentActivePlayer)
+                HasCurrentPlayerMovedSinceEnterWorld = true;
+
             if (!Settings.SqlTables.player_movement_client &&
                 !Settings.SqlTables.creature_movement_client)
                 return;
@@ -1324,8 +1333,13 @@ namespace WowPacketParser.Store
         public static readonly DataBag<CreatureStats> CreatureStats = new DataBag<CreatureStats>(Settings.SqlTables.creature_stats);
         public static readonly DataBag<CreatureStats> CreatureStatsDirty = new DataBag<CreatureStats>(Settings.SqlTables.creature_stats);
         public static readonly DataBag<CreatureUniqueEquipment> CreatureUniqueEquipments = new DataBag<CreatureUniqueEquipment>(Settings.SqlTables.creature_unique_equipment);
-        public static readonly RowList<CreatureVisibilityDistance> CreatureVisibilityDistances = new RowList<CreatureVisibilityDistance>();
-        public static readonly RowList<CreatureVisibilityDistance> GameObjectVisibilityDistances = new RowList<CreatureVisibilityDistance>();
+        public class VisibilityDistanceData
+        {
+            public P2QuantileEstimator median = new P2QuantileEstimator(0.5);
+            public SortedSet<int> sniffIds = new SortedSet<int>();
+        }
+        public static readonly Dictionary<uint /*entry*/, Dictionary<uint /*map*/, VisibilityDistanceData>> CreatureVisibilityDistances = new Dictionary<uint, Dictionary<uint, VisibilityDistanceData>>();
+        public static readonly Dictionary<uint /*entry*/, Dictionary<uint /*map*/, VisibilityDistanceData>> GameObjectVisibilityDistances = new Dictionary<uint, Dictionary<uint, VisibilityDistanceData>>();
 
         public static void StoreCreatureEquipment(Unit npc, int sniffId)
         {
@@ -2950,6 +2964,7 @@ namespace WowPacketParser.Store
         // Called from SMSG_NEW_WORLD
         public static void ClearDataOnMapChange()
         {
+            HasCurrentPlayerMovedSinceEnterWorld = false;
             CurrentTaxiNode = 0;
             LastCreatureCastGo.Clear();
             CreatureDeathTimes.Clear();
