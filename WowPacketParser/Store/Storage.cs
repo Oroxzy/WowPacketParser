@@ -361,7 +361,7 @@ namespace WowPacketParser.Store
                    !player.UnitData.Flags.HasAnyFlag(UnitFlags.OnTaxi) &&
                    (player.UnitData.ChannelData == null || player.UnitData.ChannelData.SpellID == 0))
                 {
-                    uint distance = (uint)Utilities.GetDistance3D(
+                    float distance = Utilities.GetDistance3D(
                         player.Movement.Position.X,
                         player.Movement.Position.Y,
                         player.Movement.Position.Z,
@@ -369,10 +369,13 @@ namespace WowPacketParser.Store
                         movement.Position.Y,
                         movement.Position.Z);
 
-                    if (guid.GetHighType() == HighGuidType.Creature)
-                        AddVisibilityDistance(guid.GetEntry(), map, distance, packet.SniffId, CreatureVisibilityDistances);
-                    else
-                        AddVisibilityDistance(guid.GetEntry(), map, distance, packet.SniffId, GameObjectVisibilityDistances);
+                    if (distance > 10)
+                    {
+                        if (guid.GetHighType() == HighGuidType.Creature)
+                            AddVisibilityDistance(guid.GetEntry(), map, (uint)(Math.Round(distance / 10.0f) * 10), packet.SniffId, CreatureVisibilityDistances);
+                        else
+                            AddVisibilityDistance(guid.GetEntry(), map, (uint)(Math.Round(distance / 10.0f) * 10), packet.SniffId, GameObjectVisibilityDistances);
+                    }
                 }
             }
 
