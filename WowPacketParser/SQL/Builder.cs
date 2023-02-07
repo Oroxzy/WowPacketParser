@@ -86,7 +86,7 @@ namespace WowPacketParser.SQL
             foreach (var obj in Storage.Objects)
                 obj.Value.Item1.LoadValuesFromUpdateFields();
 
-            using (var store = new SQLFile(fileName))
+            using (var store = new SQLFile(fileName, header))
             {
                 var builderMethods = Assembly.GetExecutingAssembly()
                     .GetTypes()
@@ -129,7 +129,7 @@ namespace WowPacketParser.SQL
                     }
                 }
 
-                Trace.WriteLine(store.WriteToFile(header)
+                Trace.WriteLine(store.AnythingWritten()
                     ? $"{prefix}: Saved file to '{fileName}'"
                     : "No SQL files created -- empty.");
                 var endTime = DateTime.Now;
