@@ -7,7 +7,7 @@ namespace WowPacketParserModule.V2_5_1_38707.UpdateFields.V1_14_3_42770
 {
     public class ActivePlayerData : IActivePlayerData
     {
-        public WowGuid[] InvSlots { get; } = new WowGuid[129];
+        public WowGuid[] InvSlots { get; set; } = new WowGuid[129];
         public WowGuid FarsightObject { get; set; }
         public WowGuid ComboTarget { get; set; }
         public WowGuid SummonedBattlePetGUID { get; set; }
@@ -19,7 +19,7 @@ namespace WowPacketParserModule.V2_5_1_38707.UpdateFields.V1_14_3_42770
         public int CharacterPoints { get; set; }
         public int MaxTalentTiers { get; set; }
         public uint TrackCreatureMask { get; set; }
-        public uint[] TrackResourceMask { get; } = new uint[2];
+        public uint[] TrackResourceMask { get; set; } = new uint[2];
         public float MainhandExpertise { get; set; }
         public float OffhandExpertise { get; set; }
         public float RangedExpertise { get; set; }
@@ -32,11 +32,11 @@ namespace WowPacketParserModule.V2_5_1_38707.UpdateFields.V1_14_3_42770
         public float CritPercentage { get; set; }
         public float RangedCritPercentage { get; set; }
         public float OffhandCritPercentage { get; set; }
-        public float[] SpellCritPercentages { get; } = new float[7];
+        public float[] SpellCritPercentages { get; set; } = new float[7];
         public float SpellCritPercentage => SpellCritPercentages[0];
-        public int[] ModDamageDonePos { get; } = new int[7];
-        public int[] ModDamageDoneNeg { get; } = new int[7];
-        public float[] ModDamageDonePercent { get; } = new float[7];
+        public int[] ModDamageDonePos { get; set; } = new int[7];
+        public int[] ModDamageDoneNeg { get; set; } = new int[7];
+        public float[] ModDamageDonePercent { get; set; } = new float[7];
         public int ShieldBlock { get; set; }
         public float Mastery { get; set; }
         public float Speed { get; set; }
@@ -46,14 +46,14 @@ namespace WowPacketParserModule.V2_5_1_38707.UpdateFields.V1_14_3_42770
         public float VersatilityBonus { get; set; }
         public float PvpPowerDamage { get; set; }
         public float PvpPowerHealing { get; set; }
-        public ulong[] ExploredZones { get; } = new ulong[240];
+        public ulong[] ExploredZones { get; set; } = new ulong[240];
         public IRestInfo[] RestInfo { get; } = new IRestInfo[2];
         public int ModHealingDonePos { get; set; }
         public float ModHealingPercent { get; set; }
         public float ModHealingDonePercent { get; set; }
         public float ModPeriodicHealingDonePercent { get; set; }
-        public float[] WeaponDmgMultipliers { get; } = new float[3];
-        public float[] WeaponAtkSpeedMultipliers { get; } = new float[3];
+        public float[] WeaponDmgMultipliers { get; set; } = new float[3];
+        public float[] WeaponAtkSpeedMultipliers { get; set; } = new float[3];
         public float ModSpellPowerPercent { get; set; }
         public float ModResiliencePercent { get; set; }
         public float OverrideSpellPowerByAPPercent { get; set; }
@@ -67,8 +67,8 @@ namespace WowPacketParserModule.V2_5_1_38707.UpdateFields.V1_14_3_42770
         public byte NumRespecs { get; set; }
         public int AmmoID { get; set; }
         public uint PvpMedals { get; set; }
-        public uint[] BuybackPrice { get; } = new uint[12];
-        public long[] BuybackTimestamp { get; } = new long[12];
+        public uint[] BuybackPrice { get; set; } = new uint[12];
+        public long[] BuybackTimestamp { get; set; } = new long[12];
         public ushort TodayHonorableKills { get; set; }
         public ushort TodayDishonorableKills { get; set; }
         public ushort YesterdayHonorableKills { get; set; }
@@ -84,13 +84,13 @@ namespace WowPacketParserModule.V2_5_1_38707.UpdateFields.V1_14_3_42770
         public uint LastWeekContribution { get; set; }
         public uint LastWeekRank { get; set; }
         public int WatchedFactionIndex { get; set; }
-        public int[] CombatRatings { get; } = new int[32];
+        public int[] CombatRatings { get; set; } = new int[32];
         public int MaxLevel { get; set; }
         public int ScalingPlayerLevelDelta { get; set; }
         public int MaxCreatureScalingLevel { get; set; }
-        public uint[] NoReagentCostMask { get; } = new uint[4];
+        public uint[] NoReagentCostMask { get; set; } = new uint[4];
         public int PetSpellPower { get; set; }
-        public int[] ProfessionSkillLine { get; } = new int[2];
+        public int[] ProfessionSkillLine { get; set; } = new int[2];
         public float UiHitModifier { get; set; }
         public float UiSpellHitModifier { get; set; }
         public int HomeRealmTimeOffset { get; set; }
@@ -102,9 +102,9 @@ namespace WowPacketParserModule.V2_5_1_38707.UpdateFields.V1_14_3_42770
         public int LfgBonusFactionID { get; set; }
         public ushort LootSpecID { get; set; }
         public uint OverrideZonePVPType { get; set; }
-        public uint[] BagSlotFlags { get; } = new uint[4];
-        public uint[] BankBagSlotFlags { get; } = new uint[6];
-        public ulong[] QuestCompleted { get; } = new ulong[875];
+        public uint[] BagSlotFlags { get; set; } = new uint[4];
+        public uint[] BankBagSlotFlags { get; set; } = new uint[6];
+        public ulong[] QuestCompleted { get; set; } = new ulong[875];
         public int Honor { get; set; }
         public int HonorNextLevel { get; set; }
         public int PvpTierMaxFromWins { get; set; }
@@ -129,6 +129,29 @@ namespace WowPacketParserModule.V2_5_1_38707.UpdateFields.V1_14_3_42770
         public IPVPInfo[] PvpInfo { get; } = new IPVPInfo[6];
         public bool InsertItemsLeftToRight { get; set; }
         public DynamicUpdateField<ICharacterRestriction> CharacterRestrictions { get; } = new DynamicUpdateField<ICharacterRestriction>();
+
+        public IActivePlayerData Clone()
+        {
+            ActivePlayerData copy = (ActivePlayerData)MemberwiseClone();
+            copy.InvSlots = (WowGuid[])InvSlots.Clone();
+            copy.TrackResourceMask = (uint[])TrackResourceMask.Clone();
+            copy.SpellCritPercentages = (float[])SpellCritPercentages.Clone();
+            copy.ModDamageDonePos = (int[])ModDamageDonePos.Clone();
+            copy.ModDamageDoneNeg = (int[])ModDamageDoneNeg.Clone();
+            copy.ModDamageDonePercent = (float[])ModDamageDonePercent.Clone();
+            copy.ExploredZones = (ulong[])ExploredZones.Clone();
+            copy.WeaponDmgMultipliers = (float[])WeaponDmgMultipliers.Clone();
+            copy.WeaponAtkSpeedMultipliers = (float[])WeaponAtkSpeedMultipliers.Clone();
+            copy.BuybackPrice = (uint[])BuybackPrice.Clone();
+            copy.BuybackTimestamp = (long[])BuybackTimestamp.Clone();
+            copy.CombatRatings = (int[])CombatRatings.Clone();
+            copy.NoReagentCostMask = (uint[])NoReagentCostMask.Clone();
+            copy.ProfessionSkillLine = (int[])ProfessionSkillLine.Clone();
+            copy.BagSlotFlags = (uint[])BagSlotFlags.Clone();
+            copy.BankBagSlotFlags = (uint[])BankBagSlotFlags.Clone();
+            copy.QuestCompleted = (ulong[])QuestCompleted.Clone();
+            return copy;
+        }
     }
 }
 

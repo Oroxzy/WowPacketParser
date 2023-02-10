@@ -119,6 +119,12 @@ namespace WowPacketParserModule.V8_0_1_27101.UpdateFields.V8_1_5_29683
         public bool SortBagsRightToLeft { get; set; }
         public bool InsertItemsLeftToRight { get; set; }
         public DynamicUpdateField<ICharacterRestriction> CharacterRestrictions { get; } = new DynamicUpdateField<ICharacterRestriction>();
+
+        public IActivePlayerData Clone()
+        {
+            ActivePlayerData copy = (ActivePlayerData)MemberwiseClone();
+            return copy;
+        }
     }
 }
 

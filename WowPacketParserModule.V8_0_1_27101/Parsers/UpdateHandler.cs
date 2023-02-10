@@ -78,6 +78,7 @@ namespace WowPacketParserModule.V8_0_1_27101.Parsers
                                 IGameObjectData oldGameObjectData = null;
                                 IUnitData oldUnitData = null;
                                 IPlayerData oldPlayerData = null;
+                                IActivePlayerData oldActivePlayerData = null;
 
                                 var updateTypeFlag = fieldsData.ReadUInt32();
                                 if ((updateTypeFlag & 0x0001) != 0)
@@ -104,7 +105,6 @@ namespace WowPacketParserModule.V8_0_1_27101.Parsers
                                         var data = handler.ReadUpdateUnitData(fieldsData, unit?.UnitData, i);
                                     if (unit != null)
                                         unit.UnitData = data;
-
                                 }
                                 if ((updateTypeFlag & 0x0040) != 0)
                                 {
@@ -118,7 +118,9 @@ namespace WowPacketParserModule.V8_0_1_27101.Parsers
                                 if ((updateTypeFlag & 0x0080) != 0)
                                 {
                                     var player = obj as Player;
-                                    var data = handler.ReadUpdateActivePlayerData(fieldsData, null, i);
+                                    if (player != null && player.ActivePlayerData != null)
+                                        oldActivePlayerData = player.ActivePlayerData.Clone();
+                                    var data = handler.ReadUpdateActivePlayerData(fieldsData, player?.ActivePlayerData, i);
                                     if (player != null)
                                         player.ActivePlayerData = data;
                                 }
@@ -153,7 +155,7 @@ namespace WowPacketParserModule.V8_0_1_27101.Parsers
                                 }
 
                                 if (obj != null)
-                                    StoreObjectUpdate(packet, guid, obj, oldObjectData, oldGameObjectData, oldUnitData, oldPlayerData, false);
+                                    StoreObjectUpdate(packet, guid, obj, oldObjectData, oldGameObjectData, oldUnitData, oldPlayerData, oldActivePlayerData, false);
                             }
                         }
                         else
@@ -176,9 +178,9 @@ namespace WowPacketParserModule.V8_0_1_27101.Parsers
             }
         }
 
-        public static void StoreObjectUpdate(Packet packet, WowGuid guid, WoWObject obj, IObjectData oldObjectData, IGameObjectData oldGameObjectData, IUnitData oldUnitData, IPlayerData oldPlayerData, bool isCreate)
+        public static void StoreObjectUpdate(Packet packet, WowGuid guid, WoWObject obj, IObjectData oldObjectData, IGameObjectData oldGameObjectData, IUnitData oldUnitData, IPlayerData oldPlayerData, IActivePlayerData oldActivePlayerData, bool isCreate)
         {
-            ObjectType objectType = guid.GetObjectType();
+            ObjectType objectType = obj.Type;
             if ((objectType == ObjectType.Unit) ||
                 (objectType == ObjectType.Player) ||
                 (objectType == ObjectType.ActivePlayer))
@@ -491,6 +493,17 @@ namespace WowPacketParserModule.V8_0_1_27101.Parsers
                         }
                         slot++;
                     }
+                    if (oldActivePlayerData != null)
+                    {
+                        if (oldActivePlayerData.CritPercentage != player.ActivePlayerData.CritPercentage)
+                            Storage.SavePlayerMeleeCrit(obj, packet.SniffId);
+                        if (oldActivePlayerData.RangedCritPercentage != player.ActivePlayerData.RangedCritPercentage)
+                            Storage.SavePlayerRangedCrit(obj, packet.SniffId);
+                        if (oldActivePlayerData.SpellCritPercentage != player.ActivePlayerData.SpellCritPercentage)
+                            Storage.SavePlayerSpellCrit(obj, packet.SniffId);
+                        if (oldActivePlayerData.DodgePercentage != player.ActivePlayerData.DodgePercentage)
+                            Storage.SavePlayerDodge(obj, packet.SniffId);
+                    }
                 }
                 if (hasData)
                 {
@@ -584,6 +597,7 @@ namespace WowPacketParserModule.V8_0_1_27101.Parsers
                     IGameObjectData oldGameObjectData = null;
                     IUnitData oldUnitData = null;
                     IPlayerData oldPlayerData = null;
+                    IActivePlayerData oldActivePlayerData = null;
 
                     if (isExistingObject)
                         oldObjectData = obj.ObjectData.Clone();
@@ -612,37 +626,39 @@ namespace WowPacketParserModule.V8_0_1_27101.Parsers
                             break;
                         case ObjectType.Unit:
                             if (isExistingObject && (obj as Unit).UnitData != null)
-                                oldUnitData = (obj as Unit).UnitData.Clone(); ;
+                                oldUnitData = (obj as Unit).UnitData.Clone();
                             (obj as Unit).UnitData = handler.ReadCreateUnitData(fieldsData, flags, index);
                             if (!isExistingObject)
                                 (obj as Unit).UnitDataOriginal = (obj as Unit).UnitData.Clone();
                             break;
                         case ObjectType.Player:
                             if (isExistingObject && (obj as Unit).UnitData != null)
-                                oldUnitData = (obj as Unit).UnitData.Clone(); ;
+                                oldUnitData = (obj as Unit).UnitData.Clone();
                             (obj as Unit).UnitData = handler.ReadCreateUnitData(fieldsData, flags, index);
                             if (!isExistingObject)
                                 (obj as Unit).UnitDataOriginal = (obj as Unit).UnitData.Clone();
 
                             if (isExistingObject && (obj as Player).PlayerData != null)
-                                oldPlayerData = (obj as Player).PlayerData.Clone(); ;
+                                oldPlayerData = (obj as Player).PlayerData.Clone();
                             (obj as Player).PlayerData = handler.ReadCreatePlayerData(fieldsData, flags, index);
                             if (!isExistingObject)
                                 (obj as Player).PlayerDataOriginal = (obj as Player).PlayerData.Clone();
                             break;
                         case ObjectType.ActivePlayer:
                             if (isExistingObject && (obj as Unit).UnitData != null)
-                                oldUnitData = (obj as Unit).UnitData.Clone(); ;
+                                oldUnitData = (obj as Unit).UnitData.Clone();
                             (obj as Unit).UnitData = handler.ReadCreateUnitData(fieldsData, flags, index);
                             if (!isExistingObject)
                                 (obj as Unit).UnitDataOriginal = (obj as Unit).UnitData.Clone();
 
                             if (isExistingObject && (obj as Player).PlayerData != null)
-                                oldPlayerData = (obj as Player).PlayerData.Clone(); ;
+                                oldPlayerData = (obj as Player).PlayerData.Clone();
                             (obj as Player).PlayerData = handler.ReadCreatePlayerData(fieldsData, flags, index);
                             if (!isExistingObject)
                                 (obj as Player).PlayerDataOriginal = (obj as Player).PlayerData.Clone();
 
+                            if (isExistingObject && (obj as Player).ActivePlayerData != null)
+                                oldActivePlayerData = (obj as Player).ActivePlayerData.Clone();
                             (obj as Player).ActivePlayerData = handler.ReadCreateActivePlayerData(fieldsData, flags, index);
                             if (!isExistingObject)
                                 (obj as Player).ActivePlayerDataOriginal = (obj as Player).ActivePlayerData;
@@ -674,7 +690,7 @@ namespace WowPacketParserModule.V8_0_1_27101.Parsers
                     }
 
                     if (isExistingObject)
-                        StoreObjectUpdate(packet, guid, obj, oldObjectData, oldGameObjectData, oldUnitData, oldPlayerData, true);
+                        StoreObjectUpdate(packet, guid, obj, oldObjectData, oldGameObjectData, oldUnitData, oldPlayerData, oldActivePlayerData, true);
                 }
 
                 obj.Movement = moves;
@@ -690,6 +706,13 @@ namespace WowPacketParserModule.V8_0_1_27101.Parsers
                     // Only needed for pets.
                     if (guid.GetHighType() == HighGuidType.Pet)
                         Storage.StoreCreatureStats(obj as Unit, updateMaskArray, guid.GetHighType() == HighGuidType.Pet, packet);
+                    else if (objType == ObjectType.ActivePlayer)
+                    {
+                        Storage.SavePlayerMeleeCrit(obj, packet.SniffId);
+                        Storage.SavePlayerRangedCrit(obj, packet.SniffId);
+                        Storage.SavePlayerSpellCrit(obj, packet.SniffId);
+                        Storage.SavePlayerDodge(obj, packet.SniffId);
+                    }
                 }
             }
             else

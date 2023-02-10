@@ -13,5 +13,6 @@ namespace WowPacketParser.Store.Objects.UpdateFields
         float RangedCritPercentage { get; }
         float OffhandCritPercentage { get; }
         float SpellCritPercentage { get;}
+        IActivePlayerData Clone();
     }
 }

@@ -141,6 +141,8 @@ namespace WowPacketParser.Store.Objects.UpdateFields.LegacyImplementation
                 return skillData;
             }
         }
+
+        public IActivePlayerData Clone() { return new ActivePlayerData(Object, UseOriginalData); }
     }
 }
 
