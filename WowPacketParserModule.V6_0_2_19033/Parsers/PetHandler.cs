@@ -92,7 +92,7 @@ namespace WowPacketParserModule.V6_0_2_19033.Parsers
 
             CreaturePetActions petActions = new CreaturePetActions();
             petActions.CasterGUID = petGuid;
-            petActions.CasterID = petGuid.GetEntry();
+            petActions.CasterID = Storage.GetCurrentObjectEntry(petGuid);
             const int maxCreatureSpells = 10;
             for (var i = 0; i < maxCreatureSpells; i++) // Read pet / vehicle spell ids
                 petActions.SpellID[i] = ReadPetAction(packet, "ActionButtons", i);
@@ -116,7 +116,7 @@ namespace WowPacketParserModule.V6_0_2_19033.Parsers
 
                 if (petGuid.GetHighType() == HighGuidType.Creature)
                 {
-                    cooldown.CasterID = petGuid.GetEntry();
+                    cooldown.CasterID = Storage.GetCurrentObjectEntry(petGuid);
                     cooldown.TimeSinceCast = Utilities.GetTimeDiffInMs(Storage.GetLastCastGoTimeForCreature(petGuid, (uint)cooldown.SpellID), packet.Time);
                     cooldown.SniffId = packet.SniffIdString;
                     Storage.CreaturePetRemainingCooldown.Add(cooldown);

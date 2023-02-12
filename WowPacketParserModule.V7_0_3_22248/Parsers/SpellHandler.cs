@@ -465,9 +465,9 @@ namespace WowPacketParserModule.V7_0_3_22248.Parsers
                 petCooldown.SpellID = (uint)packet.ReadInt32("SrecID", i);
                 petCooldown.Cooldown = (uint)packet.ReadInt32("ForcedCooldown", i);
                 petCooldown.ModRate = packet.ReadSingle("ModRate", i);
-                if (casterGuid.GetObjectType() == ObjectType.Unit)
+                if (casterGuid.GetHighType() == HighGuidType.Creature)
                 {
-                    petCooldown.CasterID = casterGuid.GetEntry();
+                    petCooldown.CasterID = Storage.GetCurrentObjectEntry(casterGuid);
                     petCooldown.Flags = flags;
                     petCooldown.Index = (byte)i;
                     petCooldown.SniffId = packet.SniffIdString;

@@ -41,7 +41,7 @@ namespace WowPacketParser.Parsing.Parsers
             bool isMinion = guid.GetHighType() == HighGuidType.Creature;
             CreaturePetActions petActions = new CreaturePetActions();
             petActions.CasterGUID = guid;
-            petActions.CasterID = guid.GetEntry();
+            petActions.CasterID = Storage.GetCurrentObjectEntry(guid);
             const int maxCreatureSpells = 10;
             var spells = new List<uint?>(maxCreatureSpells);
             for (int i = 0; i < maxCreatureSpells; i++) // Read pet/vehicle spell ids
@@ -96,7 +96,7 @@ namespace WowPacketParser.Parsing.Parsers
 
                 if (isMinion)
                 {
-                    cooldown.CasterID = guid.GetEntry();
+                    cooldown.CasterID = Storage.GetCurrentObjectEntry(guid);
                     cooldown.TimeSinceCast = Utilities.GetTimeDiffInMs(Storage.GetLastCastGoTimeForCreature(guid, (uint)cooldown.SpellID), packet.Time);
                     cooldown.SniffId = packet.SniffIdString;
                     Storage.CreaturePetRemainingCooldown.Add(cooldown);

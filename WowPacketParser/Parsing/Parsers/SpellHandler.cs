@@ -1322,9 +1322,9 @@ namespace WowPacketParser.Parsing.Parsers
                 CreaturePetCooldown petCooldown = new CreaturePetCooldown();
                 petCooldown.SpellID = packet.ReadUInt32<SpellId>("Spell ID");
                 petCooldown.Cooldown = (uint)packet.ReadInt32("Time");
-                if (casterGuid.GetObjectType() == ObjectType.Unit)
+                if (casterGuid.GetHighType() == HighGuidType.Creature)
                 {
-                    petCooldown.CasterID = casterGuid.GetEntry();
+                    petCooldown.CasterID = Storage.GetCurrentObjectEntry(casterGuid);
                     petCooldown.Flags = flags;
                     petCooldown.Index = i++;
                     petCooldown.ModRate = 1;
