@@ -2,7 +2,7 @@
 using WowPacketParser.Misc;
 using WowPacketParser.Parsing;
 
-namespace WowPacketParserModule.V6_0_2_19033.Parsers
+namespace WowPacketParserModule.V2_5_1_38707.Parsers
 {
     public static class TicketHandler
     {
@@ -15,7 +15,7 @@ namespace WowPacketParserModule.V6_0_2_19033.Parsers
 
         public static void ReadCliSupportTicketChatLine(Packet packet, params object[] idx)
         {
-                packet.ReadTime("Timestamp", idx);
+                packet.ReadTime64("Timestamp", idx);
 
                 var textLength = packet.ReadBits("TextLength", 12, idx);
                 packet.ResetBitReader();
@@ -73,7 +73,7 @@ namespace WowPacketParserModule.V6_0_2_19033.Parsers
 
         public static void ReadCliSupportTicketGuildInfo(Packet packet, params object[] idx)
         {
-            var guildNameLength = packet.ReadBits("GuildNameLength", 7, idx);
+            var guildNameLength = packet.ReadBits("GuildNameLength", 8, idx); // 7 or 8 ?
             packet.ResetBitReader();
 
             packet.ReadPackedGuid128("GuildID", idx);
@@ -83,7 +83,7 @@ namespace WowPacketParserModule.V6_0_2_19033.Parsers
 
         public static void ReadCliSupportTicketLFGListSearchResult(Packet packet, params object[] idx)
         {
-            LfgHandler.ReadCliRideTicket(packet, "RideTicket", idx);
+            WowPacketParserModule.V6_0_2_19033.Parsers.LfgHandler.ReadCliRideTicket(packet, "RideTicket", idx);
             packet.ReadUInt32("GroupFinderActivityID", idx);
             packet.ReadPackedGuid128("LastTitleAuthorGuid", idx);
             packet.ReadPackedGuid128("LastDescriptionAuthorGuid", idx);
@@ -104,11 +104,61 @@ namespace WowPacketParserModule.V6_0_2_19033.Parsers
 
         public static void ReadCliSupportTicketLFGListApplicant(Packet packet, params object[] idx)
         {
-            LfgHandler.ReadCliRideTicket(packet, "RideTicket", idx);
+            WowPacketParserModule.V6_0_2_19033.Parsers.LfgHandler.ReadCliRideTicket(packet, "RideTicket", idx);
 
             var length = packet.ReadBits(9);
             packet.ResetBitReader();
             packet.ReadWoWString("Comment", length, idx);
+        }
+
+        public static void ReadHorusChatLine(Packet packet, params object[] indexes)
+        {
+            packet.ReadUInt32("Timestamp", indexes);
+            packet.ReadPackedGuid128("AuthorGUID", indexes);
+
+            var hasClubID = packet.ReadBit();
+            var hasChannelGUID = packet.ReadBit();
+            var hasRealmAddress = packet.ReadBit();
+            var hasSlashCmd = packet.ReadBit();
+            var textLen = packet.ReadBits(12);
+
+            if (hasClubID)
+                packet.ReadUInt64("ClubID", indexes);
+            if (hasChannelGUID)
+                packet.ReadPackedGuid128("ChannelGUID", indexes);
+            if (hasRealmAddress)
+            {
+                packet.ReadUInt32("VirtualRealmAddress", indexes);
+                packet.ReadUInt16("field_4", indexes);
+                packet.ReadByte("field_6", indexes);
+            }
+            if (hasSlashCmd)
+                packet.ReadInt32("SlashCmd", indexes);
+
+            packet.ReadWoWString("Text", textLen, indexes);
+        }
+
+        public static void ReadHorusChatLog(Packet packet, params object[] indexes)
+        {
+            var lines = packet.ReadUInt32();
+            for (int i = 0; i < lines; i++)
+                ReadHorusChatLine(packet, i, indexes);
+        }
+
+        public static void ReadClubFinderResult(Packet packet, params object[] indexes)
+        {
+            packet.ReadUInt64("ClubFinderPostingID", indexes);
+            packet.ReadUInt64("ClubID ", indexes);
+            packet.ReadPackedGuid128("ClubFinderGUID", indexes);
+            var nameLen = packet.ReadBits(12);
+            packet.ReadWoWString("ClubName", nameLen, indexes);
+        }
+
+        public static void ReadUnused910(Packet packet, params object[] indexes)
+        {
+            var len = packet.ReadBits(7);
+            packet.ReadPackedGuid128("field_104", indexes);
+            packet.ReadWoWString("field_0", len, indexes);
         }
 
         [Parser(Opcode.CMSG_SUPPORT_TICKET_SUBMIT_COMPLAINT)]
@@ -126,19 +176,26 @@ namespace WowPacketParserModule.V6_0_2_19033.Parsers
             var hasCalendarInfo = packet.ReadBit("HasCalendarInfo");
             var hasPetInfo = packet.ReadBit("HasPetInfo");
             var hasGuildInfo = packet.ReadBit("HasGuildInfo");
-            var has5E4383 = packet.ReadBit("HasLFGListSearchResult");
-            var has5E3DFB = packet.ReadBit("HasLFGListApplicant");
+            var hasLFGListSearchResult = packet.ReadBit("HasLFGListSearchResult");
+            var hasLFGListApplicant = packet.ReadBit("HasLFGListApplicant");
+            var hasClubMessage = packet.ReadBit("HasClubMessage");
+            var hasClubFinderResult = packet.ReadBit("HasClubFinderResult");
             var hasUnkBit = packet.ReadBit("UnkBit");
 
             packet.ResetBitReader();
 
-            if (hasUnkBit)
-                packet.ReadBits("UnkBits7", 7);
+            if (hasClubMessage)
+            {
+                packet.ReadBit("IsUsingPlayerVoice");
+                packet.ResetBitReader();
+            }
+
+            ReadHorusChatLog(packet, "Horus");
+
+            packet.ReadWoWString("Note", noteLength);
 
             if (hasMailInfo)
                 ReadCliSupportTicketMailInfo(packet, "MailInfo");
-
-            packet.ReadWoWString("Note", noteLength);
 
             if (hasCalendarInfo)
                 ReadCliSupportTicketCalendarEventInfo(packet, "CalendarInfo");
@@ -149,11 +206,17 @@ namespace WowPacketParserModule.V6_0_2_19033.Parsers
             if (hasGuildInfo)
                 ReadCliSupportTicketGuildInfo(packet, "GuidInfo");
 
-            if (has5E4383)
+            if (hasLFGListSearchResult)
                 ReadCliSupportTicketLFGListSearchResult(packet, "LFGListSearchResult");
 
-            if (has5E3DFB)
+            if (hasLFGListApplicant)
                 ReadCliSupportTicketLFGListApplicant(packet, "LFGListApplicant");
+
+            if (hasClubFinderResult)
+                ReadClubFinderResult(packet, "ClubFinderResult");
+
+            if (hasUnkBit)
+                ReadUnused910(packet, "Unused910");
         }
     }
 }

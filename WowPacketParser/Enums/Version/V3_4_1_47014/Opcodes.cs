@@ -698,7 +698,7 @@ namespace WowPacketParser.Enums.Version.V3_4_1_47014
 
         private static readonly BiDictionary<Opcode, int> ServerOpcodes = new BiDictionary<Opcode, int>
         {
-
+            { Opcode.SMSG_UPDATE_OBJECT, 0x27D1 },
         };
 
         private static readonly BiDictionary<Opcode, int> MiscOpcodes = new BiDictionary<Opcode, int>();

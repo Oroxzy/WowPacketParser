@@ -986,7 +986,8 @@ namespace WowPacketParser.Misc
                 case ClientVersionBuild.V3_4_0_45102:
                 case ClientVersionBuild.V3_4_1_47014:
                 case ClientVersionBuild.V3_4_1_47720:
-                return ClientVersionBuild.V2_5_1_38707;
+                case ClientVersionBuild.V3_4_1_48632:
+                    return ClientVersionBuild.V2_5_1_38707;
                 case ClientVersionBuild.BattleNetV37165:
                     return ClientVersionBuild.BattleNetV37165;
                 case ClientVersionBuild.Zero:
@@ -1569,6 +1570,7 @@ namespace WowPacketParser.Misc
                 // Ulduar
                 case ClientVersionBuild.V3_4_1_47014:
                 case ClientVersionBuild.V3_4_1_47720:
+                case ClientVersionBuild.V3_4_1_48632:
                 {
                     return true;
                 }
