@@ -7,5 +7,6 @@
         Spamming = 9,
         Language = 11,
         GuildName = 12,
+        PetName = 14,
     }
 }
