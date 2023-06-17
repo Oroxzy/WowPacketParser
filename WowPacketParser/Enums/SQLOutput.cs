@@ -124,6 +124,7 @@
         creature_pet_remaining_cooldown,
         creature_respawn_time,
         creature_spell_immunity,
+        creature_spell_scaling_damage_periodic,
         creature_spell_timers,
         creature_stats,
         creature_template,

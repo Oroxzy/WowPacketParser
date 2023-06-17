@@ -752,6 +752,61 @@ namespace WowPacketParser.SQL.Builders
             return new SQLInsert<CreatureMeleeDamage>(rows, false).Build();
         }
 
+        [BuilderMethod]
+        public static string CreatureScalingSpellDamage()
+        {
+            if (!Settings.SqlTables.creature_spell_scaling_damage_periodic)
+                return string.Empty;
+
+            if (Storage.CreatureSpellScalingDamagePeriodic.Count == 0)
+                return string.Empty;
+
+            Dictionary<Tuple<uint, uint, uint>, CreatureSpellScalingDamagePeriodic> spellStatsDict = new Dictionary<Tuple<uint, uint, uint>, CreatureSpellScalingDamagePeriodic>();
+            Func<Tuple<uint, uint, uint>, CreatureSpellScalingDamagePeriodic> GetDataForCreature = delegate (Tuple<uint, uint, uint> entryLevelPair)
+            {
+                if (spellStatsDict.ContainsKey(entryLevelPair))
+                    return spellStatsDict[entryLevelPair];
+
+                CreatureSpellScalingDamagePeriodic spellStats = new CreatureSpellScalingDamagePeriodic();
+                spellStats.Entry = entryLevelPair.Item1;
+                spellStats.Level = entryLevelPair.Item2;
+                spellStats.SpellId = entryLevelPair.Item3;
+                spellStatsDict.Add(entryLevelPair, spellStats);
+                return spellStats;
+            };
+
+            HashSet<Tuple<uint, uint>> mobsWithDamageData = new HashSet<Tuple<uint, uint>>();
+            foreach (var creatureData in Storage.CreatureSpellScalingDamagePeriodic)
+            {
+                foreach (var levelData in creatureData.Value)
+                {
+                    foreach (var damageForSpell in levelData.Value)
+                    {
+                        Tuple<uint, uint, uint> entryLevelPair = new Tuple<uint, uint, uint>(creatureData.Key, levelData.Key, damageForSpell.Key);
+                        CreatureSpellScalingDamagePeriodic spellStats = GetDataForCreature(entryLevelPair);
+                        spellStats.HitsCount = (uint)damageForSpell.Value.Count;
+                        spellStats.DamageMin = (int)damageForSpell.Value.Min();
+                        spellStats.DamageAverage = (int)damageForSpell.Value.Average();
+                        spellStats.DamageMax = (int)damageForSpell.Value.Max();
+                    }
+                }
+            }
+
+            // not used anywhere else so empty to free up memory
+            Storage.CreatureSpellScalingDamagePeriodic.Clear();
+
+            var rows = new RowList<CreatureSpellScalingDamagePeriodic>();
+
+            foreach (var item in spellStatsDict)
+            {
+                var row = new Row<CreatureSpellScalingDamagePeriodic>();
+                row.Data = item.Value;
+                rows.Add(row);
+            }
+
+            return new SQLInsert<CreatureSpellScalingDamagePeriodic>(rows, false).Build();
+        }
+
         class CreatureTemplateNonWdbExport
         {
             public uint Entry = 0;

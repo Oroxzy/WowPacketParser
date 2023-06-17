@@ -366,8 +366,8 @@ namespace WowPacketParser.Parsing.Parsers
         private static void ReadPeriodicAuraLog(Packet packet, object index = null)
         {
             packet.ReadPackedGuid("Target GUID", index);
-            packet.ReadPackedGuid("Caster GUID", index);
-            packet.ReadInt32<SpellId>("Spell ID", index);
+            var casterGuid = packet.ReadPackedGuid("Caster GUID", index);
+            int spellId = packet.ReadInt32<SpellId>("Spell ID", index);
             var count = packet.ReadInt32("Count", index);
 
             for (var i = 0; i < count; i++)
@@ -378,17 +378,24 @@ namespace WowPacketParser.Parsing.Parsers
                     case AuraType.PeriodicDamage:
                     case AuraType.PeriodicDamagePercent:
                     {
-                        packet.ReadUInt32("Damage", index);
+                        uint damage = packet.ReadUInt32("Damage", index);
 
                         if (ClientVersion.AddedInVersion(ClientVersionBuild.V3_0_2_9056))
                             packet.ReadUInt32("Over damage", index);
 
                         packet.ReadUInt32("School", index);
-                        packet.ReadUInt32("Absorb", index);
-                        packet.ReadInt32("Resist", index);
+                        uint absorb = packet.ReadUInt32("Absorb", index);
+                        int resist = packet.ReadInt32("Resist", index);
 
+                        bool critical = false;
                         if (ClientVersion.AddedInVersion(ClientVersionBuild.V3_1_2_9901))
-                            packet.ReadByte("Critical", index);
+                            critical = packet.ReadBool("Critical", index);
+
+                        if (casterGuid.GetHighType() == HighGuidType.Creature &&
+                            absorb == 0 && resist == 0 && !critical)
+                        {
+                            Storage.StoreCreatureScalingSpellDamagePeriodic(casterGuid, (uint)spellId, damage);
+                        }
 
                         break;
                     }
