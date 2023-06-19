@@ -886,7 +886,7 @@ namespace WowPacketParser.Enums.Version.V1_14_1_40688
             {Opcode.CMSG_CREATE_CHARACTER, 0x3645},
             {Opcode.CMSG_CHECK_CHARACTER_NAME_AVAILABILITY, 0x3646},
             {Opcode.CMSG_SUPPORT_TICKET_SUBMIT_COMPLAINT, 0x3647},
-            // {Opcode.UNNAMED, 0x3648},
+            {Opcode.CMSG_SUPPORT_TICKET_SUBMIT_BUG, 0x3648},
             // {Opcode.UNNAMED, 0x3649},
             {Opcode.CMSG_PARTY_UNINVITE, 0x364A},
             {Opcode.CMSG_SET_LOOT_METHOD, 0x364B},

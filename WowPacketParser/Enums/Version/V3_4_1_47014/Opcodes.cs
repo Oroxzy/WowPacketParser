@@ -384,7 +384,7 @@ namespace WowPacketParser.Enums.Version.V3_4_1_47014
             {Opcode.CMSG_READY_CHECK_RESPONSE, 0x3636},
             {Opcode.CMSG_CREATE_CHARACTER, 0x3645},
             {Opcode.CMSG_SUPPORT_TICKET_SUBMIT_COMPLAINT, 0x3647},
-            // {Opcode.UNNAMED, 0x3648},
+            {Opcode.CMSG_SUPPORT_TICKET_SUBMIT_BUG, 0x3648},
             // {Opcode.UNNAMED, 0x3649},
             {Opcode.CMSG_PARTY_UNINVITE, 0x364A},
             {Opcode.CMSG_SET_LOOT_METHOD, 0x364B},
