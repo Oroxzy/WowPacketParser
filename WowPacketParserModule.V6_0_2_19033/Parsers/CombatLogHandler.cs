@@ -56,25 +56,25 @@ namespace WowPacketParserModule.V6_0_2_19033.Parsers
         public static void HandlePeriodicAuraLog(Packet packet)
         {
             packet.ReadPackedGuid128("TargetGUID");
-            var casterGuid = packet.ReadPackedGuid128("CasterGUID");
+            packet.ReadPackedGuid128("CasterGUID");
 
-            int spellId = packet.ReadInt32<SpellId>("SpellID");
+            packet.ReadInt32<SpellId>("SpellID");
 
             var int24 = packet.ReadInt32("PeriodicAuraLogEffectCount");
 
             // PeriodicAuraLogEffect
             for (var i = 0; i < int24; i++)
             {
-                int effect = packet.ReadInt32("Effect", i);
-                int amount = packet.ReadInt32("Amount", i);
+                packet.ReadInt32("Effect", i);
+                packet.ReadInt32("Amount", i);
                 packet.ReadInt32("OverHealOrKill", i);
                 packet.ReadInt32("SchoolMaskOrPower", i);
-                int absorb = packet.ReadInt32("AbsorbedOrAmplitude", i);
-                int resist = packet.ReadInt32("Resisted");
+                packet.ReadInt32("AbsorbedOrAmplitude", i);
+                packet.ReadInt32("Resisted");
 
                 packet.ResetBitReader();
 
-                bool critical = packet.ReadBit("Crit", i);
+                packet.ReadBit("Crit", i);
                 packet.ReadBit("Multistrike", i);
 
                 // PeriodicAuraLogEffectDebugInfo
@@ -85,11 +85,6 @@ namespace WowPacketParserModule.V6_0_2_19033.Parsers
                     packet.ReadSingle("CritRollNeeded", i);
                 }
 
-                if (casterGuid.GetHighType() == HighGuidType.Creature &&
-                    effect == 3 && absorb == 0 && resist == 0 && !critical)
-                {
-                    Storage.StoreCreatureScalingSpellDamagePeriodic(casterGuid, (uint)spellId, amount);
-                }
             }
 
             packet.ResetBitReader();

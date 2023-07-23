@@ -218,7 +218,6 @@ namespace WowPacketParser.Misc
             public static readonly bool creature_pet_remaining_cooldown = Conf.GetBoolean("creature_pet_remaining_cooldown", false);
             public static readonly bool creature_respawn_time = Conf.GetBoolean("creature_respawn_time", false);
             public static readonly bool creature_spell_immunity = Conf.GetBoolean("creature_spell_immunity", false);
-            public static readonly bool creature_spell_scaling_damage_periodic = Conf.GetBoolean("creature_spell_scaling_damage_periodic", false);
             public static readonly bool creature_spell_timers = Conf.GetBoolean("creature_spell_timers", false);
             public static readonly bool creature_stats = Conf.GetBoolean("creature_stats", false);
             public static readonly bool creature_template = Conf.GetBoolean("creature_template", false);

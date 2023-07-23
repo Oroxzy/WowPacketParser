@@ -961,63 +961,6 @@ namespace WowPacketParser.Store
                 Storage.CreatureThreatRemoves.Add(guid, threatList);
             }
         }
-        public static readonly Dictionary<uint, Dictionary<uint, Dictionary<uint, List<double>>>> CreatureSpellScalingDamagePeriodic = new Dictionary<uint, Dictionary<uint, Dictionary<uint, List<double>>>>();
-        public static void StoreCreatureScalingSpellDamagePeriodic(WowGuid casterGuid, uint spellId, double damage)
-        {
-            if (!Settings.SqlTables.creature_spell_scaling_damage_periodic)
-                return;
-
-            if (!HardcodedData.LevelScalingSpells.Contains(spellId))
-                return;
-
-            uint entry;
-            uint level;
-            if (Objects.ContainsKey(casterGuid))
-            {
-                var unit = Storage.Objects[casterGuid].Item1 as Unit;
-                entry = (uint)unit.ObjectData.EntryID;
-                level = (uint)unit.UnitData.Level;
-            }
-            else
-                return;
-
-            Dictionary<uint, Dictionary<uint, Dictionary<uint, List<double>>>> damageDict = CreatureSpellScalingDamagePeriodic;
-            if (damageDict.ContainsKey(entry))
-            {
-                if (damageDict[entry].ContainsKey(level))
-                {
-                    if (damageDict[entry][level].ContainsKey(spellId))
-                    {
-                        damageDict[entry][level][spellId].Add(damage);
-                    }
-                    else
-                    {
-                        List<double> damageList = new List<double>();
-                        damageList.Add(damage);
-                        damageDict[entry][level].Add(spellId, damageList);
-                    }
-                }
-                else
-                {
-                    Dictionary<uint, List<double>> spellDict = new Dictionary<uint, List<double>>();
-                    List<double> damageList = new List<double>();
-                    damageList.Add(damage);
-                    spellDict.Add(spellId, damageList);
-                    damageDict[entry].Add(level, spellDict);
-                }
-            }
-            else
-            {
-                Dictionary<uint, Dictionary<uint, List<double>>> levelDict = new Dictionary<uint, Dictionary<uint, List<double>>>();
-                Dictionary<uint, List<double>> spellDict = new Dictionary<uint, List<double>>();
-                List<double> damageList = new List<double>();
-                damageList.Add(damage);
-                spellDict.Add(spellId, damageList);
-                levelDict.Add(level, spellDict);
-                damageDict.Add(entry, levelDict);
-            }
-        }
-
         public static readonly Dictionary<uint, Dictionary<uint, List<CreatureDamageTaken>>> CreatureMeleeDamageTaken = new Dictionary<uint, Dictionary<uint, List<CreatureDamageTaken>>>();
         private static void StoreCreatureMeleeDamageTaken(uint entry, uint level, CreatureDamageTaken damage)
         {
@@ -3089,7 +3032,6 @@ namespace WowPacketParser.Store
 
             CreatureKillReputations.Clear();
             CreatureRespawnTimes.Clear();
-            CreatureSpellScalingDamagePeriodic.Clear();
             CreatureMeleeDamageTaken.Clear();
             CreatureMeleeAttackDamage.Clear();
             CreatureMeleeAttackDamageDirty.Clear();
