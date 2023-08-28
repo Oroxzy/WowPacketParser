@@ -752,8 +752,8 @@ CREATE TABLE IF NOT EXISTS `creature_pet_remaining_cooldown` (
   `spell_id` int(10) unsigned NOT NULL DEFAULT '0',
   `cooldown` int(10) unsigned NOT NULL DEFAULT '0',
   `category` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `category_cooldown` int(10) unsigned NOT NULL DEFAULT '0',
-  `mod_rate` float unsigned NOT NULL DEFAULT '1',
+  `category_cooldown` int(10) NOT NULL DEFAULT '0',
+  `mod_rate` float NOT NULL DEFAULT '1',
   `time_since_cast` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'milliseconds since last SMSG_SPELL_GO for this spell',
   `sniff_id` smallint(5) unsigned NOT NULL DEFAULT '0' COMMENT 'points to sniff_file table',
   `sniff_build` mediumint(8) unsigned NOT NULL DEFAULT '0',
@@ -1208,6 +1208,19 @@ CREATE TABLE IF NOT EXISTS `creature_values_update` (
 -- Data exporting was unselected.
 
 
+-- Dumping structure for table sniffs_new_test.creature_visibility_distance
+DROP TABLE IF EXISTS `creature_visibility_distance`;
+CREATE TABLE IF NOT EXISTS `creature_visibility_distance` (
+  `entry` int(10) unsigned NOT NULL,
+  `map` int(10) unsigned NOT NULL,
+  `distance` int(10) unsigned NOT NULL COMMENT 'distance from player at time of create object',
+  `sniff_id_list` text COLLATE latin1_general_ci NOT NULL,
+  PRIMARY KEY (`entry`,`distance`,`map`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci ROW_FORMAT=COMPACT COMMENT='max visibility distances';
+
+-- Data exporting was unselected.
+
+
 -- Dumping structure for table sniffs_new_test.dynamicobject
 DROP TABLE IF EXISTS `dynamicobject`;
 CREATE TABLE IF NOT EXISTS `dynamicobject` (
@@ -1484,6 +1497,18 @@ CREATE TABLE IF NOT EXISTS `gameobject_quest_item` (
 -- Data exporting was unselected.
 
 
+-- Dumping structure for table sniffs_new_test.gameobject_respawn_time
+DROP TABLE IF EXISTS `gameobject_respawn_time`;
+CREATE TABLE IF NOT EXISTS `gameobject_respawn_time` (
+  `old_guid` int(10) unsigned NOT NULL,
+  `new_guid` int(10) unsigned NOT NULL,
+  `respawn_time` int(10) unsigned NOT NULL COMMENT 'time in seconds',
+  PRIMARY KEY (`old_guid`,`new_guid`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci ROW_FORMAT=COMPACT COMMENT='stores the time in seconds between the despawn of a gameobject, and the spawn of another on the same position\r\nrespawn time is reduced dynamically if there are too many players in the same area, so beware of abnormally low values';
+
+-- Data exporting was unselected.
+
+
 -- Dumping structure for table sniffs_new_test.gameobject_template
 DROP TABLE IF EXISTS `gameobject_template`;
 CREATE TABLE IF NOT EXISTS `gameobject_template` (
@@ -1577,6 +1602,19 @@ CREATE TABLE IF NOT EXISTS `gameobject_values_update` (
   `anim_progress` int(10) unsigned DEFAULT NULL,
   `custom_param` int(10) unsigned DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci COMMENT='values updates from SMSG_UPDATE_OBJECT';
+
+-- Data exporting was unselected.
+
+
+-- Dumping structure for table sniffs_new_test.gameobject_visibility_distance
+DROP TABLE IF EXISTS `gameobject_visibility_distance`;
+CREATE TABLE IF NOT EXISTS `gameobject_visibility_distance` (
+  `entry` int(10) unsigned NOT NULL,
+  `map` int(10) unsigned NOT NULL,
+  `distance` int(10) unsigned NOT NULL COMMENT 'distance from player at time of create object',
+  `sniff_id_list` text COLLATE latin1_general_ci NOT NULL,
+  PRIMARY KEY (`entry`,`distance`,`map`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci ROW_FORMAT=COMPACT COMMENT='max visibility distances';
 
 -- Data exporting was unselected.
 
@@ -3096,6 +3134,28 @@ CREATE TABLE IF NOT EXISTS `raid_target_icon_update` (
 -- Data exporting was unselected.
 
 
+-- Dumping structure for table sniffs_new_test.replay_marked_creature
+DROP TABLE IF EXISTS `replay_marked_creature`;
+CREATE TABLE IF NOT EXISTS `replay_marked_creature` (
+  `guid` int(10) unsigned NOT NULL,
+  `marker` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`guid`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci COMMENT='creatures that have been manually marked from replay core';
+
+-- Data exporting was unselected.
+
+
+-- Dumping structure for table sniffs_new_test.replay_marked_gameobject
+DROP TABLE IF EXISTS `replay_marked_gameobject`;
+CREATE TABLE IF NOT EXISTS `replay_marked_gameobject` (
+  `guid` int(10) unsigned NOT NULL,
+  `marker` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`guid`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci COMMENT='gameobjects that have been manually marked from replay core';
+
+-- Data exporting was unselected.
+
+
 -- Dumping structure for table sniffs_new_test.sniff_data
 DROP TABLE IF EXISTS `sniff_data`;
 CREATE TABLE IF NOT EXISTS `sniff_data` (
@@ -3116,8 +3176,9 @@ CREATE TABLE IF NOT EXISTS `sniff_file` (
   `id` smallint(5) unsigned NOT NULL,
   `build` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `author` varchar(32) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
-  `name` varchar(256) COLLATE utf8_unicode_ci DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  `name` varchar(128) COLLATE utf8_unicode_ci NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='the names of all sniffs included in the database';
 
 -- Data exporting was unselected.

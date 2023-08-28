@@ -273,7 +273,20 @@ namespace WowPacketParserModule.V6_0_2_19033.Parsers
             lastGossipOption.ActionPoiId = gossipPOI.ID;
             tempGossipOptionPOI.ActionPoiId = gossipPOI.ID;
 
-            Storage.GossipPOIs.Add(gossipPOI, packet.TimeSpan);
+            if (ClientLocale.PacketLocale != LocaleConstant.enUS)
+            {
+                PointsOfInterestLocale localesPoi = new PointsOfInterestLocale
+                {
+                    ID = gossipPOI.ID.ToString(),
+                    Name = gossipPOI.Name,
+                };
+
+                Storage.LocalesPointsOfInterest.Add(localesPoi, packet.TimeSpan);
+            }
+            else
+            {
+                Storage.GossipPOIs.Add(gossipPOI, packet.TimeSpan);
+            }
 
             if (tempGossipOptionPOI.HasSelection)
             {
@@ -485,13 +498,31 @@ namespace WowPacketParserModule.V6_0_2_19033.Parsers
             uint greetingLength = packet.ReadBits(11);
             trainer.Greeting = packet.ReadWoWString("Greeting", greetingLength);
 
-            Storage.Trainers.Add(trainer, packet.TimeSpan);
             var lastGossipOption = CoreParsers.NpcHandler.LastGossipOption;
             var tempGossipOptionPOI = CoreParsers.NpcHandler.TempGossipOptionPOI;
-            if (lastGossipOption.HasSelection && lastGossipOption.Guid != null)
-                Storage.CreatureTrainers.Add(new CreatureTrainer { CreatureId = lastGossipOption.Guid.GetEntry(), MenuID = lastGossipOption.MenuId, OptionIndex = lastGossipOption.OptionIndex, TrainerId = trainer.Id }, packet.TimeSpan);
+            
+            if (ClientLocale.PacketLocale != LocaleConstant.enUS)
+            {
+                if (!string.IsNullOrEmpty(trainer.Greeting))
+                {
+                    TrainerLocale localeTrainer = new TrainerLocale
+                    {
+                        Id = (uint)trainer.Id,
+                        TrainerEntry = guid.GetEntry(),
+                        Greeting = trainer.Greeting,
+                    };
+
+                    Storage.LocalesTrainer.Add(localeTrainer, packet.TimeSpan);
+                }
+            }
             else
-                Storage.CreatureTrainers.Add(new CreatureTrainer { CreatureId = guid.GetEntry(), MenuID = 0, OptionIndex = 0, TrainerId = trainer.Id }, packet.TimeSpan);
+            {
+                Storage.Trainers.Add(trainer, packet.TimeSpan);
+                if (lastGossipOption.HasSelection && lastGossipOption.Guid != null)
+                    Storage.CreatureTrainers.Add(new CreatureTrainer { CreatureId = lastGossipOption.Guid.GetEntry(), MenuID = lastGossipOption.MenuId, OptionIndex = lastGossipOption.OptionIndex, TrainerId = trainer.Id }, packet.TimeSpan);
+                else
+                    Storage.CreatureTrainers.Add(new CreatureTrainer { CreatureId = guid.GetEntry(), MenuID = 0, OptionIndex = 0, TrainerId = trainer.Id }, packet.TimeSpan);
+            }
 
             lastGossipOption.Reset();
             tempGossipOptionPOI.Reset();

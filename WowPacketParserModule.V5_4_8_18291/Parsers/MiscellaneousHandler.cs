@@ -206,7 +206,7 @@ namespace WowPacketParserModule.V5_4_8_18291.Parsers
             weatherUpdate.Grade = packet.ReadSingle("Grade");
             weatherUpdate.Instant = packet.ReadBit("Instant");
 
-            weatherUpdate.UnixTimeMs = (ulong)Utilities.GetUnixTimeMsFromDateTime(packet.Time);
+            weatherUpdate.UnixTimeMs = (ulong)packet.UnixTimeMs;
             Storage.WeatherUpdates.Add(weatherUpdate, packet.TimeSpan);
         }
 

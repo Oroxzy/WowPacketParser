@@ -63,16 +63,30 @@ namespace WowPacketParserModule.V1_13_2_31446.Parsers
 
             packet.AddSniffData(StoreNameType.GameObject, entry.Key, "QUERY_RESPONSE");
 
-            Storage.GameObjectTemplates.Add(gameObject, packet.TimeSpan);
-
-            ObjectName objectName = new ObjectName
+            if (ClientLocale.PacketLocale != LocaleConstant.enUS)
             {
-                ObjectType = StoreNameType.GameObject,
-                ID = entry.Key,
-                Name = gameObject.Name
-            };
+                GameObjectTemplateLocale localesGameObject = new GameObjectTemplateLocale
+                {
+                    ID = (uint)entry.Key,
+                    Name = gameObject.Name,
+                    CastBarCaption = gameObject.CastCaption,
+                    Unk1 = gameObject.UnkString,
+                };
 
-            Storage.ObjectNames.Add(objectName, packet.TimeSpan);
+                Storage.LocalesGameObjects.Add(localesGameObject, packet.TimeSpan);
+            }
+            else
+            {
+                Storage.GameObjectTemplates.Add(gameObject, packet.TimeSpan);
+
+                ObjectName objectName = new ObjectName
+                {
+                    ObjectType = StoreNameType.GameObject,
+                    ID = entry.Key,
+                    Name = gameObject.Name
+                };
+                Storage.ObjectNames.Add(objectName, packet.TimeSpan);
+            }
         }
     }
 }

@@ -870,6 +870,7 @@ namespace WowPacketParser.Enums
     public enum ActivePlayerField
     {
         ACTIVE_PLAYER_END,
+        ACTIVE_PLAYER_FARSIGHT,
         ACTIVE_PLAYER_FIELD_ARENA_TEAM_INFO,
         ACTIVE_PLAYER_FIELD_AVOIDANCE,
         ACTIVE_PLAYER_FIELD_BAG_SLOT_FLAGS,

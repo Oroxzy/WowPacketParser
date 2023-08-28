@@ -290,13 +290,13 @@ namespace WowPacketParserModule.V2_5_1_38707.Parsers
             ReadSpellCastRequest(packet, "Cast");
         }
 
-
         [Parser(Opcode.CMSG_PET_CAST_SPELL)]
         public static void HandlePetCastSpell(Packet packet)
         {
             packet.ReadPackedGuid128("PetGUID");
             ReadSpellCastRequest(packet, "Cast");
         }
+
         [Parser(Opcode.CMSG_LEARN_TALENT)]
         public static void HandleLearnTalent(Packet packet)
         {

@@ -10,7 +10,7 @@ namespace WowPacketParserModule.V2_5_1_38835.Parsers
         public static void ReadAccountCharacterList(Packet packet, params object[] idx)
         {
             packet.ReadPackedGuid128("WowAccountGUID", idx);
-            packet.ReadPackedGuid128("CharacterGUID", idx);
+            WowGuid guid = packet.ReadPackedGuid128("CharacterGUID", idx);
             packet.ReadUInt32("VirtualRealmAddress", idx);
             packet.ReadByteE<Race>("Race", idx);
             packet.ReadByteE<Class>("Class", idx);
@@ -18,7 +18,7 @@ namespace WowPacketParserModule.V2_5_1_38835.Parsers
             packet.ReadByte("Level", idx);
             packet.ReadTime64("LastLogin", idx);
 
-            if (ClientVersion.AddedInVersion(ClientVersionBuild.V2_5_3_41531))
+            if (ClientVersion.AddedInClassicVersion(1, 14, 1, 2, 5, 3))
                 packet.ReadUInt32("Unk", idx);
 
             packet.ResetBitReader();
@@ -26,8 +26,10 @@ namespace WowPacketParserModule.V2_5_1_38835.Parsers
             uint characterNameLength = packet.ReadBits(6);
             uint realmNameLength = packet.ReadBits(9);
 
-            packet.ReadWoWString("CharacterName", characterNameLength, idx);
+            string name = packet.ReadWoWString("CharacterName", characterNameLength, idx);
             packet.ReadWoWString("RealmName", realmNameLength, idx);
+
+            StoreGetters.AddName(guid, name);
         }
 
         [Parser(Opcode.SMSG_GET_ACCOUNT_CHARACTER_LIST_RESULT)]
@@ -150,21 +152,7 @@ namespace WowPacketParserModule.V2_5_1_38835.Parsers
             var hasAzeriteLevel = packet.ReadBit("HasAzeriteLevel");
 
             for (int i = 0; i < 6; i++)
-            {
-                packet.ReadByte("Bracket", i, "PvpData");
-                packet.ReadInt32("Rating", i, "PvpData");
-                packet.ReadInt32("Rank", i, "PvpData");
-                packet.ReadInt32("WeeklyPlayed", i, "PvpData");
-                packet.ReadInt32("WeeklyWon", i, "PvpData");
-                packet.ReadInt32("SeasonPlayed", i, "PvpData");
-                packet.ReadInt32("SeasonWon", i, "PvpData");
-                packet.ReadInt32("WeeklyBestRating", i, "PvpData");
-                packet.ReadInt32("Unk710", i, "PvpData");
-                packet.ReadInt32("Unk801_1", i, "PvpData");
-                packet.ReadInt32("Unk252_1", i, "PvpData");
-                packet.ResetBitReader();
-                packet.ReadBit("Unk801_2", i, "PvpData");
-            }
+                WowPacketParserModule.V9_0_1_36216.Parsers.CharacterHandler.ReadPVPBracketData(packet, i, "PVPBracketData");
 
             if (hasGuildData)
             {
@@ -185,7 +173,7 @@ namespace WowPacketParserModule.V2_5_1_38835.Parsers
             packet.ReadUInt16("TodayDishonorableKills");
             packet.ReadUInt16("YesterdayHonorableKills");
             packet.ReadUInt16("YesterdayDishonorableKills");
-            if (ClientVersion.AddedInVersion(2, 5, 4))
+            if (ClientVersion.AddedInClassicVersion(1, 14, 0, 2, 5, 4))
             {
                 packet.ReadUInt16("LastWeekHonorableKills");
                 packet.ReadUInt16("LastWeekDishonorableKills");

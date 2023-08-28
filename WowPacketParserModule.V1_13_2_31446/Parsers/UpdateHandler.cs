@@ -33,6 +33,9 @@ namespace WowPacketParserModule.V1_13_2_31446.Parsers
                 {
                     WowGuid guid = packet.ReadPackedGuid128("ObjectGUID", "Destroyed", i);
                     Storage.StoreObjectDestroyTime(guid, packet.Time);
+
+                    if (guid.GetHighType() == HighGuidType.GameObject)
+                        Storage.StoreGameObjectDespawnTime(guid, packet.Time);
                 }
                 for (var i = 0; i < outOfRangeObjCount; i++)
                 {
@@ -84,7 +87,7 @@ namespace WowPacketParserModule.V1_13_2_31446.Parsers
                 obj = CoreParsers.UpdateHandler.CreateObject(objType, map);
 
             var moves = ReadMovementUpdateBlock(packet, guid, obj, index);
-            Storage.StoreObjectCreateTime(guid, map, moves, packet.Time, type);
+            Storage.StoreObjectCreateTime(guid, map, moves, packet, type);
 
             BitArray updateMaskArray = null;
             var updates = CoreParsers.UpdateHandler.ReadValuesUpdateBlockOnCreate(packet, objType, index, out updateMaskArray);
@@ -102,6 +105,10 @@ namespace WowPacketParserModule.V1_13_2_31446.Parsers
                 obj.UpdateFields = updates;
                 obj.DynamicUpdateFields = dynamicUpdates;
                 Storage.StoreNewObject(guid, obj, type, packet);
+
+                // Only needed for pets.
+                if (guid.GetHighType() == HighGuidType.Pet)
+                    Storage.StoreCreatureStats(obj as Unit, updateMaskArray, guid.GetHighType() == HighGuidType.Pet, packet);
             }  
 
             if (guid.HasEntry() && (objType == ObjectType.Unit || objType == ObjectType.GameObject))
@@ -287,6 +294,9 @@ namespace WowPacketParserModule.V1_13_2_31446.Parsers
 
                         if (hasJumpExtraData)
                             V8_0_1_27101.Parsers.MovementHandler.ReadMonsterSplineJumpExtraData(packet, index);
+
+                        if (guid == Storage.CurrentActivePlayer)
+                            Storage.CurrentMoveSplineExpireTime = packet.UnixTimeMs + (long)monsterMove.MoveTime;
 
                         if (pointsCount > 0 && (Settings.SaveTransports || (moveInfo.TransportGuid == null || moveInfo.TransportGuid.IsEmpty())))
                         {

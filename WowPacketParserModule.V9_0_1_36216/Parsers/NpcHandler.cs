@@ -59,7 +59,20 @@ namespace WowPacketParserModule.V9_0_1_36216.Parsers
             lastGossipOption.ActionPoiId = gossipPOI.ID;
             tempGossipOptionPOI.ActionPoiId = gossipPOI.ID;
 
-            Storage.GossipPOIs.Add(gossipPOI, packet.TimeSpan);
+            if (ClientLocale.PacketLocale != LocaleConstant.enUS)
+            {
+                PointsOfInterestLocale localesPoi = new PointsOfInterestLocale
+                {
+                    ID = gossipPOI.ID.ToString(),
+                    Name = gossipPOI.Name,
+                };
+
+                Storage.LocalesPointsOfInterest.Add(localesPoi, packet.TimeSpan);
+            }
+            else
+            {
+                Storage.GossipPOIs.Add(gossipPOI, packet.TimeSpan);
+            }
 
             if (tempGossipOptionPOI.HasSelection)
             {

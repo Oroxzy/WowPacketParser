@@ -9,8 +9,7 @@ namespace WowPacketParserModule.V9_0_1_36216.Parsers
         [Parser(Opcode.SMSG_SEASON_INFO)]
         public static void HandleSeasonInfo(Packet packet)
         {
-            if (ClientVersion.AddedInVersion(ClientVersionBuild.V9_2_0_42423) &&
-               !ClientVersion.IsClassicClientVersionBuild(ClientVersion.Build))
+            if (ClientVersion.AddedInVersion(9, 2, 0, 1, 14, 3, 2, 5, 4))
                 packet.ReadInt32("MythicPlusDisplaySeasonID");
 
             packet.ReadInt32("MythicPlusMilestoneSeasonID");

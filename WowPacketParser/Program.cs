@@ -62,6 +62,18 @@ namespace WowPacketParser
 
             SQLConnector.ReadDB();
 
+            // make sure files are parsed in chronological order
+            files = files.OrderBy(x => 
+            {
+                DateTime creation = File.GetCreationTime(x);
+                DateTime modification = File.GetLastWriteTime(x);
+
+                if (creation > modification)
+                    return modification.Ticks;
+                else
+                    return creation.Ticks;
+            }).ToList();
+
             var processStartTime = DateTime.Now;
             var count = 0;
             foreach (var file in files)

@@ -90,6 +90,36 @@ namespace WowPacketParserModule.V8_0_1_27101.UpdateFields.V8_2_5_31921
         public int[] StatNegBuff { get; } = new int[4];
         public int[] Resistances { get; } = new int[7];
         public int[] BonusResistanceMods { get; } = new int[7];
+        public int[] ResistanceBuffModsPositive
+        {
+            get
+            {
+                int[] resists = new int[BonusResistanceMods.Length];
+                for (int i = 0; i < BonusResistanceMods.Length; i++)
+                {
+                    if (BonusResistanceMods[i] > 0)
+                        resists[i] = BonusResistanceMods[i];
+                    else
+                        resists[i] = 0;
+                }
+                return resists;
+            }
+        }
+        public int[] ResistanceBuffModsNegative
+        {
+            get
+            {
+                int[] resists = new int[BonusResistanceMods.Length];
+                for (int i = 0; i < BonusResistanceMods.Length; i++)
+                {
+                    if (BonusResistanceMods[i] < 0)
+                        resists[i] = BonusResistanceMods[i];
+                    else
+                        resists[i] = 0;
+                }
+                return resists;
+            }
+        }
         public int[] PowerCostModifier { get; } = new int[7];
         public float[] PowerCostMultiplier { get; } = new float[7];
         public int BaseMana { get; set; }

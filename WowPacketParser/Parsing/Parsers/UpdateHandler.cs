@@ -81,7 +81,7 @@ namespace WowPacketParser.Parsing.Parsers
         {
             ObjectType objType = ObjectTypeConverter.Convert(packet.ReadByteE<ObjectTypeLegacy>("Object Type", index));
             var moves = ReadMovementUpdateBlock(packet, guid, index);
-            Storage.StoreObjectCreateTime(guid, map, moves, packet.Time, type);
+            Storage.StoreObjectCreateTime(guid, map, moves, packet, type);
 
             BitArray updateMaskArray = null;
             var updates = ReadValuesUpdateBlockOnCreate(packet, objType, index, out updateMaskArray);
@@ -102,10 +102,14 @@ namespace WowPacketParser.Parsing.Parsers
                 obj.UpdateFields = updates;
                 obj.DynamicUpdateFields = dynamicUpdates;
                 Storage.StoreNewObject(guid, obj, type, packet);
-
+               
                 // Must be after unit has been added to store.
                 if (ClientVersion.HasAurasInUpdateFields())
                     ParseAurasFromUpdateFields(packet, guid, updateMaskArray, updates, true);
+
+                // Only needed for pets.
+                if (guid.GetHighType() == HighGuidType.Pet)
+                    Storage.StoreCreatureStats(obj as Unit, updateMaskArray, guid.GetHighType() == HighGuidType.Pet, packet);
             }
 
             if (guid.HasEntry() && (objType == ObjectType.Unit || objType == ObjectType.GameObject))
@@ -987,7 +991,7 @@ namespace WowPacketParser.Parsing.Parsers
                         if (Storage.Objects.ContainsKey(guid))
                         {
                             var obj = Storage.Objects[guid].Item1 as Unit;
-                            if (obj.UnitData.ChannelData.SpellVisual.SpellXSpellVisualID != update.Value.UInt32Value)
+                            if (obj.UnitData.ChannelData.SpellXSpellVisualID != update.Value.UInt32Value)
                             {
                                 hasData = true;
                                 creatureUpdate.ChannelVisualId = update.Value.UInt32Value;
@@ -1013,7 +1017,7 @@ namespace WowPacketParser.Parsing.Parsers
                         if (Storage.Objects.ContainsKey(guid))
                         {
                             var obj = Storage.Objects[guid].Item1 as Unit;
-                            if (obj.UnitData.ChannelData.SpellVisual.SpellXSpellVisualID != update.Value.UInt32Value)
+                            if (obj.UnitData.ChannelData.SpellXSpellVisualID != update.Value.UInt32Value)
                             {
                                 hasData = true;
                                 creatureUpdate.ChannelVisualId = update.Value.UInt32Value;
@@ -1129,7 +1133,7 @@ namespace WowPacketParser.Parsing.Parsers
 
                 if (hasData)
                 {
-                    creatureUpdate.UnixTimeMs = (ulong)Utilities.GetUnixTimeMsFromDateTime(packet.Time);
+                    creatureUpdate.UnixTimeMs = (ulong)packet.UnixTimeMs;
                     Storage.StoreUnitValuesUpdate(guid, creatureUpdate);
                 }
                 if (creaturePowerUpdates != null)
@@ -1141,7 +1145,7 @@ namespace WowPacketParser.Parsing.Parsers
                             continue;
 
                         powerUpdate.PowerType = (uint)powerType;
-                        powerUpdate.UnixTimeMs = (ulong)Utilities.GetUnixTimeMsFromDateTime(packet.Time);
+                        powerUpdate.UnixTimeMs = (ulong)packet.UnixTimeMs;
                         Storage.StoreUnitPowerValuesUpdate(guid, powerUpdate);
                     }
                 }
@@ -1284,7 +1288,7 @@ namespace WowPacketParser.Parsing.Parsers
 
                 if (hasData)
                 {
-                    goUpdate.UnixTimeMs = (ulong)Utilities.GetUnixTimeMsFromDateTime(packet.Time);
+                    goUpdate.UnixTimeMs = (ulong)packet.UnixTimeMs;
                     Storage.StoreGameObjectUpdate(guid, goUpdate);
                 }
             }
@@ -2328,6 +2332,9 @@ namespace WowPacketParser.Parsing.Parsers
                         monsterMove.TransportGuid = moveInfo.TransportGuid;
                     monsterMove.TransportSeat = moveInfo.TransportSeat;
 
+                    if (guid == Storage.CurrentActivePlayer)
+                        Storage.CurrentMoveSplineExpireTime = packet.UnixTimeMs + (long)monsterMove.MoveTime;
+
                     if ((Settings.SaveTransports || moveInfo.TransportGuid == null || moveInfo.TransportGuid.IsEmpty()) &&
                         Storage.Objects.ContainsKey(guid))
                     {
@@ -2859,6 +2866,9 @@ namespace WowPacketParser.Parsing.Parsers
                         monsterMove.TransportGuid = moveInfo.TransportGuid;
                     monsterMove.TransportSeat = moveInfo.TransportSeat;
 
+                    if (guid == Storage.CurrentActivePlayer)
+                        Storage.CurrentMoveSplineExpireTime = packet.UnixTimeMs + (long)monsterMove.MoveTime;
+
                     if ((Settings.SaveTransports || moveInfo.TransportGuid == null || moveInfo.TransportGuid.IsEmpty()) &&
                         Storage.Objects.ContainsKey(guid))
                     {
@@ -3305,6 +3315,9 @@ namespace WowPacketParser.Parsing.Parsers
                     if (moveInfo.TransportGuid != null)
                         monsterMove.TransportGuid = moveInfo.TransportGuid;
                     monsterMove.TransportSeat = moveInfo.TransportSeat;
+
+                    if (guid == Storage.CurrentActivePlayer)
+                        Storage.CurrentMoveSplineExpireTime = packet.UnixTimeMs + (long)monsterMove.MoveTime;
 
                     if ((Settings.SaveTransports || moveInfo.TransportGuid == null || moveInfo.TransportGuid.IsEmpty()) &&
                         Storage.Objects.ContainsKey(guid))
@@ -3753,6 +3766,9 @@ namespace WowPacketParser.Parsing.Parsers
                         monsterMove.TransportGuid = moveInfo.TransportGuid;
                     monsterMove.TransportSeat = moveInfo.TransportSeat;
 
+                    if (guid == Storage.CurrentActivePlayer)
+                        Storage.CurrentMoveSplineExpireTime = packet.UnixTimeMs + (long)monsterMove.MoveTime;
+
                     if ((Settings.SaveTransports || moveInfo.TransportGuid == null || moveInfo.TransportGuid.IsEmpty()) &&
                         Storage.Objects.ContainsKey(guid))
                     {
@@ -4176,6 +4192,9 @@ namespace WowPacketParser.Parsing.Parsers
                         monsterMove.TransportGuid = moveInfo.TransportGuid;
                     monsterMove.TransportSeat = moveInfo.TransportSeat;
 
+                    if (guid == Storage.CurrentActivePlayer)
+                        Storage.CurrentMoveSplineExpireTime = packet.UnixTimeMs + (long)monsterMove.MoveTime;
+
                     if ((Settings.SaveTransports || moveInfo.TransportGuid == null || moveInfo.TransportGuid.IsEmpty()) &&
                         Storage.Objects.ContainsKey(guid))
                     {
@@ -4419,6 +4438,9 @@ namespace WowPacketParser.Parsing.Parsers
                     Vector3 endPos = packet.ReadVector3("Spline Endpoint", index);
                     monsterMove.SplinePoints.Add(endPos);
 
+                    if (guid == Storage.CurrentActivePlayer)
+                        Storage.CurrentMoveSplineExpireTime = packet.UnixTimeMs + (long)monsterMove.MoveTime;
+
                     if ((Settings.SaveTransports || moveInfo.TransportGuid == null || moveInfo.TransportGuid.IsEmpty()) &&
                         Storage.Objects.ContainsKey(guid))
                     {
@@ -4516,6 +4538,9 @@ namespace WowPacketParser.Parsing.Parsers
         {
             WowGuid guid = packet.ReadGuid("GUID");
             Storage.StoreObjectDestroyTime(guid, packet.Time);
+
+            if (guid.GetHighType() == HighGuidType.GameObject)
+                Storage.StoreGameObjectDespawnTime(guid, packet.Time);
 
             if (packet.CanRead())
                 packet.ReadBool("Despawn Animation");

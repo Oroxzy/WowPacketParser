@@ -315,7 +315,7 @@ namespace WowPacketParserModule.V6_0_2_19033.Parsers
 
             packet.ReadPackedGuid128("TargetCharacterGUID");
 
-            packet.ReadBits("ComplaintType", 5); // enum CliComplaintType
+            packet.ReadBitsE<CliComplaintType>("ComplaintType", 5);
 
             var noteLength = packet.ReadBits("NoteLength", 10);
 

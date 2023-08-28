@@ -145,7 +145,7 @@ namespace WowPacketParserModule.Substructures
 
         public static ItemInstance ReadItemInstance(Packet packet, params object[] indexes)
         {
-            if (ClientVersion.AddedInVersion(ClientVersionBuild.V2_5_1_38835) && 
+            if (ClientVersion.AddedInVersion(ClientVersionBuild.V2_5_1_38598) && 
                (ClientVersion.IsBurningCrusadeClassicClientVersionBuild(ClientVersion.Build) ||
                 ClientVersion.IsClassicSeasonOfMasteryClientVersionBuild(ClientVersion.Build)))
                 return ReadItemInstance251(packet, indexes);

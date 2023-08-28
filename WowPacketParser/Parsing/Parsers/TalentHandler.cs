@@ -68,7 +68,18 @@ namespace WowPacketParser.Parsing.Parsers
             packet.ReadByte("Unk Byte");
         }
 
-        [Parser(Opcode.SMSG_INSPECT_TALENT)]
+        [Parser(Opcode.SMSG_INSPECT_TALENT, ClientVersionBuild.Zero, ClientVersionBuild.V3_0_2_9056)]
+        public static void HandleInspectTalentTBC(Packet packet)
+        {
+            packet.ReadPackedGuid("GUID");
+            uint count = packet.ReadUInt32("TalentsCount");
+            for (uint i = 0; i < count; i++)
+            {
+                packet.ReadByte("Talents", i);
+            }
+        }
+
+        [Parser(Opcode.SMSG_INSPECT_TALENT, ClientVersionBuild.V3_0_2_9056)]
         public static void HandleInspectTalent(Packet packet)
         {
             if (ClientVersion.AddedInVersion(ClientVersionBuild.V4_0_6a_13623))

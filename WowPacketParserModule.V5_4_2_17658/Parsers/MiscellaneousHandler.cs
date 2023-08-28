@@ -49,7 +49,7 @@ namespace WowPacketParserModule.V5_4_2_17658.Parsers
             weatherUpdate.Grade = packet.ReadSingle("Grade");
             weatherUpdate.State = packet.ReadInt32E<WeatherState>("State");
 
-            weatherUpdate.UnixTimeMs = (ulong)Utilities.GetUnixTimeMsFromDateTime(packet.Time);
+            weatherUpdate.UnixTimeMs = (ulong)packet.UnixTimeMs;
             Storage.WeatherUpdates.Add(weatherUpdate, packet.TimeSpan);
         }
 

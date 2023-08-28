@@ -640,12 +640,19 @@ namespace WowPacketParser.Parsing.Parsers
                 var entry = packet.ReadInt32<ItemId>("Item Entry", i);
                 if (entry > 0)
                 {
-                    packet.ReadUInt32E<UnknownFlags>("Unk mask", i);
+                    if (ClientVersion.AddedInVersion(ClientVersionBuild.V3_3_0_10958))
+                        packet.ReadUInt32E<UnknownFlags>("Unk mask", i);
+
                     var ramdonEnchant = packet.ReadInt32("Random Item Property Id", i);
                     if (ramdonEnchant != 0)
                         packet.ReadUInt32("Item Suffix Factor", i);
-                    packet.ReadUInt32("Stack Count", i);
-                    packet.ReadUInt32("Unk Uint32 2", i); // Only seen 0
+
+                    if (ClientVersion.AddedInVersion(ClientVersionBuild.V3_0_2_9056))
+                        packet.ReadUInt32("Stack Count", i);
+                    else
+                        packet.ReadByte("Stack Count", i);
+
+                    packet.ReadUInt32("Perm Enchantment Id", i); // Only seen 0
                     packet.ReadByte("Spell Charges", i);
                     if (ClientVersion.AddedInVersion(ClientVersionBuild.V4_0_6a_13623))
                     {

@@ -2733,7 +2733,7 @@ namespace WowPacketParser.SQL.Builders
                     playerRow.Data.OffHandAttackTime = player.UnitDataOriginal.AttackRoundBaseTime[1];
                     playerRow.Data.RangedAttackTime = player.UnitDataOriginal.RangedAttackRoundBaseTime;
                     playerRow.Data.ChannelSpellId = (uint)player.UnitDataOriginal.ChannelData.SpellID;
-                    playerRow.Data.ChannelVisualId = (uint)player.UnitDataOriginal.ChannelData.SpellVisual.SpellXSpellVisualID;
+                    playerRow.Data.ChannelVisualId = (uint)player.UnitDataOriginal.ChannelData.SpellXSpellVisualID;
                     playerRow.Data.Auras = player.GetOriginalAurasString(false);
                     playerRow.Data.EquipmentCache = row.Data.EquipmentCache;
                     playerRows.Add(playerRow);

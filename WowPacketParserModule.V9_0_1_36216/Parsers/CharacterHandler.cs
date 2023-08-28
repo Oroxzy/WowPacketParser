@@ -142,10 +142,10 @@ namespace WowPacketParserModule.V9_0_1_36216.Parsers
             packet.ReadInt32("WeeklyBestRating", idx);
             packet.ReadInt32("SeasonBestRating", idx);
             packet.ReadInt32("PvpTierID", idx);
-            if (ClientVersion.AddedInVersion(ClientVersionBuild.V9_1_0_39185))
+            if (ClientVersion.AddedInVersion(9, 1, 0, 1, 14, 0, 2, 5, 2))
                 packet.ReadInt32("WeeklyBestWinPvpTierID", idx);
 
-            if (ClientVersion.AddedInVersion(ClientVersionBuild.V9_1_5_40772))
+            if (ClientVersion.AddedInVersion(9, 1, 5, 1, 14, 1, 2, 5, 3))
             {
                 packet.ReadInt32("Unused1", idx);
                 packet.ReadInt32("Unused2", idx);

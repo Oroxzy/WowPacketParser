@@ -250,8 +250,6 @@ namespace WowPacketParserModule.V2_5_1_38835.Parsers
                         for (int i = 0; i < 3; ++i)
                             bct.EmoteDelay[i] = db2File.ReadUInt16("EmoteDelay", i);
 
-                        Storage.BroadcastTexts.Add(bct, packet.TimeSpan);
-
                         if (ClientLocale.PacketLocale != LocaleConstant.enUS)
                         {
                             BroadcastTextLocale lbct = new BroadcastTextLocale
@@ -261,6 +259,10 @@ namespace WowPacketParserModule.V2_5_1_38835.Parsers
                                 Text1Lang = bct.Text1
                             };
                             Storage.BroadcastTextLocales.Add(lbct, packet.TimeSpan);
+                        }
+                        else
+                        {
+                            Storage.BroadcastTexts.Add(bct, packet.TimeSpan);
                         }
                         break;
                     }
@@ -325,7 +327,7 @@ namespace WowPacketParserModule.V2_5_1_38835.Parsers
                             bct.Flags = db2File.ReadByte("Flags");
                             bct.ChatBubbleDurationMs = db2File.ReadUInt32("ChatBubbleDurationMs");
 
-                            if (ClientVersion.AddedInVersion(2, 5, 3))
+                            if (ClientVersion.AddedInClassicVersion(1, 14, 1, 2, 5, 3))
                                 bct.VoiceOverPriorityID = db2File.ReadUInt32("VoiceOverPriorityID");
 
                             bct.SoundEntriesID = new uint?[2];
@@ -339,8 +341,6 @@ namespace WowPacketParserModule.V2_5_1_38835.Parsers
                             for (int i = 0; i < 3; ++i)
                                 bct.EmoteDelay[i] = db2File.ReadUInt16("EmoteDelay", i);
 
-                            Storage.BroadcastTexts.Add(bct, packet.TimeSpan);
-
                             if (ClientLocale.PacketLocale != LocaleConstant.enUS)
                             {
                                 BroadcastTextLocale lbct = new BroadcastTextLocale
@@ -350,6 +350,10 @@ namespace WowPacketParserModule.V2_5_1_38835.Parsers
                                     Text1Lang = bct.Text1
                                 };
                                 Storage.BroadcastTextLocales.Add(lbct, packet.TimeSpan);
+                            }
+                            else
+                            {
+                                Storage.BroadcastTexts.Add(bct, packet.TimeSpan);
                             }
                             break;
                         }

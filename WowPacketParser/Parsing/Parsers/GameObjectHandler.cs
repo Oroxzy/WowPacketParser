@@ -78,15 +78,30 @@ namespace WowPacketParser.Parsing.Parsers
 
             packet.AddSniffData(StoreNameType.GameObject, entry.Key, "QUERY_RESPONSE");
 
-            Storage.GameObjectTemplates.Add(gameObject, packet.TimeSpan);
-
-            ObjectName objectName = new ObjectName
+            if (ClientLocale.PacketLocale != LocaleConstant.enUS)
             {
-                ObjectType = StoreNameType.GameObject,
-                ID = entry.Key,
-                Name = gameObject.Name
-            };
-            Storage.ObjectNames.Add(objectName, packet.TimeSpan);
+                GameObjectTemplateLocale localesGameObject = new GameObjectTemplateLocale
+                {
+                    ID = (uint)entry.Key,
+                    Name = gameObject.Name,
+                    CastBarCaption = gameObject.CastCaption,
+                    Unk1 = gameObject.UnkString,
+                };
+
+                Storage.LocalesGameObjects.Add(localesGameObject, packet.TimeSpan);
+            }
+            else
+            {
+                Storage.GameObjectTemplates.Add(gameObject, packet.TimeSpan);
+
+                ObjectName objectName = new ObjectName
+                {
+                    ObjectType = StoreNameType.GameObject,
+                    ID = entry.Key,
+                    Name = gameObject.Name
+                };
+                Storage.ObjectNames.Add(objectName, packet.TimeSpan);
+            }
         }
 
         [Parser(Opcode.SMSG_DESTRUCTIBLE_BUILDING_DAMAGE)]
@@ -128,7 +143,7 @@ namespace WowPacketParser.Parsing.Parsers
             WowGuid guid = packet.ReadGuid("GUID");
             GameObjectCustomAnim animData = new GameObjectCustomAnim();
             animData.AnimId = packet.ReadInt32("Anim");
-            animData.UnixTimeMs = (ulong)Utilities.GetUnixTimeMsFromDateTime(packet.Time);
+            animData.UnixTimeMs = (ulong)packet.UnixTimeMs;
             Storage.StoreGameObjectCustomAnim(guid, animData, packet.SniffId);
             packet.AddSniffData(StoreNameType.GameObject, (int)guid.GetEntry(), "CUSTOM_ANIM");
         }

@@ -230,11 +230,15 @@ namespace WowPacketParser.Misc
             public static readonly bool creature_unique_faction = Conf.GetBoolean("creature_unique_faction", false);
             public static readonly bool creature_unique_gossip = Conf.GetBoolean("creature_unique_gossip", false);
             public static readonly bool creature_unique_text = Conf.GetBoolean("creature_unique_text", false);
+            public static readonly bool creature_visibility_distance = Conf.GetBoolean("creature_visibility_distance", false);
             public static readonly bool gameobject_addon = Conf.GetBoolean("gameobject_addon", false);
             public static readonly bool gameobject_loot = Conf.GetBoolean("gameobject_loot", false);
+            public static readonly bool gameobject_respawn_time = Conf.GetBoolean("gameobject_respawn_time", false);
             public static readonly bool gameobject_template = Conf.GetBoolean("gameobject_template", false);
             public static readonly bool gameobject_template_addon = Conf.GetBoolean("gameobject_template_addon", false);
+            public static readonly bool gameobject_template_locale = Conf.GetBoolean("gameobject_template_locale", false);
             public static readonly bool gameobject_unique_anim = Conf.GetBoolean("gameobject_unique_anim", false);
+            public static readonly bool gameobject_visibility_distance = Conf.GetBoolean("gameobject_visibility_distance", false);
             public static readonly bool gossip_menu = Conf.GetBoolean("gossip_menu", false);
             public static readonly bool gossip_menu_option = Conf.GetBoolean("gossip_menu_option", false);
             public static readonly bool item_loot = Conf.GetBoolean("item_loot", false);
@@ -260,6 +264,7 @@ namespace WowPacketParser.Misc
             public static readonly bool player_levelstats = Conf.GetBoolean("player_levelstats", false);
             public static readonly bool player_levelup_info = Conf.GetBoolean("player_levelup_info", false);
             public static readonly bool points_of_interest = Conf.GetBoolean("points_of_interest", false);
+            public static readonly bool points_of_interest_locale = Conf.GetBoolean("points_of_interest_locale", false);
             public static readonly bool quest_ender = Conf.GetBoolean("quest_ender", false); 
             public static readonly bool quest_poi = Conf.GetBoolean("quest_poi", false);
             public static readonly bool quest_poi_points = Conf.GetBoolean("quest_poi_points", false);
@@ -273,6 +278,7 @@ namespace WowPacketParser.Misc
             public static readonly bool spell_target_position = Conf.GetBoolean("spell_target_position", false);
             public static readonly bool spell_unique_caster = Conf.GetBoolean("spell_unique_caster", false);
             public static readonly bool trainer = Conf.GetBoolean("trainer", false);
+            public static readonly bool trainer_locale = Conf.GetBoolean("trainer_locale", false);
             public static readonly bool vehicle_template_accessory = Conf.GetBoolean("vehicle_template_accessory", false);
             
             public static readonly bool hotfix_data = Conf.GetBoolean("hotfix_data", false);

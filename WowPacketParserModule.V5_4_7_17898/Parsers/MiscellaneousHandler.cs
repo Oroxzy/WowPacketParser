@@ -21,7 +21,7 @@ namespace WowPacketParserModule.V5_4_7_17898.Parsers
             weatherUpdate.State = packet.ReadInt32E<WeatherState>("State");
             weatherUpdate.Instant = packet.ReadBit("Instant");
 
-            weatherUpdate.UnixTimeMs = (ulong)Utilities.GetUnixTimeMsFromDateTime(packet.Time);
+            weatherUpdate.UnixTimeMs = (ulong)packet.UnixTimeMs;
             Storage.WeatherUpdates.Add(weatherUpdate, packet.TimeSpan);
         }
 

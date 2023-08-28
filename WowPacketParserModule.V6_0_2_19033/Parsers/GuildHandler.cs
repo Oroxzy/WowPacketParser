@@ -204,7 +204,7 @@ namespace WowPacketParserModule.V6_0_2_19033.Parsers
         [Parser(Opcode.SMSG_GUILD_EVENT_PRESENCE_CHANGE)]
         public static void HandleGuildEventPresenceChange(Packet packet)
         {
-            packet.ReadPackedGuid128("Guid");
+            WowGuid guid =  packet.ReadPackedGuid128("Guid");
             packet.ReadInt32("VirtualRealmAddress");
 
             packet.ResetBitReader();
@@ -212,7 +212,9 @@ namespace WowPacketParserModule.V6_0_2_19033.Parsers
             packet.ReadBit("LoggedOn");
             packet.ReadBit("Mobile");
 
-            packet.ReadWoWString("Name", bits38);
+            string name = packet.ReadWoWString("Name", bits38);
+
+            StoreGetters.AddName(guid, name);
         }
 
         [Parser(Opcode.SMSG_GUILD_KNOWN_RECIPES)]

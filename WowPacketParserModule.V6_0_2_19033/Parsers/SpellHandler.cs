@@ -860,9 +860,9 @@ namespace WowPacketParserModule.V6_0_2_19033.Parsers
                 CreaturePetCooldown petCooldown = new CreaturePetCooldown();
                 petCooldown.SpellID = (uint)packet.ReadInt32("SrecID", i);
                 petCooldown.Cooldown = (uint)packet.ReadInt32("ForcedCooldown", i);
-                if (casterGuid.GetObjectType() == ObjectType.Unit)
+                if (casterGuid.GetHighType() == HighGuidType.Creature)
                 {
-                    petCooldown.CasterID = casterGuid.GetEntry();
+                    petCooldown.CasterID = Storage.GetCurrentObjectEntry(casterGuid);
                     petCooldown.Flags = flags;
                     petCooldown.Index = (byte)i;
                     petCooldown.ModRate = 1;

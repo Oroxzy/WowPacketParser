@@ -7,6 +7,7 @@ using CoreOpcode = WowPacketParser.Enums.Version.Opcodes;
 using MovementFlag = WowPacketParser.Enums.v4.MovementFlag;
 using MovementFlag2 = WowPacketParser.Enums.v4.MovementFlag2;
 using WowPacketParser.Store;
+using WowPacketParser.Store.Objects;
 
 namespace WowPacketParserModule.V5_4_8_18291.Parsers
 {
@@ -541,6 +542,17 @@ namespace WowPacketParserModule.V5_4_8_18291.Parsers
             pos.Y = packet.ReadSingle();
             pos.Z = packet.ReadSingle();
             pos.O = packet.ReadSingle();
+
+            if (Storage.CurrentActivePlayer != null &&
+               !Storage.CurrentActivePlayer.IsEmpty() &&
+                Storage.Objects.ContainsKey(Storage.CurrentActivePlayer))
+            {
+                WoWObject player = Storage.Objects[Storage.CurrentActivePlayer].Item1;
+                player.Movement.Position.X = pos.X;
+                player.Movement.Position.Y = pos.Y;
+                player.Movement.Position.Z = pos.Z;
+                player.Movement.Orientation = pos.O;
+            }
 
             Storage.ClearDataOnMapChange();
             packet.AddValue("Position", pos);

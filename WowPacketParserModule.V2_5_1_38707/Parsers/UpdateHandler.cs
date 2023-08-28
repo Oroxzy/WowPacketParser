@@ -6,6 +6,8 @@ using WowPacketParser.Misc;
 using WowPacketParser.Parsing;
 using WowPacketParser.Store;
 using WowPacketParser.Store.Objects;
+using WowPacketParser.Store.Objects.UpdateFields;
+using CoreFields = WowPacketParser.Enums.Version;
 using WowPacketParserModule.V7_0_3_22248.Parsers;
 using CoreParsers = WowPacketParser.Parsing.Parsers;
 using MovementFlag = WowPacketParser.Enums.v4.MovementFlag;
@@ -20,12 +22,6 @@ namespace WowPacketParserModule.V2_5_1_38707.Parsers
         [Parser(Opcode.SMSG_UPDATE_OBJECT)]
         public static void HandleUpdateObject(Packet packet)
         {
-            if (ClientVersion.IsUsingNewUpdateFieldSystem())
-            {
-                WowPacketParserModule.V8_0_1_27101.Parsers.UpdateHandler.HandleUpdateObject(packet);
-                return;
-            }
-
             var count = packet.ReadUInt32("NumObjUpdates");
             uint map = packet.ReadUInt16<MapId>("MapID");
             packet.ResetBitReader();
@@ -40,6 +36,9 @@ namespace WowPacketParserModule.V2_5_1_38707.Parsers
                 {
                     WowGuid guid = packet.ReadPackedGuid128("ObjectGUID", "Destroyed", i);
                     Storage.StoreObjectDestroyTime(guid, packet.Time);
+
+                    if (guid.GetHighType() == HighGuidType.GameObject)
+                        Storage.StoreGameObjectDespawnTime(guid, packet.Time);
                 }
                 for (var i = 0; i < outOfRangeObjCount; i++)
                 {
@@ -60,7 +59,112 @@ namespace WowPacketParserModule.V2_5_1_38707.Parsers
                     case "Values":
                     {
                         var guid = packet.ReadPackedGuid128("Object Guid", i);
-                        CoreParsers.UpdateHandler.ReadValuesUpdateBlock(packet, guid, i);
+                        if (ClientVersion.IsUsingNewUpdateFieldSystem())
+                        {
+                            var updatefieldSize = packet.ReadUInt32();
+                            var handler = CoreFields.UpdateFields.GetHandler();
+                            using (var fieldsData = new Packet(packet.ReadBytes((int)updatefieldSize), packet.Opcode, packet.Time, packet.Direction, packet.Number, packet.Writer, packet.FileName))
+                            {
+                                if (handler == null)
+                                {
+                                    packet.WriteLine("[{0}] Error: No update field handler for current build.", i);
+                                    continue;
+                                }
+
+                                WoWObject obj;
+                                Storage.Objects.TryGetValue(guid, out obj);
+
+                                IObjectData oldObjectData = null;
+                                IGameObjectData oldGameObjectData = null;
+                                IUnitData oldUnitData = null;
+                                IPlayerData oldPlayerData = null;
+                                IActivePlayerData oldActivePlayerData = null;
+
+                                var updateTypeFlag = fieldsData.ReadUInt32();
+                                if ((updateTypeFlag & 0x0001) != 0)
+                                {
+                                    if (obj != null && obj.ObjectData != null)
+                                        oldObjectData = obj.ObjectData.Clone();
+                                    var data = handler.ReadUpdateObjectData(fieldsData, obj?.ObjectData, i);
+                                    if (obj != null)
+                                        obj.ObjectData = data;
+                                }
+                                if ((updateTypeFlag & 0x0002) != 0)
+                                    handler.ReadUpdateItemData(fieldsData, null, i);
+                                if ((updateTypeFlag & 0x0004) != 0)
+                                    handler.ReadUpdateContainerData(fieldsData, null, i);
+                                if ((updateTypeFlag & 0x0008) != 0)
+                                    handler.ReadUpdateAzeriteEmpoweredItemData(fieldsData, null, i);
+                                if ((updateTypeFlag & 0x0010) != 0)
+                                    handler.ReadUpdateAzeriteItemData(fieldsData, null, i);
+                                if ((updateTypeFlag & 0x0020) != 0)
+                                {
+                                    var unit = obj as Unit;
+                                    if (unit != null && unit.UnitData != null)
+                                        oldUnitData = unit.UnitData.Clone();
+                                    var data = handler.ReadUpdateUnitData(fieldsData, unit?.UnitData, i);
+                                    if (unit != null)
+                                        unit.UnitData = data;
+                                }
+                                if ((updateTypeFlag & 0x0040) != 0)
+                                {
+                                    var player = obj as Player;
+                                    if (player != null && player.PlayerData != null)
+                                        oldPlayerData = player.PlayerData.Clone();
+                                    var data = handler.ReadUpdatePlayerData(fieldsData, player?.PlayerData, i);
+                                    if (player != null)
+                                        player.PlayerData = data;
+                                }
+                                if ((updateTypeFlag & 0x0080) != 0)
+                                {
+                                    var player = obj as Player;
+                                    if (player != null && player.ActivePlayerData != null)
+                                        oldActivePlayerData = player.ActivePlayerData.Clone();
+                                    var data = handler.ReadUpdateActivePlayerData(fieldsData, player?.ActivePlayerData, i);
+                                    if (player != null)
+                                        player.ActivePlayerData = data;
+                                }
+                                if ((updateTypeFlag & 0x0100) != 0)
+                                {
+                                    var go = obj as GameObject;
+                                    if (go != null && go.GameObjectData != null)
+                                        oldGameObjectData = go.GameObjectData.Clone();
+                                    var data = handler.ReadUpdateGameObjectData(fieldsData, go?.GameObjectData, i);
+                                    if (go != null)
+                                        go.GameObjectData = data;
+                                }
+                                if ((updateTypeFlag & 0x0200) != 0)
+                                {
+                                    DynamicObject dynobj = obj as DynamicObject;
+                                    var data = handler.ReadUpdateDynamicObjectData(fieldsData, dynobj?.DynamicObjectData, i);
+                                    if (dynobj != null)
+                                        dynobj.DynamicObjectData = data;
+                                }
+                                if ((updateTypeFlag & 0x0400) != 0)
+                                    handler.ReadUpdateCorpseData(fieldsData, null, i);
+                                if ((updateTypeFlag & 0x0800) != 0)
+                                    handler.ReadUpdateAreaTriggerData(fieldsData, null, i);
+                                if ((updateTypeFlag & 0x1000) != 0)
+                                    handler.ReadUpdateSceneObjectData(fieldsData, null, i);
+                                if ((updateTypeFlag & 0x2000) != 0)
+                                {
+                                    var conversation = obj as ConversationTemplate;
+                                    var data = handler.ReadUpdateConversationData(fieldsData, conversation?.ConversationData, i);
+                                    if (conversation != null)
+                                        conversation.ConversationData = data;
+                                }
+
+                                if (obj != null)
+                                {
+                                    V8_0_1_27101.Parsers.UpdateHandler.StoreObjectUpdate(packet, guid, obj, oldObjectData, oldGameObjectData, oldUnitData, oldPlayerData, oldActivePlayerData, false);
+
+                                    if (guid.GetObjectType() == ObjectType.Unit)
+                                        Storage.StoreCreatureStats(obj as Unit, null, guid.GetHighType() == HighGuidType.Pet, packet);
+                                }
+                            }
+                        }
+                        else
+                            CoreParsers.UpdateHandler.ReadValuesUpdateBlock(packet, guid, i);
                         break;
                     }
                     case "CreateObject1":
@@ -81,35 +185,188 @@ namespace WowPacketParserModule.V2_5_1_38707.Parsers
 
         private static void ReadCreateObjectBlock(Packet packet, WowGuid guid, uint map, object index, ObjectCreateType type)
         {
-            ObjectType objType = ObjectTypeConverter.Convert(packet.ReadByteE<ObjectTypeBCC>("Object Type", index));
-            packet.ReadInt32("HeirFlags", index);
+            ObjectType objType;
+            if (!ClientVersion.IsUsingNewUpdateFieldSystem())
+            {
+                objType = ObjectTypeConverter.Convert(packet.ReadByteE<ObjectTypeBCC>("Object Type", index));
+                packet.ReadInt32("HeirFlags", index);
+            }
+            else
+                objType = ObjectTypeConverter.Convert(packet.ReadByteE<ObjectType801>("Object Type", index));
 
             WoWObject obj;
-            if (Storage.Objects.ContainsKey(guid))
+            bool isExistingObject = Storage.Objects.ContainsKey(guid);
+            if (isExistingObject)
                 obj = Storage.Objects[guid].Item1;
             else
                 obj = CoreParsers.UpdateHandler.CreateObject(objType, map);
 
-            var moves = ReadMovementUpdateBlock(packet, guid, obj, index);
-            Storage.StoreObjectCreateTime(guid, map, moves, packet.Time, type);
-
             BitArray updateMaskArray = null;
-            var updates = CoreParsers.UpdateHandler.ReadValuesUpdateBlockOnCreate(packet, objType, index, out updateMaskArray);
-            var dynamicUpdates = CoreParsers.UpdateHandler.ReadDynamicValuesUpdateBlockOnCreate(packet, objType, index);
+            var moves = ReadMovementUpdateBlock(packet, guid, obj, index);
+            Storage.StoreObjectCreateTime(guid, map, moves, packet, type);
 
-            // If this is the second time we see the same object (same guid,
-            // same position) update its phasemask
-            if (Storage.Objects.ContainsKey(guid))
+            if (ClientVersion.IsUsingNewUpdateFieldSystem())
             {
-                CoreParsers.UpdateHandler.ProcessExistingObject(ref obj, guid, packet, updateMaskArray, updates, dynamicUpdates, moves);
+                var updatefieldSize = packet.ReadUInt32();
+                var handler = CoreFields.UpdateFields.GetHandler();
+                using (var fieldsData = new Packet(packet.ReadBytes((int)updatefieldSize), packet.Opcode, packet.Time, packet.Direction, packet.Number, packet.Writer, packet.FileName))
+                {
+                    if (handler == null)
+                    {
+                        packet.WriteLine("[{0}] Error: No update field handler for current build.", index);
+                        return;
+                    }
+
+                    var flags = fieldsData.ReadByteE<UpdateFieldFlag>("FieldFlags", index);
+
+                    IObjectData oldObjectData = null;
+                    IGameObjectData oldGameObjectData = null;
+                    IUnitData oldUnitData = null;
+                    IPlayerData oldPlayerData = null;
+                    IActivePlayerData oldActivePlayerData = null;
+
+                    if (isExistingObject)
+                        oldObjectData = obj.ObjectData.Clone();
+
+                    obj.ObjectData = handler.ReadCreateObjectData(fieldsData, flags, index);
+
+                    if (!isExistingObject)
+                        obj.ObjectDataOriginal = obj.ObjectData.Clone();
+
+                    switch (objType)
+                    {
+                        case ObjectType.Item:
+                            handler.ReadCreateItemData(fieldsData, flags, index);
+                            break;
+                        case ObjectType.Container:
+                            handler.ReadCreateItemData(fieldsData, flags, index);
+                            handler.ReadCreateContainerData(fieldsData, flags, index);
+                            break;
+                        case ObjectType.AzeriteEmpoweredItem:
+                            handler.ReadCreateItemData(fieldsData, flags, index);
+                            handler.ReadCreateAzeriteEmpoweredItemData(fieldsData, flags, index);
+                            break;
+                        case ObjectType.AzeriteItem:
+                            handler.ReadCreateItemData(fieldsData, flags, index);
+                            handler.ReadCreateAzeriteItemData(fieldsData, flags, index);
+                            break;
+                        case ObjectType.Unit:
+                            if (isExistingObject && (obj as Unit).UnitData != null)
+                                oldUnitData = (obj as Unit).UnitData.Clone(); ;
+                            (obj as Unit).UnitData = handler.ReadCreateUnitData(fieldsData, flags, index);
+                            if (!isExistingObject)
+                                (obj as Unit).UnitDataOriginal = (obj as Unit).UnitData.Clone();
+                            break;
+                        case ObjectType.Player:
+                            if (isExistingObject && (obj as Unit).UnitData != null)
+                                oldUnitData = (obj as Unit).UnitData.Clone(); ;
+                            (obj as Unit).UnitData = handler.ReadCreateUnitData(fieldsData, flags, index);
+                            if (!isExistingObject)
+                                (obj as Unit).UnitDataOriginal = (obj as Unit).UnitData.Clone();
+
+                            if (isExistingObject && (obj as Player).PlayerData != null)
+                                oldPlayerData = (obj as Player).PlayerData.Clone(); ;
+                            (obj as Player).PlayerData = handler.ReadCreatePlayerData(fieldsData, flags, index);
+                            if (!isExistingObject)
+                                (obj as Player).PlayerDataOriginal = (obj as Player).PlayerData.Clone();
+                            break;
+                        case ObjectType.ActivePlayer:
+                            if (isExistingObject && (obj as Unit).UnitData != null)
+                                oldUnitData = (obj as Unit).UnitData.Clone(); ;
+                            (obj as Unit).UnitData = handler.ReadCreateUnitData(fieldsData, flags, index);
+                            if (!isExistingObject)
+                                (obj as Unit).UnitDataOriginal = (obj as Unit).UnitData.Clone();
+
+                            if (isExistingObject && (obj as Player).PlayerData != null)
+                                oldPlayerData = (obj as Player).PlayerData.Clone(); ;
+                            (obj as Player).PlayerData = handler.ReadCreatePlayerData(fieldsData, flags, index);
+                            if (!isExistingObject)
+                                (obj as Player).PlayerDataOriginal = (obj as Player).PlayerData.Clone();
+
+                            if (isExistingObject && (obj as Player).ActivePlayerData != null)
+                                oldActivePlayerData = (obj as Player).ActivePlayerData.Clone(); ;
+                            (obj as Player).ActivePlayerData = handler.ReadCreateActivePlayerData(fieldsData, flags, index);
+                            if (!isExistingObject)
+                                (obj as Player).ActivePlayerDataOriginal = (obj as Player).ActivePlayerData;
+                            break;
+                        case ObjectType.GameObject:
+                            if (isExistingObject && (obj as GameObject).GameObjectData != null)
+                                oldGameObjectData = (obj as GameObject).GameObjectData.Clone();
+                            (obj as GameObject).GameObjectData = handler.ReadCreateGameObjectData(fieldsData, flags, index);
+                            if (!isExistingObject)
+                                (obj as GameObject).GameObjectDataOriginal = (obj as GameObject).GameObjectData.Clone();
+                            break;
+                        case ObjectType.DynamicObject:
+                            (obj as DynamicObject).DynamicObjectData = handler.ReadCreateDynamicObjectData(fieldsData, flags, index);
+                            if (!isExistingObject)
+                                (obj as DynamicObject).DynamicObjectDataOriginal = (obj as DynamicObject).DynamicObjectData;
+                            break;
+                        case ObjectType.Corpse:
+                            handler.ReadCreateCorpseData(fieldsData, flags, index);
+                            break;
+                        case ObjectType.AreaTrigger:
+                            (obj as AreaTriggerCreateProperties).AreaTriggerData = handler.ReadCreateAreaTriggerData(fieldsData, flags, index);
+                            break;
+                        case ObjectType.SceneObject:
+                            (obj as SceneObject).SceneObjectData = handler.ReadCreateSceneObjectData(fieldsData, flags, index);
+                            break;
+                        case ObjectType.Conversation:
+                            (obj as ConversationTemplate).ConversationData = handler.ReadCreateConversationData(fieldsData, flags, index);
+                            break;
+                    }
+
+                    if (isExistingObject)
+                        V8_0_1_27101.Parsers.UpdateHandler.StoreObjectUpdate(packet, guid, obj, oldObjectData, oldGameObjectData, oldUnitData, oldPlayerData, oldActivePlayerData, true);
+
+                    if (objType == ObjectType.Unit)
+                        Storage.StoreCreatureStats(obj as Unit, null, guid.GetHighType() == HighGuidType.Pet, packet);
+                }
+
+                obj.Movement = moves;
+
+                // If this is the second time we see the same object (same guid,
+                // same position) update its phasemask
+                if (isExistingObject)
+                    CoreParsers.UpdateHandler.ProcessExistingObject(ref obj, guid, packet, updateMaskArray, obj.UpdateFields, obj.DynamicUpdateFields, moves); // can't do "ref Storage.Objects[guid].Item1 directly
+                else
+                {
+                    Storage.StoreNewObject(guid, obj, type, packet);
+
+                    // Only needed for pets.
+                    if (guid.GetHighType() == HighGuidType.Pet)
+                        Storage.StoreCreatureStats(obj as Unit, updateMaskArray, guid.GetHighType() == HighGuidType.Pet, packet);
+                    else if (objType == ObjectType.ActivePlayer)
+                    {
+                        Storage.SavePlayerMeleeCrit(obj, packet.SniffId);
+                        Storage.SavePlayerRangedCrit(obj, packet.SniffId);
+                        Storage.SavePlayerSpellCrit(obj, packet.SniffId);
+                        Storage.SavePlayerDodge(obj, packet.SniffId);
+                    }
+                }
             }
             else
             {
-                obj.Movement = moves;
-                obj.UpdateFields = updates;
-                obj.DynamicUpdateFields = dynamicUpdates;
-                Storage.StoreNewObject(guid, obj, type, packet);
-            }  
+                var updates = CoreParsers.UpdateHandler.ReadValuesUpdateBlockOnCreate(packet, objType, index, out updateMaskArray);
+                var dynamicUpdates = CoreParsers.UpdateHandler.ReadDynamicValuesUpdateBlockOnCreate(packet, objType, index);
+
+                // If this is the second time we see the same object (same guid,
+                // same position) update its phasemask
+                if (isExistingObject)
+                {
+                    CoreParsers.UpdateHandler.ProcessExistingObject(ref obj, guid, packet, updateMaskArray, updates, dynamicUpdates, moves);
+                }
+                else
+                {
+                    obj.Movement = moves;
+                    obj.UpdateFields = updates;
+                    obj.DynamicUpdateFields = dynamicUpdates;
+                    Storage.StoreNewObject(guid, obj, type, packet);
+
+                    // Only needed for pets.
+                    if (guid.GetHighType() == HighGuidType.Pet)
+                        Storage.StoreCreatureStats(obj as Unit, updateMaskArray, guid.GetHighType() == HighGuidType.Pet, packet);
+                }
+            }
 
             if (guid.HasEntry() && (objType == ObjectType.Unit || objType == ObjectType.GameObject))
                 packet.AddSniffData(Utilities.ObjectTypeToStore(objType), (int)guid.GetEntry(), "SPAWN");
@@ -334,6 +591,9 @@ namespace WowPacketParserModule.V2_5_1_38707.Parsers
                                 packet.ReadInt32("Unknown4", index, "Unknown901", i);
                             }
                         }
+
+                        if (guid == Storage.CurrentActivePlayer)
+                            Storage.CurrentMoveSplineExpireTime = packet.UnixTimeMs + (long)monsterMove.MoveTime;
 
                         if (pointsCount > 0 && (Settings.SaveTransports || (moveInfo.TransportGuid == null || moveInfo.TransportGuid.IsEmpty())))
                         {

@@ -27,7 +27,7 @@ namespace WowPacketParserModule.V9_0_1_36216.Parsers
             }
         }
 
-        [Parser(Opcode.CMSG_QUERY_PLAYER_NAME, ClientVersionBuild.V9_2_0_42423)]
+        [Parser(Opcode.CMSG_QUERY_PLAYER_NAMES)]
         public static void HandleNameQuery(Packet packet)
         {
             var count = packet.ReadUInt32();
@@ -35,7 +35,7 @@ namespace WowPacketParserModule.V9_0_1_36216.Parsers
                 packet.ReadPackedGuid128("Players", i);
         }
 
-        [Parser(Opcode.SMSG_QUERY_PLAYER_NAME_RESPONSE, ClientVersionBuild.V9_2_0_42423)]
+        [Parser(Opcode.SMSG_QUERY_PLAYER_NAMES_RESPONSE)]
         public static void HandleNameQueryResponse(Packet packet)
         {
             var count = packet.ReadUInt32("Count");

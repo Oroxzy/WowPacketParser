@@ -11,14 +11,14 @@ namespace WowPacketParser.SQL
         private StreamWriter _file;
 
         private readonly string _fileName;
+        private readonly string _header;
 
-        private readonly List<string> _sqls = new List<string>();
-
-        public SQLFile(string file)
+        public SQLFile(string file, string header)
         {
             if (string.IsNullOrWhiteSpace(Settings.SQLFileName)) // only delete file if no global
                 File.Delete(file);                               // file name was specified
             _fileName = file;
+            _header = header;
         }
 
         ~SQLFile()
@@ -31,22 +31,18 @@ namespace WowPacketParser.SQL
             if (string.IsNullOrWhiteSpace(sql))
                 return;
 
-            _sqls.Add(sql);
+            if (_file == null)
+            {
+                _file = new StreamWriter(_fileName, true);
+                _file.WriteLine(_header);
+            }
+
+            _file.WriteLine(sql);
         }
 
-        public bool WriteToFile(string header)
+        public bool AnythingWritten()
         {
-            if (_sqls.All(String.IsNullOrWhiteSpace))
-                return false;
-
-            _file = new StreamWriter(_fileName, true);
-
-            _file.WriteLine(header);
-
-            foreach (var sql in _sqls)
-                _file.WriteLine(sql);
-
-            return true;
+            return _file != null;
         }
 
         public void Dispose()
@@ -57,9 +53,6 @@ namespace WowPacketParser.SQL
 
         private void Dispose(bool disposing)
         {
-            if (disposing)
-                _sqls.Clear();
-
             if (_file != null)
             {
                 _file.Flush();

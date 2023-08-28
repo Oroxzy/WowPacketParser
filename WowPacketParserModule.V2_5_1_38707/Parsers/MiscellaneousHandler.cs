@@ -6,7 +6,7 @@ namespace WowPacketParserModule.V2_5_1_38707.Parsers
 {
     public static class MiscellaneousHandler
     {
-        [Parser(Opcode.SMSG_UNK_DEBUG1)]
+        [Parser(Opcode.SMSG_UNK_SPELL_DEBUG1)]
         public static void HandleUnkDebug1(Packet packet)
         {
             packet.ReadPackedGuid128("Guid1");

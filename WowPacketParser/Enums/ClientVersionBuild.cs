@@ -6,6 +6,7 @@ namespace WowPacketParser.Enums
         Zero = 0,
 
         V1_9_4_5086 = 5086,
+        V1_10_2_5302 = 5302,
         V1_12_1_5875 = 5875,
 
         V2_0_1_6180 = 6180,
@@ -492,10 +493,23 @@ namespace WowPacketParser.Enums
         V1_14_3_43037 = 43037, // ptr
         V1_14_3_43086 = 43086, // ptr
         V1_14_3_43154 = 43154, // both live and ptr
+        V1_14_3_43401 = 43401, // both live and ptr
+        V1_14_3_43639 = 43639, // both live and ptr
+        V1_14_3_44016 = 44016, // both live and ptr
+        V1_14_3_44170 = 44170, // both live and ptr
+        V1_14_3_44403 = 44403, // both live and ptr
+        V1_14_3_44834 = 44834, // both live and ptr
+        V1_14_3_45437 = 45437, // both live and ptr
+        V1_14_3_46575 = 46575, // both live and ptr
+        V1_14_3_47658 = 47658, // live
+        V1_14_3_48611 = 48611, // live
+        V1_14_3_49229 = 49229, // live
+        V1_14_3_49821 = 49821, // live
 
         // TBC Classic
         V2_5_1_38598 = 38598, // ptr
         V2_5_1_38644 = 38644,
+        V2_5_1_38677 = 38677,
         V2_5_1_38707 = 38707, // pre patch
         V2_5_1_38741 = 38741,
         V2_5_1_38757 = 38757,
@@ -510,6 +524,7 @@ namespace WowPacketParser.Enums
 
         V2_5_2_39570 = 39570, // ptr
         V2_5_2_39618 = 39618, // ptr
+        V2_5_2_39801 = 39801, // ptr
         V2_5_2_39926 = 39926, // ptr
         V2_5_2_40011 = 40011, // both live and ptr
         V2_5_2_40045 = 40045, // live
@@ -539,6 +554,44 @@ namespace WowPacketParser.Enums
         V2_5_4_42873 = 42873, // both live and ptr
         V2_5_4_42917 = 42917, // live
         V2_5_4_42940 = 42940, // both live and ptr
+        V2_5_4_43400 = 43400, // both live and ptr
+        V2_5_4_43638 = 43638, // both live and ptr
+        V2_5_4_43861 = 43861, // both live and ptr
+        V2_5_4_44036 = 44036, // both live and ptr
+        V2_5_4_44171 = 44171, // both live and ptr
+        V2_5_4_44400 = 44400, // both live and ptr
+        V2_5_4_44833 = 44833, // both live and ptr
+
+        // WotLK Classic
+        V3_4_0_43659 = 43659, // beta
+        V3_4_0_43682 = 43682, // beta
+        V3_4_0_43746 = 43746, // beta
+        V3_4_0_43788 = 43788, // beta
+        V3_4_0_43866 = 43866, // beta
+        V3_4_0_43881 = 43881, // submission
+        V3_4_0_43929 = 43929, // submission
+        V3_4_0_43955 = 43955, // beta
+        V3_4_0_44064 = 44064, // beta
+        V3_4_0_44184 = 44184, // beta
+        V3_4_0_44250 = 44250, // beta
+        V3_4_0_44301 = 44301, // beta
+        V3_4_0_44369 = 44369, // beta
+        V3_4_0_44463 = 44463, // beta
+        V3_4_0_44547 = 44547, // beta
+        V3_4_0_44644 = 44644, // beta
+        V3_4_0_44701 = 44701, // submission
+        V3_4_0_44729 = 44729, // beta
+        V3_4_0_44832 = 44832, // beta
+        V3_4_0_44925 = 44925, // submission
+        V3_4_0_44930 = 44930, // beta and ptr
+        V3_4_0_44996 = 44996, // submission
+        V3_4_0_45043 = 45043, // beta and ptr
+        V3_4_0_45064 = 45064, // submission
+        V3_4_0_45102 = 45102, // submission
+
+        V3_4_1_47014 = 47014, // ptr
+        V3_4_1_47720 = 47720, // live and ptr
+        V3_4_1_48632 = 48632, // live and ptr
 
         // Battle.net - should probably not mix this but oh well
         BattleNetV37165 = 37165,

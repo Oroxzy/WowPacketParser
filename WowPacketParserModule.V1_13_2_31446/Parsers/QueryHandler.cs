@@ -90,36 +90,21 @@ namespace WowPacketParserModule.V1_13_2_31446.Parsers
             creature.DisplayTotalCount = packet.ReadUInt32("DisplayIdCount");
             creature.DisplayTotalProbability = packet.ReadSingle("TotalProbability");
 
-            creature.DisplayIDs = new uint?[4];
-            for (uint i = 0; i < 4; ++i)
-                creature.DisplayIDs[i] = 0;
+            creature.DisplayIDs = new uint[4];
+            creature.DisplayScale = new float[4];
+            creature.DisplayProbability = new float[4];
+
             for (uint i = 0; i < creature.DisplayTotalCount; ++i)
             {
-                if (i == 0)
-                {
-                    creature.DisplayIDs[i] = (uint)packet.ReadInt32("DisplayId1", i);
-                    creature.DisplayScale1 = packet.ReadSingle("DisplayScale1", i);
-                    creature.DisplayProbability1 = packet.ReadSingle("DisplayProbability1", i);
-                }
-                if (i == 1)
-                {
-                    creature.DisplayIDs[i] = (uint)packet.ReadInt32("DisplayId2", i);
-                    creature.DisplayScale2 = packet.ReadSingle("DisplayScale2", i);
-                    creature.DisplayProbability2 = packet.ReadSingle("DisplayProbability2", i);
-                }
+                uint displayId = (uint)packet.ReadInt32("DisplayId", i);
+                float displayScale = packet.ReadSingle("DisplayScale", i);
+                float displayProbability = packet.ReadSingle("DisplayProbability", i);
 
-                if (i == 2)
+                if (i < 4)
                 {
-                    creature.DisplayIDs[i] = (uint)packet.ReadInt32("DisplayId3", i);
-                    creature.DisplayScale3 = packet.ReadSingle("DisplayScale3", i);
-                    creature.DisplayProbability3 = packet.ReadSingle("DisplayProbability3", i);
-                }
-
-                if (i == 3)
-                {
-                    creature.DisplayIDs[i] = (uint)packet.ReadInt32("DisplayId4", i);
-                    creature.DisplayScale4 = packet.ReadSingle("DisplayScale4", i);
-                    creature.DisplayProbability4 = packet.ReadSingle("DisplayProbability4", i);
+                    creature.DisplayIDs[i] = displayId;
+                    creature.DisplayScale[i] = displayScale;
+                    creature.DisplayProbability[i] = displayProbability;
                 }
             }
 
@@ -155,8 +140,6 @@ namespace WowPacketParserModule.V1_13_2_31446.Parsers
 
             packet.AddSniffData(StoreNameType.Unit, entry.Key, "QUERY_RESPONSE");
 
-            Storage.CreatureTemplates.Add(creature, packet.TimeSpan);
-
             if (ClientLocale.PacketLocale != LocaleConstant.enUS)
             {
                 CreatureTemplateLocale localesCreature = new CreatureTemplateLocale
@@ -169,14 +152,18 @@ namespace WowPacketParserModule.V1_13_2_31446.Parsers
                 };
                 Storage.LocalesCreatures.Add(localesCreature, packet.TimeSpan);
             }
-
-            ObjectName objectName = new ObjectName
+            else
             {
-                ObjectType = StoreNameType.Unit,
-                ID = entry.Key,
-                Name = creature.Name
-            };
-            Storage.ObjectNames.Add(objectName, packet.TimeSpan);
+                Storage.CreatureTemplates.Add(creature, packet.TimeSpan);
+
+                ObjectName objectName = new ObjectName
+                {
+                    ObjectType = StoreNameType.Unit,
+                    ID = entry.Key,
+                    Name = creature.Name
+                };
+                Storage.ObjectNames.Add(objectName, packet.TimeSpan);
+            }
         }
 
         [HasSniffData]
@@ -350,20 +337,25 @@ namespace WowPacketParserModule.V1_13_2_31446.Parsers
                 uint descriptionLength = packet.ReadBits(8);
                 questInfoObjective.Description = packet.ReadWoWString("Description", descriptionLength, i);
 
-                if (ClientLocale.PacketLocale != LocaleConstant.enUS && questInfoObjective.Description != string.Empty)
+                if (ClientLocale.PacketLocale != LocaleConstant.enUS)
                 {
-                    QuestObjectivesLocale localesQuestObjectives = new QuestObjectivesLocale
+                    if (!string.IsNullOrEmpty(questInfoObjective.Description))
                     {
-                        ID = (uint)objectiveId.Key,
-                        QuestId = (uint)id.Key,
-                        StorageIndex = questInfoObjective.StorageIndex,
-                        Description = questInfoObjective.Description
-                    };
+                        QuestObjectivesLocale localesQuestObjectives = new QuestObjectivesLocale
+                        {
+                            ID = (uint)objectiveId.Key,
+                            QuestId = (uint)id.Key,
+                            StorageIndex = questInfoObjective.StorageIndex,
+                            Description = questInfoObjective.Description
+                        };
 
-                    Storage.LocalesQuestObjectives.Add(localesQuestObjectives, packet.TimeSpan);
+                        Storage.LocalesQuestObjectives.Add(localesQuestObjectives, packet.TimeSpan);
+                    }
                 }
-
-                Storage.QuestObjectives.Add(questInfoObjective, packet.TimeSpan);
+                else
+                {
+                    Storage.QuestObjectives.Add(questInfoObjective, packet.TimeSpan);
+                }
             }
 
             quest.LogTitle = packet.ReadWoWString("LogTitle", logTitleLen);
@@ -394,8 +386,10 @@ namespace WowPacketParserModule.V1_13_2_31446.Parsers
 
                 Storage.LocalesQuests.Add(localesQuest, packet.TimeSpan);
             }
-
-            Storage.QuestTemplates.Add(quest, packet.TimeSpan);
+            else
+            {
+                Storage.QuestTemplates.Add(quest, packet.TimeSpan);
+            }
         }
     }
 }

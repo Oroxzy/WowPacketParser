@@ -46,15 +46,15 @@ namespace WowPacketParser.Store.Objects
         [DBFieldName("Data", TargetedDbExpansion.Cataclysm, TargetedDbExpansion.WarlordsOfDraenor, 32, true, DbType = (TargetedDbType.TRINITY))]
         [DBFieldName("data", TargetedDbExpansion.WarlordsOfDraenor, TargetedDbExpansion.BattleForAzeroth, 33, true, DbType = (TargetedDbType.WPP | TargetedDbType.VMANGOS | TargetedDbType.CMANGOS))]
         [DBFieldName("Data", TargetedDbExpansion.WarlordsOfDraenor, TargetedDbExpansion.BattleForAzeroth, 33, true, DbType = (TargetedDbType.TRINITY))]
-        [DBFieldName("data", TargetedDbExpansion.BurningCrusadeClassic, 34, true, DbType = (TargetedDbType.WPP | TargetedDbType.VMANGOS | TargetedDbType.CMANGOS))]
-        [DBFieldName("Data", TargetedDbExpansion.BurningCrusadeClassic, 34, true, DbType = (TargetedDbType.TRINITY))]
+        [DBFieldName("data", TargetedDbExpansion.WrathOfTheLichKingClassic, 34, true, DbType = (TargetedDbType.WPP | TargetedDbType.VMANGOS | TargetedDbType.CMANGOS))]
+        [DBFieldName("Data", TargetedDbExpansion.WrathOfTheLichKingClassic, 34, true, DbType = (TargetedDbType.TRINITY))]
         [DBFieldName("data", TargetedDbExpansion.BattleForAzeroth, TargetedDbExpansion.Shadowlands, 34, true, DbType = (TargetedDbType.WPP | TargetedDbType.VMANGOS | TargetedDbType.CMANGOS))]
         [DBFieldName("Data", TargetedDbExpansion.BattleForAzeroth, TargetedDbExpansion.Shadowlands, 34, true, DbType = (TargetedDbType.TRINITY))]
         [DBFieldName("data", TargetedDbExpansion.Shadowlands, 35, true, DbType = (TargetedDbType.WPP | TargetedDbType.VMANGOS | TargetedDbType.CMANGOS))]
         [DBFieldName("Data", TargetedDbExpansion.Shadowlands, 35, true, DbType = (TargetedDbType.TRINITY))]
         public int?[] Data;
 
-        [DBFieldName("quest_items_count", TargetedDbExpansion.BurningCrusadeClassic, TargetedDbExpansion.Zero, DbType = (TargetedDbType.WPP))]
+        [DBFieldName("quest_items_count", TargetedDbExpansion.WrathOfTheLichKingClassic, TargetedDbExpansion.Zero, DbType = (TargetedDbType.WPP))]
         [DBFieldName("quest_items_count", TargetedDbExpansion.WrathOfTheLichKing, DbType = (TargetedDbType.WPP))]
         public uint QuestItems;
 

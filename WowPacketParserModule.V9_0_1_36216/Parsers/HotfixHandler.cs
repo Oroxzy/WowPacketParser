@@ -83,8 +83,6 @@ namespace WowPacketParserModule.V9_0_1_36216.Parsers
                             for (int i = 0; i < 3; ++i)
                                 bct.EmoteDelay[i] = db2File.ReadUInt16("EmoteDelay", i);
 
-                            Storage.BroadcastTexts.Add(bct, packet.TimeSpan);
-
                             if (ClientLocale.PacketLocale != LocaleConstant.enUS)
                             {
                                 BroadcastTextLocale lbct = new BroadcastTextLocale
@@ -94,6 +92,10 @@ namespace WowPacketParserModule.V9_0_1_36216.Parsers
                                     Text1Lang = bct.Text1
                                 };
                                 Storage.BroadcastTextLocales.Add(lbct, packet.TimeSpan);
+                            }
+                            else
+                            {
+                                Storage.BroadcastTexts.Add(bct, packet.TimeSpan);
                             }
                             break;
                         }

@@ -198,8 +198,13 @@ namespace WowPacketParserModule.V7_0_3_22248.Parsers
             packet.ReadInt32("Ranking", idx);
             packet.ReadInt32("SeasonPlayed", idx);
             packet.ReadInt32("SeasonWon", idx);
-            packet.ReadInt32("Unused1", idx); // equal to SeasonPlayed
-            packet.ReadInt32("Unused2", idx); // equal to SeasonWon
+
+            if (!ClientVersion.IsClassicClientVersionBuild(ClientVersion.Build))
+            {
+                packet.ReadInt32("Unused1", idx); // equal to SeasonPlayed
+                packet.ReadInt32("Unused2", idx); // equal to SeasonWon
+            }
+            
             packet.ReadInt32("WeeklyPlayed", idx);
             packet.ReadInt32("WeeklyWon", idx);
             packet.ReadInt32("BestWeeklyRating", idx);
@@ -217,9 +222,13 @@ namespace WowPacketParserModule.V7_0_3_22248.Parsers
                 }
                 if (ClientVersion.AddedInVersion(ClientVersionBuild.V9_1_5_40772))
                 {
-                    packet.ReadInt32("Unused4");
-                    packet.ReadInt32("Rank");
+                    packet.ReadInt32("Unused4", idx);
+                    packet.ReadInt32("Rank", idx);
                 }
+
+                if (ClientVersion.IsClassicClientVersionBuild(ClientVersion.Build))
+                    packet.ReadInt32("Unused5", idx);
+
                 packet.ResetBitReader();
                 packet.ReadBit("Disqualified", idx);
             }

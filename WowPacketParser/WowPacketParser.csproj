@@ -210,6 +210,7 @@
     <Compile Include="Enums\ChatRestrictionType.cs" />
     <Compile Include="Enums\ChatTag.cs" />
     <Compile Include="Enums\Class.cs" />
+    <Compile Include="Enums\CliComplaintType.cs" />
     <Compile Include="Enums\CollectionType.cs" />
     <Compile Include="Enums\FileCompression.cs" />
     <Compile Include="Enums\ClassMask.cs" />
@@ -441,6 +442,8 @@
     <Compile Include="Enums\Version\V2_5_3_41750\UpdateFields.cs" />
     <Compile Include="Enums\Version\V2_5_3_41750\Opcodes.cs" />
     <Compile Include="Enums\Version\V2_5_4_42581\Opcodes.cs" />
+    <Compile Include="Enums\Version\V3_4_0_43659\Opcodes.cs" />
+    <Compile Include="Enums\Version\V3_4_1_47014\Opcodes.cs" />
     <Compile Include="Enums\Version\V3_0_9_9551\UpdateFields.cs" />
     <Compile Include="Enums\Version\V4_1_0_13914\UpdateFields.cs" />
     <Compile Include="Enums\Version\V5_0_5_16048\Opcodes.cs" />
@@ -548,6 +551,7 @@
     <Compile Include="Misc\HardcodedData.cs" />
     <Compile Include="Misc\HighGuid.cs" />
     <Compile Include="Misc\ObjectTypeConverter.cs" />
+    <Compile Include="Misc\P2QuantileEstimator.cs" />
     <Compile Include="Misc\WowGuid.cs" />
     <Compile Include="Misc\LfgEntry.cs" />
     <Compile Include="Misc\Logger.cs" />
@@ -675,9 +679,11 @@
     <Compile Include="Store\Objects\CreatureTemplateScaling.cs" />
     <Compile Include="Store\Objects\ChatPacketData.cs" />
     <Compile Include="Store\Objects\CreatureTrainer.cs" />
+    <Compile Include="Store\Objects\CreatureVisibilityDistance.cs" />
     <Compile Include="Store\Objects\DynamicObject.cs" />
     <Compile Include="Store\Objects\DynamicObjectSpawn.cs" />
     <Compile Include="Store\Objects\FactionStandingUpdate.cs" />
+    <Compile Include="Store\Objects\GameObjectTemplateLocale.cs" />
     <Compile Include="Store\Objects\Guilds.cs" />
     <Compile Include="Store\Objects\ItemInstance.cs" />
     <Compile Include="Store\Objects\LocalesQuestObjective.cs" />
@@ -685,6 +691,7 @@
     <Compile Include="Store\Objects\MailTemplate.cs" />
     <Compile Include="Store\Objects\ObjectCreate.cs" />
     <Compile Include="Store\Objects\PlayerGuidLookupData.cs" />
+    <Compile Include="Store\Objects\PointsOfInterestLocale.cs" />
     <Compile Include="Store\Objects\SceneObject.cs" />
     <Compile Include="Store\Objects\Sounds.cs" />
     <Compile Include="Store\Objects\SpellCastData.cs" />

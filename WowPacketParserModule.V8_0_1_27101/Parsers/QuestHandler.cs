@@ -352,20 +352,25 @@ namespace WowPacketParserModule.V8_0_1_27101.Parsers
                 uint descriptionLength = packet.ReadBits(8);
                 questInfoObjective.Description = packet.ReadWoWString("Description", descriptionLength, i);
 
-                if (ClientLocale.PacketLocale != LocaleConstant.enUS && questInfoObjective.Description != string.Empty)
+                if (ClientLocale.PacketLocale != LocaleConstant.enUS)
                 {
-                    QuestObjectivesLocale localesQuestObjectives = new QuestObjectivesLocale
+                    if (!string.IsNullOrEmpty(questInfoObjective.Description))
                     {
-                        ID = (uint)objectiveId.Key,
-                        QuestId = (uint)id.Key,
-                        StorageIndex = questInfoObjective.StorageIndex,
-                        Description = questInfoObjective.Description
-                    };
+                        QuestObjectivesLocale localesQuestObjectives = new QuestObjectivesLocale
+                        {
+                            ID = (uint)objectiveId.Key,
+                            QuestId = (uint)id.Key,
+                            StorageIndex = questInfoObjective.StorageIndex,
+                            Description = questInfoObjective.Description
+                        };
 
-                    Storage.LocalesQuestObjectives.Add(localesQuestObjectives, packet.TimeSpan);
+                        Storage.LocalesQuestObjectives.Add(localesQuestObjectives, packet.TimeSpan);
+                    }
                 }
-
-                Storage.QuestObjectives.Add(questInfoObjective, packet.TimeSpan);
+                else
+                {
+                    Storage.QuestObjectives.Add(questInfoObjective, packet.TimeSpan);
+                }
             }
 
             quest.LogTitle = packet.ReadWoWString("LogTitle", logTitleLen);
@@ -396,8 +401,10 @@ namespace WowPacketParserModule.V8_0_1_27101.Parsers
 
                 Storage.LocalesQuests.Add(localesQuest, packet.TimeSpan);
             }
-
-            Storage.QuestTemplates.Add(quest, packet.TimeSpan);
+            else
+            {
+                Storage.QuestTemplates.Add(quest, packet.TimeSpan);
+            }
         }
 
         public static void ReadTreasurePickItem(Packet packet, params object[] indexes)
@@ -597,7 +604,24 @@ namespace WowPacketParserModule.V8_0_1_27101.Parsers
                 QuestId = (uint)id
             };
             Storage.QuestEnders.Add(questEnder, packet.TimeSpan);
-            Storage.QuestOfferRewards.Add(questOfferReward, packet.TimeSpan);
+            
+            if (ClientLocale.PacketLocale != LocaleConstant.enUS)
+            {
+                if (!string.IsNullOrEmpty(questOfferReward.RewardText))
+                {
+                    QuestOfferRewardLocale localesQuestOfferReward = new QuestOfferRewardLocale
+                    {
+                        ID = (uint)id,
+                        RewardText = questOfferReward.RewardText
+                    };
+
+                    Storage.LocalesQuestOfferRewards.Add(localesQuestOfferReward, packet.TimeSpan);
+                }
+            }
+            else
+            {
+                Storage.QuestOfferRewards.Add(questOfferReward, packet.TimeSpan);
+            }
         }
 
         [Parser(Opcode.SMSG_DISPLAY_PLAYER_CHOICE)]
@@ -797,16 +821,22 @@ namespace WowPacketParserModule.V8_0_1_27101.Parsers
                 QuestId = (uint)id
             };
             Storage.QuestEnders.Add(questEnder, packet.TimeSpan);
-            Storage.QuestRequestItems.Add(questRequestItems, packet.TimeSpan);
 
-            if (ClientLocale.PacketLocale != LocaleConstant.enUS && questRequestItems.CompletionText != string.Empty)
+            if (ClientLocale.PacketLocale != LocaleConstant.enUS)
             {
-                QuestRequestItemsLocale localesQuestRequestItems = new QuestRequestItemsLocale
+                if (!string.IsNullOrEmpty(questRequestItems.CompletionText))
                 {
-                    ID = (uint)id,
-                    CompletionText = questRequestItems.CompletionText
-                };
-                Storage.LocalesQuestRequestItems.Add(localesQuestRequestItems, packet.TimeSpan);
+                    QuestRequestItemsLocale localesQuestRequestItems = new QuestRequestItemsLocale
+                    {
+                        ID = (uint)id,
+                        CompletionText = questRequestItems.CompletionText
+                    };
+                    Storage.LocalesQuestRequestItems.Add(localesQuestRequestItems, packet.TimeSpan);
+                }
+            }
+            else
+            {
+                Storage.QuestRequestItems.Add(questRequestItems, packet.TimeSpan);
             }
         }
 
@@ -841,17 +871,22 @@ namespace WowPacketParserModule.V8_0_1_27101.Parsers
                     break;
             }
 
-            Storage.QuestGreetings.Add(questGreeting, packet.TimeSpan);
-
-            if (ClientLocale.PacketLocale != LocaleConstant.enUS && questGreeting.Greeting != string.Empty)
+            if (ClientLocale.PacketLocale != LocaleConstant.enUS)
             {
-                QuestGreetingLocale localesQuestGreeting = new QuestGreetingLocale
+                if (!string.IsNullOrEmpty(questGreeting.Greeting))
                 {
-                    ID = questGreeting.ID,
-                    Type = questGreeting.Type,
-                    Greeting = questGreeting.Greeting
-                };
-                Storage.LocalesQuestGreeting.Add(localesQuestGreeting, packet.TimeSpan);
+                    QuestGreetingLocale localesQuestGreeting = new QuestGreetingLocale
+                    {
+                        ID = questGreeting.ID,
+                        Type = questGreeting.Type,
+                        Greeting = questGreeting.Greeting
+                    };
+                    Storage.LocalesQuestGreeting.Add(localesQuestGreeting, packet.TimeSpan);
+                }
+            }
+            else
+            {
+                Storage.QuestGreetings.Add(questGreeting, packet.TimeSpan);
             }
         }
 

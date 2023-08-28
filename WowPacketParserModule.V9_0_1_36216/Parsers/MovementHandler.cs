@@ -2,6 +2,7 @@
 using WowPacketParser.Misc;
 using WowPacketParser.Parsing;
 using WowPacketParser.Store;
+using WowPacketParser.Store.Objects;
 
 namespace WowPacketParserModule.V9_0_1_36216.Parsers
 {
@@ -12,11 +13,22 @@ namespace WowPacketParserModule.V9_0_1_36216.Parsers
         public static void HandleNewWorld(Packet packet)
         {
             WowPacketParser.Parsing.Parsers.MovementHandler.CurrentMapId = (uint)packet.ReadInt32<MapId>("Map");
-            packet.ReadVector4("Position");
+            Vector4 pos = packet.ReadVector4("Position");
             packet.ReadInt32("Unused901_1");
             packet.ReadInt32("Unused901_2");
             packet.ReadUInt32("Reason");
             packet.ReadVector3("MovementOffset");
+
+            if (Storage.CurrentActivePlayer != null &&
+               !Storage.CurrentActivePlayer.IsEmpty() &&
+                Storage.Objects.ContainsKey(Storage.CurrentActivePlayer))
+            {
+                WoWObject player = Storage.Objects[Storage.CurrentActivePlayer].Item1;
+                player.Movement.Position.X = pos.X;
+                player.Movement.Position.Y = pos.Y;
+                player.Movement.Position.Z = pos.Z;
+                player.Movement.Orientation = pos.O;
+            }
 
             Storage.ClearDataOnMapChange();
             packet.AddSniffData(StoreNameType.Map, (int)WowPacketParser.Parsing.Parsers.MovementHandler.CurrentMapId, "NEW_WORLD");
@@ -87,6 +99,25 @@ namespace WowPacketParserModule.V9_0_1_36216.Parsers
             packet.ReadSingle("Height");
             packet.ReadInt32("MountDisplayID");
             packet.ReadByte("Reason");
+        }
+
+        [Parser(Opcode.CMSG_MOVE_INIT_ACTIVE_MOVER_COMPLETE)]
+        public static void HandleMoveInitActiveMoverComplete(Packet packet)
+        {
+            packet.ReadInt32("Ticks");
+        }
+
+        [Parser(Opcode.CMSG_MOUNT_SPECIAL_ANIM)]
+        public static void HandleMountSpecialAnim(Packet packet)
+        {
+            if (ClientVersion.AddedInVersion(9, 0, 5, 1, 14, 0, 2, 5, 1))
+            {
+                uint count = packet.ReadUInt32("SpellVisualKitCount");
+                if (ClientVersion.AddedInVersion(9, 2, 0, 1, 14, 2, 2, 5, 3))
+                    packet.ReadInt32("SequenceVariation");
+                for (uint i = 0; i < 0; i++)
+                    packet.ReadInt32("SpellVisualKitID", i);
+            }
         }
     }
 }

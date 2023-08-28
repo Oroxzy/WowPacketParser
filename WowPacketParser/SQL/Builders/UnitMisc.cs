@@ -528,10 +528,6 @@ namespace WowPacketParser.SQL.Builders
             if (!Settings.SqlTables.creature_stats)
                 return string.Empty;
 
-            // Update fields system changed in BfA.
-            if (ClientVersion.IsUsingNewUpdateFieldSystem())
-                return string.Empty;
-
             HashSet<Tuple<uint, uint>> mobsWithStats = new HashSet<Tuple<uint, uint>>();
             var rows = new RowList<CreatureStats>();
 
@@ -561,7 +557,13 @@ namespace WowPacketParser.SQL.Builders
             }
 
             var statSql = new SQLInsert<CreatureStats>(rows, false, true);
-            return statSql.Build();
+            string result = statSql.Build();
+
+            // not used anywhere else so empty to free up memory
+            Storage.CreatureStats.Clear();
+            Storage.CreatureStatsDirty.Clear();
+
+            return result;
         }
 
         [BuilderMethod(false, Units = true)]
@@ -666,7 +668,12 @@ namespace WowPacketParser.SQL.Builders
                 }
             }
 
-            return new SQLInsert<CreatureArmor>(rows, false).Build();
+            string result = new SQLInsert<CreatureArmor>(rows, false).Build();
+
+            // not used anywhere else so empty to free up memory
+            Storage.CreatureMeleeDamageTaken.Clear();
+
+            return result;
         }
 
         [BuilderMethod]
@@ -728,6 +735,10 @@ namespace WowPacketParser.SQL.Builders
                     }
                 }
             }
+
+            // not used anywhere else so empty to free up memory
+            Storage.CreatureMeleeAttackDamage.Clear();
+            Storage.CreatureMeleeAttackDamageDirty.Clear();
 
             var rows = new RowList<CreatureMeleeDamage>();
 
@@ -1341,6 +1352,9 @@ namespace WowPacketParser.SQL.Builders
                 result += SQLUtil.MakeSniffIdListUpdate<CreatureUniqueText>(rows);
             }
 
+            // not used anywhere else so empty to free up memory
+            Storage.CreatureUniqueTexts.Clear();
+
             return result;
         }
 
@@ -1588,7 +1602,12 @@ namespace WowPacketParser.SQL.Builders
             if (!Settings.SqlTables.creature_spell_immunity)
                 return string.Empty;
 
-            return SQLUtil.MakeInsertWithSniffIdList(Storage.CreatureSpellImmunity, false, true);
+            string result = SQLUtil.MakeInsertWithSniffIdList(Storage.CreatureSpellImmunity, false, true);
+
+            // not used anywhere else so empty to free up memory
+            Storage.CreatureSpellImmunity.Clear();
+
+            return result;
         }
 
         [BuilderMethod]
@@ -1600,7 +1619,29 @@ namespace WowPacketParser.SQL.Builders
             if (!Settings.SqlTables.creature_respawn_time)
                 return string.Empty;
 
-            return SQLUtil.Insert(Storage.CreatureRespawnTimes, false, true);
+            string result = SQLUtil.Insert(Storage.CreatureRespawnTimes, false, true);
+
+            // not used anywhere else so empty to free up memory
+            Storage.CreatureRespawnTimes.Clear();
+
+            return result;
+        }
+
+        [BuilderMethod]
+        public static string GameObjectRespawnTime()
+        {
+            if (Storage.GameObjectRespawnTimes.IsEmpty())
+                return string.Empty;
+
+            if (!Settings.SqlTables.gameobject_respawn_time)
+                return string.Empty;
+
+            string result = SQLUtil.Insert(Storage.GameObjectRespawnTimes, false, true, "gameobject_respawn_time");
+
+            // not used anywhere else so empty to free up memory
+            Storage.GameObjectRespawnTimes.Clear();
+
+            return result;
         }
 
         [BuilderMethod]
@@ -1612,7 +1653,12 @@ namespace WowPacketParser.SQL.Builders
             if (!Settings.SqlTables.creature_kill_reputation)
                 return string.Empty;
 
-            return SQLUtil.Insert(Storage.CreatureKillReputations, false, true);
+            string result = SQLUtil.Insert(Storage.CreatureKillReputations, false, true);
+
+            // not used anywhere else so empty to free up memory
+            Storage.CreatureKillReputations.Clear();
+
+            return result;
         }
 
         [BuilderMethod]
@@ -1624,7 +1670,88 @@ namespace WowPacketParser.SQL.Builders
             if (!Settings.SqlTables.creature_unique_emote)
                 return string.Empty;
 
-            return SQLUtil.MakeInsertWithSniffIdList(Storage.CreatureUniqueEmotes, false, true);
+            string result = SQLUtil.MakeInsertWithSniffIdList(Storage.CreatureUniqueEmotes, false, true);
+
+            // not used anywhere else so empty to free up memory
+            Storage.CreatureUniqueEmotes.Clear();
+
+            return result;
+        }
+
+        [BuilderMethod]
+        public static string CreatureVisibilityDistances()
+        {
+            if (Storage.CreatureVisibilityDistances.Count == 0)
+                return string.Empty;
+
+            if (!Settings.SqlTables.creature_visibility_distance)
+                return string.Empty;
+
+            RowList<CreatureVisibilityDistance> rows = new RowList<CreatureVisibilityDistance>();
+            foreach (var itrEntry in Storage.CreatureVisibilityDistances)
+            {
+                foreach (var itrMap in itrEntry.Value)
+                {
+                    CreatureVisibilityDistance row = new CreatureVisibilityDistance();
+                    row.Entry = itrEntry.Key;
+                    row.Map = itrMap.Key;
+                    row.Distance = (uint)itrMap.Value.median.GetQuantile();
+                    row.SniffIdList = itrMap.Value.sniffIds;
+                    rows.Add(row);
+                }
+                itrEntry.Value.Clear(); // free memory
+            }
+
+            // not used anywhere else so empty to free up memory
+            Storage.CreatureVisibilityDistances.Clear();
+
+            string result = new SQLInsert<CreatureVisibilityDistance>(rows, false, true, null).Build();
+            if (!String.IsNullOrEmpty(result))
+            {
+                result += Environment.NewLine;
+                result += SQLUtil.MakeSniffIdListUpdate<CreatureVisibilityDistance>(rows, null);
+                result += Environment.NewLine;
+            }
+
+            return result ;
+        }
+
+        [BuilderMethod]
+        public static string GameObjectVisibilityDistances()
+        {
+            if (Storage.GameObjectVisibilityDistances.Count == 0)
+                return string.Empty;
+
+            if (!Settings.SqlTables.gameobject_visibility_distance)
+                return string.Empty;
+
+            RowList<CreatureVisibilityDistance> rows = new RowList<CreatureVisibilityDistance>();
+            foreach (var itrEntry in Storage.GameObjectVisibilityDistances)
+            {
+                foreach (var itrMap in itrEntry.Value)
+                {
+                    CreatureVisibilityDistance row = new CreatureVisibilityDistance();
+                    row.Entry = itrEntry.Key;
+                    row.Map = itrMap.Key;
+                    row.Distance = (uint)itrMap.Value.median.GetQuantile();
+                    row.SniffIdList = itrMap.Value.sniffIds;
+                    rows.Add(row);
+                }
+                itrEntry.Value.Clear(); // free memory
+            }
+
+            // not used anywhere else so empty to free up memory
+            Storage.GameObjectVisibilityDistances.Clear();
+
+            string result = new SQLInsert<CreatureVisibilityDistance>(rows, false, true, "gameobject_visibility_distance").Build();
+            if (!String.IsNullOrEmpty(result))
+            {
+                result += Environment.NewLine;
+                result += SQLUtil.MakeSniffIdListUpdate<CreatureVisibilityDistance>(rows, "gameobject_visibility_distance");
+                result += Environment.NewLine;
+            }
+
+            return result;
         }
     }
 }

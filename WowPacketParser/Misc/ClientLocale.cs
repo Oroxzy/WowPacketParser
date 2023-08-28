@@ -11,7 +11,17 @@ namespace WowPacketParser.Misc
 
         public static string PacketLocaleString = "enUS";
 
-        public static LocaleConstant PacketLocale => (LocaleConstant)Enum.Parse(typeof(LocaleConstant), PacketLocaleString);
+        public static LocaleConstant PacketLocale => GetLocaleConstantFromLocaleName(PacketLocaleString);
+
+        public static LocaleConstant GetLocaleConstantFromLocaleName(string locale)
+        {
+            return (LocaleConstant)Enum.Parse(typeof(LocaleConstant), locale);
+        }
+
+        public static int GetLocaleIndexFromLocaleName(string locale)
+        {
+            return (int)GetLocaleConstantFromLocaleName(locale);
+        }
 
         public static void SetLocale(string locale)
         {

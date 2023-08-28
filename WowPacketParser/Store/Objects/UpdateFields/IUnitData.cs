@@ -35,6 +35,9 @@ namespace WowPacketParser.Store.Objects.UpdateFields
         int[] Stats { get; }
         int[] StatPosBuff { get; }
         int[] StatNegBuff { get; }
+        int[] Resistances { get; }
+        int[] ResistanceBuffModsPositive { get; }
+        int[] ResistanceBuffModsNegative { get; } 
         int BaseMana { get; }
         int BaseHealth { get; }
         IVisibleItem[] VirtualItems { get; }
@@ -42,6 +45,20 @@ namespace WowPacketParser.Store.Objects.UpdateFields
         uint Flags2 { get; }
         uint Flags3 { get; }
         uint DynamicFlags { get; }
+        float MinDamage { get; }
+        float MaxDamage { get; }
+        float MinOffHandDamage { get; }
+        float MaxOffHandDamage { get;}
+        float MinRangedDamage { get; }
+        float MaxRangedDamage { get; }
+        int AttackPower { get; }
+        int AttackPowerModPos { get; }
+        int AttackPowerModNeg { get; }
+        float AttackPowerMultiplier { get; }
+        int RangedAttackPower { get; }
+        int RangedAttackPowerModPos { get; }
+        int RangedAttackPowerModNeg { get; }
+        float RangedAttackPowerMultiplier { get; }
         uint[] AttackRoundBaseTime { get; }
         uint RangedAttackRoundBaseTime { get; }
         float BoundingRadius { get; }

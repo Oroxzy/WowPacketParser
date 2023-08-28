@@ -60,7 +60,7 @@ namespace WowPacketParserModule.V5_4_1_17538.Parsers
         {
             ObjectType objType = ObjectTypeConverter.Convert(packet.ReadByteE<ObjectTypeLegacy>("Object Type", index));
             var moves = ReadMovementUpdateBlock(packet, guid, index);
-            Storage.StoreObjectCreateTime(guid, map, moves, packet.Time, type);
+            Storage.StoreObjectCreateTime(guid, map, moves, packet, type);
 
             BitArray updateMaskArray = null;
             var updates = CoreParsers.UpdateHandler.ReadValuesUpdateBlockOnCreate(packet, objType, index, out updateMaskArray);
@@ -81,6 +81,10 @@ namespace WowPacketParserModule.V5_4_1_17538.Parsers
                 obj.UpdateFields = updates;
                 obj.DynamicUpdateFields = dynamicUpdates;
                 Storage.StoreNewObject(guid, obj, type, packet);
+
+                // Only needed for pets.
+                if (guid.GetHighType() == HighGuidType.Pet)
+                    Storage.StoreCreatureStats(obj as Unit, updateMaskArray, guid.GetHighType() == HighGuidType.Pet, packet);
             }
 
             if (guid.HasEntry() && (objType == ObjectType.Unit || objType == ObjectType.GameObject))
@@ -811,6 +815,9 @@ namespace WowPacketParserModule.V5_4_1_17538.Parsers
                     if (moveInfo.TransportGuid != null)
                         monsterMove.TransportGuid = moveInfo.TransportGuid;
                     monsterMove.TransportSeat = moveInfo.TransportSeat;
+
+                    if (guid == Storage.CurrentActivePlayer)
+                        Storage.CurrentMoveSplineExpireTime = packet.UnixTimeMs + (long)monsterMove.MoveTime;
 
                     if ((Settings.SaveTransports || moveInfo.TransportGuid == null || moveInfo.TransportGuid.IsEmpty()) &&
                         Storage.Objects.ContainsKey(guid))

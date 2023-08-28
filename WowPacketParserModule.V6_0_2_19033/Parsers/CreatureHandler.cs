@@ -70,7 +70,7 @@ namespace WowPacketParserModule.V6_0_2_19033.Parsers
             for (int i = 0; i < 2; ++i)
                 creature.KillCredits[i] = packet.ReadUInt32("ProxyCreatureID", i);
 
-            creature.DisplayIDs = new uint?[4];
+            creature.DisplayIDs = new uint[4];
             for (var i = 0; i < 4; ++i)
                 creature.DisplayIDs[i] = packet.ReadUInt32("CreatureDisplayID", i);
 
@@ -105,8 +105,6 @@ namespace WowPacketParserModule.V6_0_2_19033.Parsers
 
             packet.AddSniffData(StoreNameType.Unit, entry.Key, "QUERY_RESPONSE");
 
-            Storage.CreatureTemplates.Add(creature, packet.TimeSpan);
-
             if (ClientLocale.PacketLocale != LocaleConstant.enUS)
             {
                 CreatureTemplateLocale localesCreature = new CreatureTemplateLocale
@@ -120,14 +118,18 @@ namespace WowPacketParserModule.V6_0_2_19033.Parsers
 
                 Storage.LocalesCreatures.Add(localesCreature, packet.TimeSpan);
             }
-
-            ObjectName objectName = new ObjectName
+            else
             {
-                ObjectType = StoreNameType.Unit,
-                ID = entry.Key,
-                Name = creature.Name
-            };
-            Storage.ObjectNames.Add(objectName, packet.TimeSpan);
+                Storage.CreatureTemplates.Add(creature, packet.TimeSpan);
+
+                ObjectName objectName = new ObjectName
+                {
+                    ObjectType = StoreNameType.Unit,
+                    ID = entry.Key,
+                    Name = creature.Name
+                };
+                Storage.ObjectNames.Add(objectName, packet.TimeSpan);
+            }
         }
     }
 }

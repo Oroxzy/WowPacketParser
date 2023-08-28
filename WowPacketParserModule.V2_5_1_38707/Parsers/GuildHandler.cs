@@ -17,6 +17,12 @@ namespace WowPacketParserModule.V2_5_1_38707.Parsers
         [Parser(Opcode.SMSG_GUILD_ROSTER)]
         public static void HandleGuildRoster(Packet packet)
         {
+            if (ClientVersion.AddedInClassicVersion(1, 14, 3, 2, 5, 4))
+            {
+                WowPacketParserModule.V9_0_1_36216.Parsers.GuildHandler.HandleGuildRoster(packet);
+                return;
+            }
+
             WowPacketParserModule.V8_0_1_27101.Parsers.GuildHandler.HandleGuildRoster(packet);
         }
 

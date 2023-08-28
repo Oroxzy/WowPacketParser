@@ -206,7 +206,24 @@ namespace WowPacketParserModule.V1_13_2_31446.Parsers
                 QuestId = (uint)id
             };
             Storage.QuestEnders.Add(questEnder, packet.TimeSpan);
-            Storage.QuestOfferRewards.Add(questOfferReward, packet.TimeSpan);
+
+            if (ClientLocale.PacketLocale != LocaleConstant.enUS)
+            {
+                if (!string.IsNullOrEmpty(questOfferReward.RewardText))
+                {
+                    QuestOfferRewardLocale localesQuestOfferReward = new QuestOfferRewardLocale
+                    {
+                        ID = (uint)id,
+                        RewardText = questOfferReward.RewardText
+                    };
+
+                    Storage.LocalesQuestOfferRewards.Add(localesQuestOfferReward, packet.TimeSpan);
+                }
+            }
+            else
+            {
+                Storage.QuestOfferRewards.Add(questOfferReward, packet.TimeSpan);
+            }
         }
     }
 }

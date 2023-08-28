@@ -232,7 +232,20 @@ namespace WowPacketParserModule.V5_4_2_17658.Parsers
             gossipPOI.Importance = packet.ReadUInt32("Data");
             gossipPOI.Name = packet.ReadCString("Icon Name");
 
-            Storage.GossipPOIs.Add(gossipPOI, packet.TimeSpan);
+            if (ClientLocale.PacketLocale != LocaleConstant.enUS)
+            {
+                PointsOfInterestLocale localesPoi = new PointsOfInterestLocale
+                {
+                    ID = gossipPOI.ID.ToString(),
+                    Name = gossipPOI.Name,
+                };
+
+                Storage.LocalesPointsOfInterest.Add(localesPoi, packet.TimeSpan);
+            }
+            else
+            {
+                Storage.GossipPOIs.Add(gossipPOI, packet.TimeSpan);
+            }
 
             var lastGossipOption = CoreParsers.NpcHandler.LastGossipOption;
             var tempGossipOptionPOI = CoreParsers.NpcHandler.TempGossipOptionPOI;
@@ -442,22 +455,40 @@ namespace WowPacketParserModule.V5_4_2_17658.Parsers
 
             packet.ReadXORByte(guidBytes, 3);
 
-            packet.WriteGuid("TrainerGUID", guidBytes);
-            Storage.Trainers.Add(trainer, packet.TimeSpan);
-            tempList.ForEach(trainerSpell =>
-            {
-                trainerSpell.TrainerId = trainer.Id;
-                Storage.TrainerSpells.Add(trainerSpell, packet.TimeSpan);
-            });
+            var trainerGuid = packet.WriteGuid("TrainerGUID", guidBytes);
 
-            var lastGossipOption = CoreParsers.NpcHandler.LastGossipOption;
-            if (lastGossipOption.HasSelection)
+            if (ClientLocale.PacketLocale != LocaleConstant.enUS)
             {
-                if ((packet.TimeSpan - lastGossipOption.TimeSpan).Duration() <= TimeSpan.FromMilliseconds(2500))
-                    Storage.CreatureTrainers.Add(new CreatureTrainer { CreatureId = lastGossipOption.Guid.GetEntry(), MenuID = lastGossipOption.MenuId, OptionIndex = lastGossipOption.OptionIndex, TrainerId = trainer.Id }, packet.TimeSpan);
+                if (!string.IsNullOrEmpty(trainer.Greeting))
+                {
+                    TrainerLocale localeTrainer = new TrainerLocale
+                    {
+                        Id = (uint)trainer.Id,
+                        TrainerEntry = trainerGuid.GetEntry(),
+                        Greeting = trainer.Greeting,
+                    };
+
+                    Storage.LocalesTrainer.Add(localeTrainer, packet.TimeSpan);
+                }
             }
             else
-                Storage.CreatureTrainers.Add(new CreatureTrainer { CreatureId = lastGossipOption.Guid.GetEntry(), MenuID = 0, OptionIndex = 0, TrainerId = trainer.Id }, packet.TimeSpan);
+            {
+                Storage.Trainers.Add(trainer, packet.TimeSpan);
+                tempList.ForEach(trainerSpell =>
+                {
+                    trainerSpell.TrainerId = trainer.Id;
+                    Storage.TrainerSpells.Add(trainerSpell, packet.TimeSpan);
+                });
+
+                var lastGossipOption = CoreParsers.NpcHandler.LastGossipOption;
+                if (lastGossipOption.HasSelection)
+                {
+                    if ((packet.TimeSpan - lastGossipOption.TimeSpan).Duration() <= TimeSpan.FromMilliseconds(2500))
+                        Storage.CreatureTrainers.Add(new CreatureTrainer { CreatureId = lastGossipOption.Guid.GetEntry(), MenuID = lastGossipOption.MenuId, OptionIndex = lastGossipOption.OptionIndex, TrainerId = trainer.Id }, packet.TimeSpan);
+                }
+                else
+                    Storage.CreatureTrainers.Add(new CreatureTrainer { CreatureId = lastGossipOption.Guid.GetEntry(), MenuID = 0, OptionIndex = 0, TrainerId = trainer.Id }, packet.TimeSpan);
+            }
         }
 
         [Parser(Opcode.CMSG_BANKER_ACTIVATE)]

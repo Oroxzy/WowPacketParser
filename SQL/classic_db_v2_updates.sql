@@ -1420,3 +1420,56 @@ ALTER TABLE `creature_melee_damage`
 	CHANGE COLUMN `damage_min` `damage_min` INT(10) NOT NULL DEFAULT '0' AFTER `hits_count`,
 	CHANGE COLUMN `damage_average` `damage_average` INT(10) NOT NULL DEFAULT '0' AFTER `damage_min`,
 	CHANGE COLUMN `damage_max` `damage_max` INT(10) NOT NULL DEFAULT '0' AFTER `damage_average`;
+
+CREATE TABLE `replay_marked_creature` (
+	`guid` INT UNSIGNED NOT NULL,
+	`marker` INT NOT NULL DEFAULT '0',
+	PRIMARY KEY (`guid`)
+)
+COMMENT='creatures that have been manually marked from replay core'
+COLLATE='latin1_general_ci'
+ENGINE=InnoDB
+;
+
+CREATE TABLE `replay_marked_gameobject` (
+	`guid` INT UNSIGNED NOT NULL,
+	`marker` INT NOT NULL DEFAULT '0',
+	PRIMARY KEY (`guid`)
+)
+COMMENT='gameobjects that have been manually marked from replay core'
+COLLATE='latin1_general_ci'
+ENGINE=InnoDB
+;
+
+ALTER TABLE `creature_pet_remaining_cooldown`
+	CHANGE COLUMN `category_cooldown` `category_cooldown` INT(10) NOT NULL DEFAULT '0' AFTER `category`;
+ALTER TABLE `creature_pet_remaining_cooldown`
+	CHANGE COLUMN `mod_rate` `mod_rate` FLOAT NOT NULL DEFAULT '1' AFTER `category_cooldown`;
+
+CREATE TABLE `gameobject_respawn_time` (
+	`old_guid` INT(10) UNSIGNED NOT NULL,
+	`new_guid` INT(10) UNSIGNED NOT NULL,
+	`respawn_time` INT(10) UNSIGNED NOT NULL COMMENT 'time in seconds',
+	PRIMARY KEY (`old_guid`, `new_guid`)
+)
+ COLLATE 'latin1_general_ci' ENGINE=InnoDB ROW_FORMAT=Compact COMMENT='stores the time in seconds between the despawn of a gameobject, and the spawn of another on the same position\r\nrespawn time is reduced dynamically if there are too many players in the same area, so beware of abnormally low values';
+
+CREATE TABLE IF NOT EXISTS `creature_visibility_distance` (
+  `entry` int(10) unsigned NOT NULL,
+  `map` int(10) unsigned NOT NULL,
+  `distance` int(10) unsigned NOT NULL COMMENT 'distance from player at time of create object',
+  `sniff_id_list` text COLLATE latin1_general_ci NOT NULL,
+  PRIMARY KEY (`entry`,`distance`,`map`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci ROW_FORMAT=COMPACT COMMENT='max visibility distances';
+
+CREATE TABLE IF NOT EXISTS `gameobject_visibility_distance` (
+  `entry` int(10) unsigned NOT NULL,
+  `map` int(10) unsigned NOT NULL,
+  `distance` int(10) unsigned NOT NULL COMMENT 'distance from player at time of create object',
+  `sniff_id_list` text COLLATE latin1_general_ci NOT NULL,
+  PRIMARY KEY (`entry`,`distance`,`map`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci ROW_FORMAT=COMPACT COMMENT='max visibility distances';
+
+ALTER TABLE `sniff_file`
+	CHANGE COLUMN `name` `name` VARCHAR(128) NOT NULL COLLATE 'utf8_unicode_ci' AFTER `author`,
+	ADD UNIQUE INDEX `name` (`name`);

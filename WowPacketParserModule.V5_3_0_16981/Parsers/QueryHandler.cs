@@ -77,7 +77,7 @@ namespace WowPacketParserModule.V5_3_0_16981.Parsers
             if (lenS4 > 1)
                 creature.IconName = packet.ReadCString("Icon Name");
 
-            creature.DisplayIDs = new uint?[4];
+            creature.DisplayIDs = new uint[4];
             creature.DisplayIDs[1] = packet.ReadUInt32("CreatureDisplayID", 1);
             creature.DisplayIDs[0] = packet.ReadUInt32("CreatureDisplayID", 0);
             creature.MovementID = packet.ReadUInt32("MovementID");
@@ -94,15 +94,31 @@ namespace WowPacketParserModule.V5_3_0_16981.Parsers
 
             packet.AddSniffData(StoreNameType.Unit, entry.Key, "QUERY_RESPONSE");
 
-            Storage.CreatureTemplates.Add(creature, packet.TimeSpan);
-
-            var objectName = new ObjectName
+            if (ClientLocale.PacketLocale != LocaleConstant.enUS)
             {
-                ObjectType = StoreNameType.Unit,
-                ID = entry.Key,
-                Name = creature.Name
-            };
-            Storage.ObjectNames.Add(objectName, packet.TimeSpan);
+                CreatureTemplateLocale localesCreature = new CreatureTemplateLocale
+                {
+                    ID = (uint)entry.Key,
+                    Name = creature.Name,
+                    NameAlt = creature.FemaleName,
+                    Title = creature.SubName,
+                    TitleAlt = creature.TitleAlt
+                };
+
+                Storage.LocalesCreatures.Add(localesCreature, packet.TimeSpan);
+            }
+            else
+            {
+                Storage.CreatureTemplates.Add(creature, packet.TimeSpan);
+
+                ObjectName objectName = new ObjectName
+                {
+                    ObjectType = StoreNameType.Unit,
+                    ID = entry.Key,
+                    Name = creature.Name
+                };
+                Storage.ObjectNames.Add(objectName, packet.TimeSpan);
+            }
         }
 
         [Parser(Opcode.CMSG_QUERY_NPC_TEXT)]
@@ -245,7 +261,23 @@ namespace WowPacketParserModule.V5_3_0_16981.Parsers
             packet.ReadUInt32("Entry");
 
             packet.AddSniffData(StoreNameType.PageText, (int)entry, "QUERY_RESPONSE");
-            Storage.PageTexts.Add(pageText, packet.TimeSpan);
+
+            if (ClientLocale.PacketLocale != LocaleConstant.enUS)
+            {
+                if (!string.IsNullOrEmpty(pageText.Text))
+                {
+                    PageTextLocale localesPageText = new PageTextLocale
+                    {
+                        ID = pageText.ID,
+                        Text = pageText.Text
+                    };
+                    Storage.LocalesPageText.Add(localesPageText, packet.TimeSpan);
+                }
+            }
+            else
+            {
+                Storage.PageTexts.Add(pageText, packet.TimeSpan);
+            }
         }
 
         [HasSniffData]

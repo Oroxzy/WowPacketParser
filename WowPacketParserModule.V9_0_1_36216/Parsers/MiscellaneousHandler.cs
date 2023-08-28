@@ -37,11 +37,16 @@ namespace WowPacketParserModule.V9_0_1_36216.Parsers
             packet.ReadUInt32("ClubsPresenceUpdateTimer");
             packet.ReadUInt32("HiddenUIClubsPresenceUpdateTimer");
 
-            if (ClientVersion.AddedInVersion(ClientVersionBuild.V9_2_0_42423))
+            if (ClientVersion.AddedInVersion(9, 2, 0, 1, 14, 1, 2, 5, 3))
             {
-                packet.ReadInt32("GameRuleUnknown1");
+                packet.ReadInt32("ActiveSeason");
                 var gameRuleValuesCount = packet.ReadUInt32("GameRuleValuesCount");
-                packet.ReadInt16("MaxPlayerNameQueriesPerPacket");
+
+                if (ClientVersion.AddedInVersion(9, 2, 0, 1, 14, 2, 2, 5, 3))
+                    packet.ReadInt16("MaxPlayerNameQueriesPerPacket");
+
+                if (ClientVersion.AddedInVersion(9, 2, 7, 1, 14, 4, 3, 4, 0))
+                    packet.ReadInt16("PlayerNameQueryTelemetryInterval");
 
                 for (var i = 0; i < gameRuleValuesCount; ++i)
                     ReadGameRuleValuePair(packet, "GameRuleValues");
@@ -81,12 +86,19 @@ namespace WowPacketParserModule.V9_0_1_36216.Parsers
             packet.ReadBit("ClubFinderEnabled");
             packet.ReadBit("Unknown901CheckoutRelated");
 
-            if (ClientVersion.AddedInVersion(ClientVersionBuild.V9_1_5_40772))
+            if (ClientVersion.AddedInVersion(9, 1, 5, 1, 14, 1, 2, 5, 3))
             {
                 packet.ReadBit("TextToSpeechFeatureEnabled");
                 packet.ReadBit("ChatDisabledByDefault");
                 packet.ReadBit("ChatDisabledByPlayer");
                 packet.ReadBit("LFGListCustomRequiresAuthenticator");
+            }
+
+            var hasRaceClassExpansionLevels = false;
+            if (ClientVersion.IsClassicClientVersionBuild(ClientVersion.Build))
+            {
+                packet.ReadBit("BattleGroundsEnabled");
+                hasRaceClassExpansionLevels = packet.ReadBit("RaceClassExpansionLevels");
             }
 
             {
@@ -118,6 +130,13 @@ namespace WowPacketParserModule.V9_0_1_36216.Parsers
 
             if (hasSessionAlert)
                 V6_0_2_19033.Parsers.MiscellaneousHandler.ReadClientSessionAlertConfig(packet, "SessionAlert");
+
+            if (hasRaceClassExpansionLevels)
+            {
+                var int88 = packet.ReadUInt32("RaceClassExpansionLevelsCount");
+                for (int i = 0; i < int88; i++)
+                    packet.ReadByte("RaceClassExpansionLevels", i);
+            }
 
             packet.ResetBitReader();
             V8_0_1_27101.Parsers.MiscellaneousHandler.ReadVoiceChatManagerSettings(packet, "VoiceChatManagerSettings");
@@ -174,11 +193,16 @@ namespace WowPacketParserModule.V9_0_1_36216.Parsers
 
             var gameRuleValuesCount = 0u;
 
-            if (ClientVersion.AddedInVersion(ClientVersionBuild.V9_2_0_42423))
+            if (ClientVersion.AddedInVersion(9, 2, 0, 1, 14, 1, 2, 5, 3))
             {
-                packet.ReadInt32("GameRuleUnknown1");
+                packet.ReadInt32("ActiveSeason");
                 gameRuleValuesCount = packet.ReadUInt32("GameRuleValuesCount");
-                packet.ReadInt16("MaxPlayerNameQueriesPerPacket");
+
+                if (ClientVersion.AddedInVersion(9, 2, 0, 1, 14, 2, 2, 5, 3))
+                    packet.ReadInt16("MaxPlayerNameQueriesPerPacket");
+
+                if (ClientVersion.AddedInVersion(9, 2, 7, 1, 14, 4, 3, 4, 0))
+                    packet.ReadInt16("PlayerNameQueryTelemetryInterval");
             }
 
             for (int i = 0; i < liveRegionCharacterCopySourceRegionsCount; i++)
@@ -225,7 +249,10 @@ namespace WowPacketParserModule.V9_0_1_36216.Parsers
         public static void HandleWorldServerInfo(Packet packet)
         {
             CoreParsers.MovementHandler.CurrentDifficultyID = packet.ReadUInt32<DifficultyId>("DifficultyID");
-            packet.ReadByte("IsTournamentRealm");
+            if (ClientVersion.AddedInVersion(9, 2, 7, 1, 14, 4, 3, 4, 0))
+                packet.ReadBit("IsTournamentRealm");
+            else
+                packet.ReadByte("IsTournamentRealm");
 
             packet.ReadBit("XRealmPvpAlert");
 
